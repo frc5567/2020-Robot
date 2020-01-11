@@ -6,7 +6,7 @@ public class ColorReader{
 
     private String gameData;
 
-    public colorReader(String gameData){
+    public void colorReader(String gameData){
         this.gameData = DriverStation.getInstance().getGameSpecificMessage();
     }
 
