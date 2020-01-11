@@ -8,6 +8,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -21,8 +26,41 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
    */
+  TalonSRX leftTalon;
+  TalonSRX rightTalon;
+
+  VictorSPX leftVictor;
+  VictorSPX rightVictor;
+
+  VictorSPX shooterMotor;
+
+  Launcher shooter;
+  ShuffleboardShooterControl shooterControl;
+
+  XboxController testController;
+
+  public Robot() {
+    leftTalon = new TalonSRX(1);
+    rightTalon = new TalonSRX(2);
+
+    leftVictor = new VictorSPX(11);
+    rightVictor = new VictorSPX(12);
+
+    shooterMotor = new VictorSPX(15);
+
+    shooter = new Launcher(0.5, shooterMotor);
+    shooterControl = new ShuffleboardShooterControl(shooter);
+
+    testController = new XboxController(0);
+
+  }
+
   @Override
   public void robotInit() {
+    leftTalon.set(ControlMode.PercentOutput, 0);
+    rightTalon.set(ControlMode.PercentOutput, 0);
+    leftVictor.set(ControlMode.PercentOutput, 0);
+    rightVictor.set(ControlMode.PercentOutput, 0);
   }
 
   @Override
@@ -43,10 +81,15 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    shooterControl.zeroSpeed();
   }
 
   @Override
   public void testPeriodic() {
+    if(testController.getAButton()) {
+      shooterControl.setSpeed();
+    }
+    else shooterControl.zeroSpeed();
   }
 
 }
