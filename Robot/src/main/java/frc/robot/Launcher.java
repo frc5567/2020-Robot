@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.fasterxml.jackson.databind.JsonSerializable.Base;
 
 /**
  * A launcher that uses one or multiple motors to launch a projectile
@@ -21,7 +22,8 @@ public class Launcher {
     private double error;
 
     //speed controller used to launch 
-    private BaseMotorController motor;
+    private BaseMotorController leftMotor;
+    private BaseMotorController rightMotor;
 
     /**
      * Constructor for Launcher objects
@@ -29,11 +31,12 @@ public class Launcher {
      * <p> To be used for any system that launches a projectile
      * 
      * @param p The proportionality constant used to control this launcher's speed
-     * @param motor The speed controller used to launch the projectile
+     * @param leftMotor The speed controller used to launch the projectile
      */
-    public Launcher(double p, BaseMotorController motor) {
+    public Launcher(double p, BaseMotorController leftMotor, BaseMotorController rightMotor) {
         this.p = p;
-        this.motor = motor;
+        this.leftMotor = leftMotor;
+        this.rightMotor = rightMotor;
     }
 
     /**
@@ -41,7 +44,8 @@ public class Launcher {
      * @param speed A value between -1.0 and 1.0 where 1.0 is full speed forward
      */
     public void setMotor(double speed) {
-        motor.set(ControlMode.PercentOutput, speed);
+        leftMotor.set(ControlMode.PercentOutput, speed);
+        rightMotor.set(ControlMode.PercentOutput, -speed);
     }
 
     /**
@@ -79,6 +83,6 @@ public class Launcher {
      * @return the state of the Launcher object summarized in a string
      */
     public String toString() {
-        return "Motor: " + motor.toString() + " | P Constant: " + p + " | Current Speed: " + currentSpeed + " | Current Error: " + error;
+        return "Motor: " + leftMotor.toString() + " " + rightMotor.toString() + " | P Constant: " + p + " | Current Speed: " + currentSpeed + " | Current Error: " + error;
     }
 }
