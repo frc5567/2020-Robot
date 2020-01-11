@@ -9,6 +9,10 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -21,8 +25,26 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
    */
+  TalonSRX leftTalon;
+  TalonSRX rightTalon;
+
+  VictorSPX leftVictor;
+  VictorSPX rightVictor;
+
+  public Robot() {
+    leftTalon = new TalonSRX(1);
+    rightTalon = new TalonSRX(2);
+
+    leftVictor = new VictorSPX(11);
+    rightVictor = new VictorSPX(12);
+
+  }
   @Override
   public void robotInit() {
+    leftTalon.set(ControlMode.PercentOutput, 0);
+    rightTalon.set(ControlMode.PercentOutput, 0);
+    leftVictor.set(ControlMode.PercentOutput, 0);
+    rightVictor.set(ControlMode.PercentOutput, 0);
   }
 
   @Override
