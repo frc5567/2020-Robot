@@ -1,38 +1,99 @@
-// import motors
-// import piston
-// import speed controller
-// import speed controller group
+package frc.robot;
+
+//import encoder
+import edu.wpi.first.wpilibj.Encoder;
+// import speed controller/motor
+import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+// import solenoid
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 
-public class Intake{
 
-// declare motors
-// declare piston
-// declare xbox controller
-// declare IntakeMotor controllers
-// declare IntakeMotor button
-// declare variable intakeMotorButtonPressed
-// declare DropBarPiston button
-// declare DropBarPiston boolean
-// declare variabe intakeMotorSpeed
 
-    // class in which the intake motor will be told to move
-    public void setIntakeMotor(double intakeMotorSpeed){
-        //set boolean intakeMotorButtonPressed = 0
-                                               // set initial intake speed to 0         do we need?
-                                               // set intakeMotorSpeed = 0;
-                                               // initiate set motor speed to s
-         // set motor speed to intakeMotorSpeed while pressed, 0 when released
-          /**if intakeMortorButtonPressed = 1{
-        * set intakeMotorSpeed = 1
-        * 
-        *  } else {
-        *  set speed = 0
-        * }
-        * */ 
+public class Intake {
+
+    //Declare the double Soleniod
+    DoubleSolenoid dSolDropBar;
+    
+    // Instantiate the Double Solenoid
+    dSolDropBar = new DoubleSolenoid(1); // the 1 is the port number needed for the double solenoid
+
+    // declare intake motors controllers
+    private SpeedController leftIntakeMotor;
+    private SpeedController rightIntakeMotor;
+
+    //declare encoder
+    private Encoder m_encoder;
+    //stores values of the drop bar position
+    public enum DropBarPosition {
+        kUp(0),
+        kDown(1);
+        //variable for up/down
+        private int armValue;
+
+        
+        DropBarPosition(int armValue){
+            //this specific location of arm value
+            this.armValue = armValue;
+        }
+
+
+    }
+    //class that tells the position of the drop bar
+    public void setDropBarPosition(DropBarPosition armValue) {
+        //switches in between the cases
+        switch (armValue){
+            //the case where the drop bar is up
+            case kUp:
+                dSolDropBar.set(Value.kForward);
+                break;
+            //the case where the drop bar is down    
+            case kDown:
+                dSolDropBar.set(Value.kReverse);
+                break;
+        }
+    }
+    //class that moves the drop bar
+    public void moveDropBarPiston(boolean buttonA, boolean buttonB){
+        //when button A is pressed, drop bar drops
+        if(buttonA = true){
+            this.setDropBarPosition(DropBarPosition.kDown);
+        } 
+        //when button B is pressed, drop bar rises
+        if(buttonB = true){
+            this.setDropBarPosition(DropBarPosition.kUp);
+        }
+        
     }
 
-    /**             //all the things used here
+
+
+
+    //declare motor controller group
+    SpeedControllerGroup m_intakeMotors;
+    //created the speed controller group
+    m_intakeMotors = new SpeedControllerGroup(leftIntakeMotor, rightIntakeMotor);
+
+    // class in which the intake motor will be told to move
+    public void setIntakeMotor(double intakeMotorSpeed, boolean button){
+        
+        //turns on the intake motor
+        if (button = true){
+            m_intakeMotors.set(0.5);
+        }
+        else{
+            //leaves the motor still
+            m_intakeMotors.set(0.0);
+
+        }
+
+    }
+
+    
+    
+/**             //all the things used here
      *              declare DropBarMotor
      *              declare variable dropBarMotorSpeed
      *              declare DropBarButtonDown
@@ -42,6 +103,7 @@ public class Intake{
      *              
      *              // encoder on DropBarMotor
      *              declare DropBarEncoder
+     * 
      * 
      * // resets the encoder value
      * public void encoderReset(){
@@ -93,22 +155,5 @@ public class Intake{
      *      }
      * } 
     **/
-    public void setDropBarPiston(boolean DropBarPiston){
-
-        // make button
-        // init boolean to 0
-        /**
-         * if button = activated{
-         * 
-         * set piston boolean = extended (1)
-         * 
-         * } else {
-         * 
-         * set piston boolean = contracted (0)
-         * 
-         * }
-         */
-    }
-
 
 }
