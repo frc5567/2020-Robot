@@ -7,8 +7,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -37,6 +37,8 @@ public class Robot extends TimedRobot {
   Launcher shooter;
   ShuffleboardShooterControl shooterControl;
 
+  XboxController testController;
+
   public Robot() {
     leftTalon = new TalonSRX(1);
     rightTalon = new TalonSRX(2);
@@ -49,8 +51,10 @@ public class Robot extends TimedRobot {
     shooter = new Launcher(0.5, shooterMotor);
     shooterControl = new ShuffleboardShooterControl(shooter);
 
+    testController = new XboxController(0);
+
   }
-  
+
   @Override
   public void robotInit() {
     leftTalon.set(ControlMode.PercentOutput, 0);
@@ -77,10 +81,15 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    shooterControl.zeroSpeed();
   }
 
   @Override
   public void testPeriodic() {
+    if(testController.getAButton()) {
+      shooterControl.setSpeed();
+    }
+    else shooterControl.zeroSpeed();
   }
 
 }
