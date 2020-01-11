@@ -7,6 +7,12 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
+/**
+ * A class to control the speed of the launcher via shuffleboard for testing purposes
+ * 
+ * @version 1/7/2020
+ * @author Josh Overbeek
+ */
 public class ShuffleboardShooterControl {
 
     //declare private variables for creating a tab, instantiating a launcher and retrieving data
