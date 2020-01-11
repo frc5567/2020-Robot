@@ -1,7 +1,7 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 
 /**
  * A launcher that uses one or multiple motors to launch a projectile
@@ -21,7 +21,7 @@ public class Launcher {
     private double error;
 
     //speed controller used to launch 
-    private SpeedController motor;
+    private BaseMotorController motor;
 
     /**
      * Constructor for Launcher objects
@@ -31,20 +31,7 @@ public class Launcher {
      * @param p The proportionality constant used to control this launcher's speed
      * @param motor The speed controller used to launch the projectile
      */
-    public Launcher(double p, SpeedController motor) {
-        this.p = p;
-        this.motor = motor;
-    }
-    
-    /**
-     * Constructor for Launcher objects
-     * 
-     * <p> To be used for any system that launches a projectile
-     * 
-     * @param p The proportionality constant used to control this launcher's speed
-     * @param motor The speed controller group used to launch the projectile
-     */
-    public Launcher(double p, SpeedControllerGroup motor) {
+    public Launcher(double p, BaseMotorController motor) {
         this.p = p;
         this.motor = motor;
     }
@@ -54,7 +41,7 @@ public class Launcher {
      * @param speed A value between -1.0 and 1.0 where 1.0 is full speed forward
      */
     public void setMotor(double speed) {
-        motor.set(speed);
+        motor.set(ControlMode.PercentOutput, speed);
     }
 
     /**
