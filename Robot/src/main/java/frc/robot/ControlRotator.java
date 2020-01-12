@@ -1,60 +1,66 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Speedcontroller;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Encoder;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 
-public class ControlRotater{
+public class ControlRotator{
 
     /*
     1 speedcontroller
     1 encoder
     variable for the value of ticks and ratio of distance to ticks
     when called spin until encoder ticks are over __
-
     */
 
-    //Declare Speedcontroller
-    private SpeedController m_rotater;
-    //Declare Encoder
-    private Encoder m_encoder;
+    //Declares Speedcontroller
+    public SpeedController m_rotater;
+    //Declares Encoder
+    public Encoder m_encoder;
     //variable for color of wheel to rotate to
-    private ColorReader m_fmsColor;
+    public char m_fmsColor;
+    //variable for speed
+    public double m_speed = 1;
+    //variable for how much we should spin the spinner
+    public double m_controlPanelTicks = 0;
 
-
-
-
-    public Spinner(SpeedController rotater, Encoder rotateEncoder){
-        //instantiates 
+    //constructer
+    public void Spinner(SpeedController rotater, Encoder rotateEncoder, char fmsColor, double speed, double controlPanelTicks){
         m_rotater = rotater;
         m_encoder = rotateEncoder;
-        double m_speed = 1;
-        double m_controlPanelTicks = 0;
+        m_speed = speed;
+        m_controlPanelTicks = controlPanelTicks;
         m_fmsColor = fmsColor;
-
-
     }
+
+    //method for just spinning the wheel on its own
     public void manualSpin(){
-        rotater.set(speed);
+        m_rotater.set(m_speed);
     }
 
+    //method for making the wheel spin about 3 times
     public void autoRotate(){
-        if(encoder.ticks < controlPanelTicks){
-            rotater.set(speed);
+        while(m_encoder.get() < m_controlPanelTicks){
+            m_rotater.set(m_speed);
         }
+        m_encoder.reset();
     }
+    
     /*
+    //method for spinning to a certain color
     public void autoColor(){
-        if(/*Color Sensor Output* != (fmsColor.getColor())){
-            rotater.set(speed);
+        if(/*Color Sensor Output* != getRecievedColor(){
+            m_rotater.set(speed);
         }
     }
-
     */
 
-
-
+    //getter method for recievedColor
+    public char getRecievedColor(){
+        ColorReader color = new ColorReader();
+        m_fmsColor = color.recievedColor;
+        return m_fmsColor;
+    }
 
 
 
