@@ -7,7 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
  * A launcher that uses one or multiple motors to launch a projectile
  * <p>Utilizes a scrapped together proportionality controller to adjust speed
  * 
- * @version 1/7/2020
+ * @version 1/13/2020
  * @author Josh Overbeek
  */
 public class Launcher {
