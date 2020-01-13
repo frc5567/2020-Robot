@@ -21,6 +21,7 @@ public class TwoMotorLauncher extends Launcher{
      * 
      * @param p The proportionality constant used to control this launcher's speed
      * @param motor The speed controller used to launch the projectile
+     * @param secondMotor The other speed contoller used to launch
      */
     public TwoMotorLauncher(double p, BaseMotorController motor, BaseMotorController secondMotor) {
         super(p, motor);
