@@ -72,6 +72,27 @@ public class Launcher {
     public double getP() {
         return p;
     }
+    
+    /**
+     * @return the motor used to drive the launcher
+     */
+    public BaseMotorController getMotor() {
+        return motor;
+    }
+
+    /**
+     * @return the current speed the motor controller is set to
+     */
+    public double getCurrentSpeed() {
+        return currentSpeed;
+    }
+
+    /**
+     * @return the current difference between the current speed and the setpoint
+     */
+    public double getError() {
+        return error;
+    }
 
     /**
      * toString method containing motor, p, current speed and current error
