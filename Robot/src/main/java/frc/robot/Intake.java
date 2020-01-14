@@ -1,101 +1,105 @@
 package frc.robot;
 
 //import encoder
-import edu.wpi.first.wpilibj.Encoder;
+import com.ctre.phoenix.motorcontrol.SensorCollection;
+// import the Xboc controller
+import edu.wpi.first.wpilibj.XboxController;
 // import speed controller/motor
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 // import solenoid
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-
+//import edu.wpi.first.wpilibj.DoubleSolenoid.Value;   -not currently used but might need
 
 
 
 public class Intake {
-
-    //Declare the double Soleniod
-    DoubleSolenoid dSolDropBar;
+    //Declares and Instantiates the double Soleniod. The 0 and 1 are the forward and reverse channels.
+    private DoubleSolenoid dSolDropBar = new DoubleSolenoid(0, 1);
     
-    // Instantiate the Double Solenoid
-    dSolDropBar = new DoubleSolenoid(1); // the 1 is the port number needed for the double solenoid
-
     // declare intake motors controllers
     private SpeedController leftIntakeMotor;
     private SpeedController rightIntakeMotor;
 
+    //declares and Instantiates motor controller group
+    private SpeedControllerGroup intakeMotors= new SpeedControllerGroup(leftIntakeMotor, rightIntakeMotor);
+
     //declare encoder
-    private Encoder m_encoder;
-    //stores values of the drop bar position
-    public enum DropBarPosition {
-        kUp(0),
-        kDown(1);
-        //variable for up/down
-        private int armValue;
+    private SensorCollection encoder;
 
-        
-        DropBarPosition(int armValue){
-            //this specific location of arm value
-            this.armValue = armValue;
-        }
+    //declare DropBarMotor
+    private SpeedController dropBarMotor;
+    
+    //declare variable dropBarMotorSpeed
+    double dropBarMotorSpeedDown = 0.5;
+    double dropBarMotorSpeedUp = -0.5;
 
+    //declare the Xbox Controller
+    private XboxController testController = new XboxController(0);
+
+    //Constructor for the Intake objects
+    public Intake(DoubleSolenoid dSolDropBar, SpeedControllerGroup intakeMotors, SpeedController leftIntakeMotor, SpeedController rightIntakeMotor, SensorCollection encoder, XboxController testController){
+        this.dSolDropBar = dSolDropBar;
+        this.intakeMotors = intakeMotors;
+        this.leftIntakeMotor = leftIntakeMotor;
+        this.rightIntakeMotor = rightIntakeMotor;
+        this.encoder = encoder;
+        this.testController = testController;
 
     }
-    //class that tells the position of the drop bar
-    public void setDropBarPosition(DropBarPosition armValue) {
-        //switches in between the cases
-        switch (armValue){
-            //the case where the drop bar is up
-            case kUp:
-                dSolDropBar.set(Value.kForward);
-                break;
-            //the case where the drop bar is down    
-            case kDown:
-                dSolDropBar.set(Value.kReverse);
-                break;
-        }
+
+    public void kUp(){
+        dSolDropBar.set(DoubleSolenoid.Value.kForward);
     }
+
+    public void kDown(){
+        dSolDropBar.set(DoubleSolenoid.Value.kReverse);
+    }
+
+
     //class that moves the drop bar
-    public void moveDropBarPiston(boolean buttonA, boolean buttonB){
+    public void moveDropBarPiston(){
         //when button A is pressed, drop bar drops
-        if(buttonA = true){
-            this.setDropBarPosition(DropBarPosition.kDown);
+        if(testController.getAButton()){
+           kDown(); 
         } 
         //when button B is pressed, drop bar rises
-        if(buttonB = true){
-            this.setDropBarPosition(DropBarPosition.kUp);
+        if(testController.getBButton()){
+            kUp();
         }
         
     }
 
 
-
-
-    //declare motor controller group
-    SpeedControllerGroup m_intakeMotors;
-    //created the speed controller group
-    m_intakeMotors = new SpeedControllerGroup(leftIntakeMotor, rightIntakeMotor);
 
     // class in which the intake motor will be told to move
     public void setIntakeMotor(double intakeMotorSpeed, boolean button){
         
         //turns on the intake motor
-        if (button = true){
-            m_intakeMotors.set(0.5);
+        if (testController.getXButton()){
+            intakeMotors.set(0.5);
         }
         else{
             //leaves the motor still
-            m_intakeMotors.set(0.0);
+            
+            intakeMotors.set(0.0);
 
         }
 
     }
+ 
+    public void dropBarButton(boolean buttonC){ //button name can change
+        if (buttonC = true){
+            if (encoder.get() <  )dropBarMotor.set(dropBarMotorSpeedDown);
+        } else{
+            // if(false){
 
-    
+            // }
+        }
+    }
     
 /**             //all the things used here
-     *              declare DropBarMotor
-     *              declare variable dropBarMotorSpeed
+     *              
      *              declare DropBarButtonDown
      *              declare DropBarButtonUp
      *              declare boolean dropBarButtonDownPressed
