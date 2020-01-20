@@ -9,7 +9,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -22,74 +24,93 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
  * project.
  */
 public class Robot extends TimedRobot {
-  /**
+    /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
    */
-  TalonSRX leftTalon;
-  TalonSRX rightTalon;
+    TalonSRX leftTalon;
+    TalonSRX rightTalon;
 
-  VictorSPX leftVictor;
-  VictorSPX rightVictor;
+    VictorSPX leftVictor;
+    VictorSPX rightVictor;
 
-  VictorSPX shooterMotor;
+    VictorSPX shooterMotor;
 
-  Launcher shooter;
-  ShuffleboardShooterControl shooterControl;
+    Launcher shooter;
+    ShuffleboardShooterControl shooterControl;
 
-  XboxController testController;
+    XboxController testController;
 
-  public Robot() {
-    leftTalon = new TalonSRX(1);
-    rightTalon = new TalonSRX(2);
+    //toggle for the limelight
+    boolean isDriverCamera;
 
-    leftVictor = new VictorSPX(11);
-    rightVictor = new VictorSPX(12);
+    NetworkTable limelightTable;
 
-    shooterMotor = new VictorSPX(15);
+    public Robot() {
+        leftTalon = new TalonSRX(1);
+        rightTalon = new TalonSRX(2);
 
-    shooter = new Launcher(0.5, shooterMotor);
-    shooterControl = new ShuffleboardShooterControl(shooter);
+        leftVictor = new VictorSPX(11);
+        rightVictor = new VictorSPX(12);
 
-    testController = new XboxController(0);
+        shooterMotor = new VictorSPX(15);
 
-  }
+        shooter = new Launcher(0.5, shooterMotor);
+        shooterControl = new ShuffleboardShooterControl(shooter);
 
-  @Override
-  public void robotInit() {
-    leftTalon.set(ControlMode.PercentOutput, 0);
-    rightTalon.set(ControlMode.PercentOutput, 0);
-    leftVictor.set(ControlMode.PercentOutput, 0);
-    rightVictor.set(ControlMode.PercentOutput, 0);
-  }
+        testController = new XboxController(0);
 
-  @Override
-  public void autonomousInit() {
-  }
+        limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+        isDriverCamera = false;
 
-  @Override
-  public void autonomousPeriodic() {
-  }
-
-  @Override
-  public void teleopInit() {
-  }
-
-  @Override
-  public void teleopPeriodic() {
-  }
-
-  @Override
-  public void testInit() {
-    shooterControl.zeroSpeed();
-  }
-
-  @Override
-  public void testPeriodic() {
-    if(testController.getAButton()) {
-      shooterControl.setSpeed();
     }
-    else shooterControl.zeroSpeed();
-  }
+
+    @Override
+    public void robotInit() {
+        leftTalon.set(ControlMode.PercentOutput, 0);
+        rightTalon.set(ControlMode.PercentOutput, 0);
+        leftVictor.set(ControlMode.PercentOutput, 0);
+        rightVictor.set(ControlMode.PercentOutput, 0);
+    }
+
+    @Override
+    public void autonomousInit() {
+    }
+
+    @Override
+    public void autonomousPeriodic() {
+    }
+
+    @Override
+    public void teleopInit() {
+    }
+
+    @Override
+    public void teleopPeriodic() {
+    }
+
+    @Override
+    public void testInit() {
+        shooterControl.zeroSpeed();
+    }
+
+    @Override
+    public void testPeriodic() {
+        if(testController.getAButton()) {
+            shooterControl.setSpeed();
+        }
+        else {
+            shooterControl.zeroSpeed();
+        }
+
+        if(testController.getBButtonReleased()) {
+            if(isDriverCamera) {
+                limelightTable.getEntry("camMode").setNumber(0);
+            }
+            else {
+                limelightTable.getEntry("camMode").setNumber(0);
+            }
+        }
+    }
 
 }
