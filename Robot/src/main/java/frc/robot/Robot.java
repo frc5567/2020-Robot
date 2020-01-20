@@ -147,12 +147,10 @@ public class Robot extends TimedRobot {
             }
             isDriverCamera = !isDriverCamera;
         }
+        double netHeight = (targetHeight.getDouble(0) - cameraHeight.getDouble(0));
+        double netAngle = Math.tan((Math.PI / 180) * (cameraAngle.getDouble(0) + limelightTable.getEntry("ty").getDouble(0)));
 
-        distance.setDouble((targetHeight.getDouble(0) - cameraHeight.getDouble(0)) / Math.tan( cameraAngle.getDouble(0) + limelightTable.getEntry("ty").getDouble(0)));
-
-
-
-
+        distance.setDouble(  netHeight / netAngle );
     }
 
 }
