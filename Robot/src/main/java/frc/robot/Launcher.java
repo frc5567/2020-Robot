@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
-import com.fasterxml.jackson.databind.JsonSerializable.Base;
 
 /**
  * A launcher that uses one or multiple motors to launch a projectile
