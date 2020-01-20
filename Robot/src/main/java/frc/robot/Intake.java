@@ -27,6 +27,12 @@ public class Intake {
     //declare encoder
     private SensorCollection encoder;
 
+    //declare the number of encoder ticks -change number to correct number
+    double maxEncoderTick = 22;
+
+    //declare the number of ticks left untill max Encoder tick value
+    double ticksLeft = maxEncoderTick - encoder.get();
+
     //declare DropBarMotor
     private SpeedController dropBarMotor;
     
@@ -36,6 +42,8 @@ public class Intake {
 
     //declare the Xbox Controller
     private XboxController testController = new XboxController(0);
+
+    double i;
 
     //Constructor for the Intake objects
     public Intake(DoubleSolenoid dSolDropBar, SpeedControllerGroup intakeMotors, SpeedController leftIntakeMotor, SpeedController rightIntakeMotor, SensorCollection encoder, XboxController testController){
@@ -73,7 +81,7 @@ public class Intake {
 
 
     // class in which the intake motor will be told to move
-    public void setIntakeMotor(double intakeMotorSpeed, boolean button){
+    public void setIntakeMotor(double intakeMotorSpeed){
         
         //turns on the intake motor
         if (testController.getXButton()){
@@ -88,13 +96,25 @@ public class Intake {
 
     }
  
-    public void dropBarButton(boolean buttonC){ //button name can change
-        if (buttonC = true){
-            if (encoder.get() <  )dropBarMotor.set(dropBarMotorSpeedDown);
+    //lowers and raises the drop bar for intake
+    public void dropBarButton(){ //the button can change
+        if (testController.getYButton()){
+            if (encoder.get() < maxEncoderTick){
+                //double check for loop
+                for (i = ticksLeft; i < ticksLeft; i++){
+                    dropBarMotor.set(dropBarMotorSpeedDown);
+                } 
+            } else {
+                if(encoder.get() = maxEncoderTick){
+                    // Double check for loop
+                    for(i = encoder.get(); i > 0; i--){
+                       dropBarMotor.set(dropBarMotorSpeedUp); 
+                    } 
+                }
+            }
+            
         } else{
-            // if(false){
-
-            // }
+            dropBarMotor.set(0.0);
         }
     }
     
