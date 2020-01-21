@@ -19,36 +19,33 @@ public class ControlRotator{
     public Encoder m_encoder;
     //variable for color of wheel to rotate to
     public char m_fmsColor;
-    //variable for speed
-    public double m_speed = 1;
     //variable for how much we should spin the spinner
-    public double m_controlPanelTicks = 0;
+    public double m_controlPanelTicks;
 
     //constructer
-    public void Spinner(SpeedController rotater, Encoder rotateEncoder, char fmsColor, double speed, double controlPanelTicks){
+    public Spinner(SpeedController rotater, Encoder rotateEncoder, char fmsColor, double controlPanelTicks){
         m_rotater = rotater;
         m_encoder = rotateEncoder;
-        m_speed = speed;
         m_controlPanelTicks = controlPanelTicks;
         m_fmsColor = fmsColor;
     }
 
     //method for just spinning the wheel on its own
-    public void manualSpin(){
-        m_rotater.set(m_speed);
+    public void manualSpin(double speed){
+        m_rotater.set(speed);
     }
 
     //method for making the wheel spin about 3 times
-    public void autoRotate(){
-        while(m_encoder.get() < m_controlPanelTicks){
-            m_rotater.set(m_speed);
+    public void autoRotate(double speed){
+        if(m_encoder.get() < m_controlPanelTicks){
+            m_rotater.set(speed);
         }
         m_encoder.reset();
     }
     
     /*
     //method for spinning to a certain color
-    public void autoColor(){
+    public void autoColor(double speed){
         if(/*Color Sensor Output* != getRecievedColor(){
             m_rotater.set(speed);
         }
