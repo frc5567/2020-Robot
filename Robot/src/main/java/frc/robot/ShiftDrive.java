@@ -20,12 +20,12 @@ public class ShiftDrive {
     //pass in 2 drive, 2 slave
     /**
      * Contructor for drive trains that can shift speed based on double solenoids
-     * @param leftDrive
-     * @param rightDrive
-     * @param leftSlave
-     * @param rightSlave
-     * @param leftPiston
-     * @param rightPiston
+     * @param leftDrive The left master motor controller
+     * @param rightDrive The right master motor controller
+     * @param leftSlave The left slave motor contoller
+     * @param rightSlave The right slave motor controller
+     * @param leftPiston The solenoid for shifting gears on the left gearbox
+     * @param rightPiston THe solenoid for shifting gears on the right gearbox
      */
     public ShiftDrive(TalonSRX leftDrive, TalonSRX rightDrive, VictorSPX leftSlave, VictorSPX rightSlave, DoubleSolenoid leftPiston, DoubleSolenoid rightPiston) {
         this.leftDrive = leftDrive;
