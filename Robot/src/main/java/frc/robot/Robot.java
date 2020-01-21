@@ -66,10 +66,10 @@ public class Robot extends TimedRobot {
         leftVictor = new VictorSPX(11);
         rightVictor = new VictorSPX(12);
 
-        shooterMotor = new VictorSPX(15);
-
-        shooter = new Launcher(0.5, shooterMotor);
+        shooter = new Launcher(0.5, leftTalon, rightTalon);
         shooterControl = new ShuffleboardShooterControl(shooter);
+
+        shooterMotor = new VictorSPX(15);
 
         testController = new XboxController(0);
 
