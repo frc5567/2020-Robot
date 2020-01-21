@@ -3,9 +3,7 @@ package frc.robot;
 //import edu.wpi.first.wpilibj.DriverStation;
 
 public class ColorReader{
-
-    //declares varibale or the color recieved from the fms system
-    public char recievedColor;
+    
     //declares gameData varibale
     private String gameData;
 
@@ -15,12 +13,10 @@ public class ColorReader{
         this.gameData = DriverStation.getInstance().getGameSpecificMessage();
     }
 
-    //method for setting recievedColor to the color recieved fro fms or the manually inputted color
-    public void getColor(){
-        
+    //method for setting recievedColor to the color recieved from fms or the manually inputted color
+    public char getColor(){
         if(gameData.length() > 0){
-            recievedColor = gameData.charAt(0);
+            return gameData.charAt(0);
         }
     }
-
 }
