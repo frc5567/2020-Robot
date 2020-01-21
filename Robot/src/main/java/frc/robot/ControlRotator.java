@@ -19,14 +19,13 @@ public class ControlRotator{
     public Encoder m_encoder;
     //variable for color of wheel to rotate to
     public char m_fmsColor;
-    //variable for how much we should spin the spinner
-    public double m_controlPanelTicks;
+    //variable for number of ticks per 1 revolution of the big wheel. The value that it s currently set to is made up and needs to be changed
+    public double TICKS_PER_REVOLUTION = 50;
 
     //constructer
-    public Spinner(SpeedController rotater, Encoder rotateEncoder, char fmsColor, double controlPanelTicks){
+    public ControlRotator(SpeedController rotater, Encoder rotateEncoder, char fmsColor){
         m_rotater = rotater;
         m_encoder = rotateEncoder;
-        m_controlPanelTicks = controlPanelTicks;
         m_fmsColor = fmsColor;
     }
 
@@ -36,11 +35,17 @@ public class ControlRotator{
     }
 
     //method for making the wheel spin about 3 times
-    public void autoRotate(double speed){
-        if(m_encoder.get() < m_controlPanelTicks){
+    public boolean autoRotate(double speed, boolean doneSpinning){
+        if(m_encoder.get() < 3 * TICKS_PER_REVOLUTION){
             m_rotater.set(speed);
+            doneSpinning = false;
+            return doneSpinning;
         }
-        m_encoder.reset();
+        else{
+            m_encoder.reset();
+            doneSpinning = true;
+            return doneSpinning;
+        }
     }
     
     /*
