@@ -14,11 +14,11 @@ public class ControlRotator{
     */
 
     //Declares Speedcontroller
-    public SpeedController m_rotater;
+    private SpeedController m_rotater;
     //Declares Encoder
-    public Encoder m_encoder;
+    private Encoder m_encoder;
     //variable for color of wheel to rotate to
-    public char m_fmsColor;
+    private char m_fmsColor;
     //variable for number of ticks per 1 revolution of the big wheel. The value that it s currently set to is made up and needs to be changed
     public double TICKS_PER_REVOLUTION = 50;
 
