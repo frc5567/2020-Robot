@@ -77,11 +77,17 @@ public class Launcher {
     }
     
     /**
+     * Returns a motor based on a string passed in
+     * <p>Will default to left motor
+     * @param motorName The name of the motor to get. Pass in "right" to get the right motor,
+     * otherwise it will return the left motor
      * @return the motor used to drive the launcher
-     * TODO: Fix this so we pick which motor to get
      */
-    public BaseMotorController getMotor() {
-        return leftMotor;
+    public BaseMotorController getMotor(String motorName) {
+        if (motorName == "right") {
+            return rightMotor;
+        }
+        else return leftMotor;
     }
 
     /**

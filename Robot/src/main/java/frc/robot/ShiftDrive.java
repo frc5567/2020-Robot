@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
@@ -38,6 +40,15 @@ public class ShiftDrive {
 
         //invert the right drive motor, this is arbitrary and should be based on tests
         rightDrive.setInverted(true);
+        rightSlave.setInverted(InvertType.FollowMaster);
+
+        leftDrive.setNeutralMode(NeutralMode.Brake);
+        rightDrive.setNeutralMode(NeutralMode.Brake);
+
+        leftDrive.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        rightDrive.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        leftSlave.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        rightSlave.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
     }
 
     /**
