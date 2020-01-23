@@ -22,7 +22,7 @@ public class Intake {
     private SpeedController rightIntakeMotor;
 
     //declares and Instantiates motor controller group
-    private SpeedControllerGroup intakeMotors= new SpeedControllerGroup(leftIntakeMotor, rightIntakeMotor);
+    private SpeedControllerGroup intakeMotors = new SpeedControllerGroup(leftIntakeMotor, rightIntakeMotor);
 
     //declare encoder
     private SensorCollection encoder;
