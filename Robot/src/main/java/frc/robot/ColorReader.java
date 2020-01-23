@@ -13,10 +13,11 @@ public class ColorReader{
         this.gameData = DriverStation.getInstance().getGameSpecificMessage();
     }
 
-    //method for getting the color recieved from fms or the manually inputted color
+    //method for getting the color recieved from fms or the manually inputted color. If 0 is returned, no color was recieved
     public char getColor(){
         if(gameData.length() > 0){
             return gameData.charAt(0);
         }
+        return '0';
     }
 }
