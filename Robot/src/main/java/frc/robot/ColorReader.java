@@ -14,10 +14,11 @@ public class ColorReader{
     }
 
     //method for getting the color recieved from fms or the manually inputted color. If 0 is returned, no color was recieved
-    public char getColor(){
+    public char getColor(char noColor){
         if(gameData.length() > 0){
             return gameData.charAt(0);
         }
-        return '0';
+        noColor = '0';
+        return noColor;
     }
 }
