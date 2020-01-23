@@ -8,15 +8,38 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class ShiftDrive {
+
+    /**
+     * An Enum for storing what gear the drivetrain is currently in
+     */
+    public enum Gear {
+        kLow,
+        kHigh;
+        
+        //an empty contructor that allows Gear objects to be instantiated
+        private Gear() {
+
+        }
+    }
+
+    //declare our drive motors
     private TalonSRX leftDrive;
     private TalonSRX rightDrive;
+
+    //declare our slave motors
     private VictorSPX leftSlave;
     private VictorSPX rightSlave;
 
+    //declare the solenoids used to shift gears
+    //note that this may be one solenoid in the future
     private DoubleSolenoid leftPiston;
     private DoubleSolenoid rightPiston;
+
+    //declare a Gear object to store what gear we are in
+    private Gear m_gear;
 
     //constructor
     //pass in 2 drive, 2 slave
@@ -42,23 +65,61 @@ public class ShiftDrive {
         rightDrive.setInverted(true);
         rightSlave.setInverted(InvertType.FollowMaster);
 
+        //set the motors to brake when not given an active command
         leftDrive.setNeutralMode(NeutralMode.Brake);
         rightDrive.setNeutralMode(NeutralMode.Brake);
 
+        //configs the drive train to have an acceleration based on the RobotMap constant
         leftDrive.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
         rightDrive.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
         leftSlave.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
         rightSlave.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+
+        m_gear = Gear.kLow;
+    }
+
+    /**
+     * Sets the drive gear using our pistons. This is private so that it can never be called by an outside class to prevent confusion
+     * 
+     * @param value The value to give to the pistons where kOff removes pressure, kForward is _ gear, and kReverse is _ gear
+     */
+    private void setPistons(DoubleSolenoid.Value value) {
+        leftPiston.set(value);
+        rightPiston.set(value);
     }
 
     /**
      * Sets the drive gear using our pistons
+     * <p> The solenoid value is currently arbitrary and needs to be confirmed
      * 
-     * @param value The value to give to the pistons where kOff removes pressure, kForward is _ gear, and kReverse is _ gear
+     * @param gear The gear we want the drivetrain to shift to
      */
-    public void setGear(DoubleSolenoid.Value value) {
-        leftPiston.set(value);
-        rightPiston.set(value);
+    public void shiftGear(Gear gear) {
+        //sets our current gear to the inputted gear
+        m_gear = gear;
+
+        //sets our pistons based on what gear we request
+        if (m_gear == Gear.kLow) {
+            setPistons(Value.kForward);
+        }
+        else if (m_gear == Gear.kHigh) {
+            setPistons(Value.kReverse);
+        }
+    }
+
+    /**
+     * Toggles our gear to whatever it is not currently
+     */
+    public void switchGear() {
+        if (m_gear == Gear.kLow) {
+            m_gear = Gear.kHigh;
+        }
+        else if (m_gear == Gear.kHigh) {
+            m_gear = Gear.kLow;
+        }
+
+        //shifts gears to whatever our new gear is
+        shiftGear(m_gear);
     }
 
     //TODO Re-comment
@@ -69,8 +130,11 @@ public class ShiftDrive {
      * @param rightSpeed The speed for the right half of the drive train
      */
     public void tankDrive (double leftSpeed, double rightSpeed){
+        //sets power to the motors based on input
         leftDrive.set(ControlMode.PercentOutput, leftSpeed);
         rightDrive.set(ControlMode.PercentOutput, rightSpeed);
+
+        //sets the slave motors to copy the masters
         leftSlave.follow(leftDrive);
         rightSlave.follow(rightDrive);
     }
