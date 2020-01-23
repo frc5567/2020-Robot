@@ -9,15 +9,14 @@
 * Method names should always start with a lower-case letter
 * Variable names should always start with a lower-case letter
 
-### Current Port Numbers
-* CURRENT CAN PORT NUMBERS
-* Device Name                 Port Number
-* ----------------------------------------------------------
-* PCM                         20
-* PDP                         0
-* TalonSRX                    1
-* TalonSRX                    2
-* VictorSPX                   11
-* VictorSPX                   12
-* VictorSPX                   15
+### Current Can Port Numbers
+| Device Name   |  Port Number  |
+| ------------- | ------------- |
+| PCM           | 20            |
+| PDP           | 0             |
+| TalonSRX      | 1             |
+| TalonSRX      | 2             |
+| VictorSPX     | 11            |
+| VictorSpx     | 12            |
+| VictorSpx     | 15            |
 
