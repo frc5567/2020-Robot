@@ -18,25 +18,20 @@ public class ShiftDrive {
     public enum Gear {
         kLow,
         kHigh;
-        
-        //an empty contructor that allows Gear objects to be instantiated
-        private Gear() {
-
-        }
     }
 
     //declare our drive motors
-    private TalonSRX leftDrive;
-    private TalonSRX rightDrive;
+    private TalonSRX m_leftDrive;
+    private TalonSRX m_rightDrive;
 
     //declare our slave motors
-    private VictorSPX leftSlave;
-    private VictorSPX rightSlave;
+    private VictorSPX m_leftSlave;
+    private VictorSPX m_rightSlave;
 
     //declare the solenoids used to shift gears
     //note that this may be one solenoid in the future
-    private DoubleSolenoid leftPiston;
-    private DoubleSolenoid rightPiston;
+    private DoubleSolenoid m_leftPiston;
+    private DoubleSolenoid m_rightPiston;
 
     //declare a Gear object to store what gear we are in
     private Gear m_gear;
@@ -53,27 +48,27 @@ public class ShiftDrive {
      * @param rightPiston THe solenoid for shifting gears on the right gearbox
      */
     public ShiftDrive(TalonSRX leftDrive, TalonSRX rightDrive, VictorSPX leftSlave, VictorSPX rightSlave, DoubleSolenoid leftPiston, DoubleSolenoid rightPiston) {
-        this.leftDrive = leftDrive;
-        this.rightDrive = rightDrive;
-        this.leftSlave = leftSlave;
-        this.rightSlave = rightSlave;
+        m_leftDrive = leftDrive;
+        m_rightDrive = rightDrive;
+        m_leftSlave = leftSlave;
+        m_rightSlave = rightSlave;
 
-        this.leftPiston = leftPiston;
-        this.rightPiston = rightPiston;
+        m_leftPiston = leftPiston;
+        m_rightPiston = rightPiston;
 
         //invert the right drive motor, this is arbitrary and should be based on tests
-        rightDrive.setInverted(true);
-        rightSlave.setInverted(InvertType.FollowMaster);
+        m_rightDrive.setInverted(true);
+        m_rightSlave.setInverted(InvertType.FollowMaster);
 
         //set the motors to brake when not given an active command
-        leftDrive.setNeutralMode(NeutralMode.Brake);
-        rightDrive.setNeutralMode(NeutralMode.Brake);
+        m_leftDrive.setNeutralMode(NeutralMode.Brake);
+        m_rightDrive.setNeutralMode(NeutralMode.Brake);
 
         //configs the drive train to have an acceleration based on the RobotMap constant
-        leftDrive.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
-        rightDrive.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
-        leftSlave.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
-        rightSlave.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        m_leftDrive.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        m_rightDrive.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        m_leftSlave.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        m_rightSlave.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
 
         m_gear = Gear.kLow;
     }
@@ -84,8 +79,8 @@ public class ShiftDrive {
      * @param value The value to give to the pistons where kOff removes pressure, kForward is _ gear, and kReverse is _ gear
      */
     private void setPistons(DoubleSolenoid.Value value) {
-        leftPiston.set(value);
-        rightPiston.set(value);
+        m_leftPiston.set(value);
+        m_rightPiston.set(value);
     }
 
     /**
@@ -122,7 +117,13 @@ public class ShiftDrive {
         shiftGear(m_gear);
     }
 
-    //TODO Re-comment
+    /**
+     * @return The gear that we are currently in (kHigh or kLow)
+     */
+    public Gear getGear() {
+        return m_gear;
+    }
+
     /**
      * Drives the drive train as a tank, controlling the sides individually
      * <p>Speeds are double values between -1.0 and 1.0, where 1.0 is full speed forwards
@@ -131,12 +132,12 @@ public class ShiftDrive {
      */
     public void tankDrive (double leftSpeed, double rightSpeed){
         //sets power to the motors based on input
-        leftDrive.set(ControlMode.PercentOutput, leftSpeed);
-        rightDrive.set(ControlMode.PercentOutput, rightSpeed);
+        m_leftDrive.set(ControlMode.PercentOutput, leftSpeed);
+        m_rightDrive.set(ControlMode.PercentOutput, rightSpeed);
 
         //sets the slave motors to copy the masters
-        leftSlave.follow(leftDrive);
-        rightSlave.follow(rightDrive);
+        m_leftSlave.follow(m_leftDrive);
+        m_rightSlave.follow(m_rightDrive);
     }
 
     /**
@@ -146,9 +147,9 @@ public class ShiftDrive {
      */
     public void arcadeDrive(double speed, double turn){
         //this references last year's code, may need to be revised
-        leftDrive.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, speed);
-        rightDrive.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, speed);
-        leftSlave.follow(leftDrive);
-        rightSlave.follow(rightDrive);
+        m_leftDrive.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, speed);
+        m_rightDrive.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, speed);
+        m_leftSlave.follow(m_leftDrive);
+        m_rightSlave.follow(m_rightDrive);
     }
 }
