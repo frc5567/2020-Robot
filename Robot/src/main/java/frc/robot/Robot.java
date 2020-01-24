@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.networktables.NetworkTable;
@@ -15,6 +16,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.PilotController.DriveType;
+
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
@@ -51,6 +54,14 @@ public class Robot extends TimedRobot {
     //declares an xbox controller used for testing prototype code
     XboxController testController;
 
+    //declares controllers and drivetrain for testing drive code
+    XboxController driveController;
+    PilotController pilotController;
+    ShiftDrive drivetrain;
+
+    DoubleSolenoid leftPiston;
+    DoubleSolenoid rightPiston;
+
     //toggle for the limelight
     boolean isDriverCamera;
 
@@ -83,6 +94,14 @@ public class Robot extends TimedRobot {
 
         //instantiates our test controller
         testController = new XboxController(0);
+
+        //instantiate drivetrain for tested
+        driveController = new XboxController(1);
+        leftPiston = new DoubleSolenoid(0,1);
+        rightPiston = new DoubleSolenoid(0,1);
+        drivetrain = new ShiftDrive(leftTalon, rightTalon, leftVictor, rightVictor, leftPiston, rightPiston)
+
+        pilotController = new PilotController(driveController, drivetrain, DriveType.kArcade);
 
         //gives us access to the network table for the limelight
         limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
@@ -138,6 +157,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        pilotController.controlDriveTrain();
     }
 
     @Override
