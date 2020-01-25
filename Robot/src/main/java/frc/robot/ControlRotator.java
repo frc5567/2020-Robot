@@ -27,7 +27,7 @@ public class ControlRotator{
         m_encoder = rotaterEncoder;
     }
 
-    //method for just spinning the wheel on its own
+    //method for just spinning the wheel manually
     public void manualRotate(double speed){
         m_rotater.set(speed);
     }
@@ -61,6 +61,7 @@ public class ControlRotator{
         return color.getColor();
     }
 
+    //method to make the spinner speed up more and more over time
     public void proportionalSpeedSetter(double setpoint) {
         //calculates error based on the difference between current and target speeds
         m_error = setpoint - m_currentSpeed;
