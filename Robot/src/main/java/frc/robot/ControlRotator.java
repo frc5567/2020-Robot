@@ -7,13 +7,11 @@ import edu.wpi.first.wpilibj.Encoder;
 public class ControlRotator{
 
     //Declares Speedcontroller
-    private SpeedController m_rotater;
+    private SpeedController m_rotator;
     //Declares Encoder
     private Encoder m_encoder;
     //Declares a variable for number of ticks per 1 revolution of the big wheel. The value that it s currently set to is made up and needs to be changed
     public double TICKS_PER_REVOLUTION = 50;
-    //variable to say if the autorotator is done or not yet
-    public boolean doneSpinning;
     //difference between current speed and target speed (set point)
     private double m_error;
     //current set speed of the motor
@@ -21,36 +19,37 @@ public class ControlRotator{
     //error times this gives you the increase in speed 
     private double m_adjustmentValue;
 
-    //constructer
-    public ControlRotator(SpeedController rotater, Encoder rotaterEncoder){
-        m_rotater = rotater;
-        m_encoder = rotaterEncoder;
+    //Constructer; make sure to pass in paramaters when created in the Robot class
+    public ControlRotator(SpeedController rotator, Encoder rotatorEncoder){
+        m_rotator = rotator;
+        m_encoder = rotatorEncoder;
     }
 
     //method for just spinning the wheel manually
     public void manualRotate(double speed){
-        m_rotater.set(speed);
+        m_rotator.set(speed);
     }
 
     //method for making the wheel spin about 3 times
-    public boolean autoRotate(double speed, boolean doneSpinning){
+    public boolean autoRotate(double speed){
+        //variable to say if the autorotator is done or not yet
+        boolean doneSpinning = false;
         if(m_encoder.get() < (3 * TICKS_PER_REVOLUTION)){
-            m_rotater.set(speed);
-            doneSpinning = false;
-            return doneSpinning;
+            m_rotator.set(speed);
         }
         else{
+            m_rotator.set(0);
             m_encoder.reset();
             doneSpinning = true;
-            return doneSpinning;
         }
+        return doneSpinning;
     }
     
     /*
     //method for spinning to a certain color
     public void autoColor(double speed){
         if(/*Color Sensor Output* != getRecievedColor(){
-            m_rotater.set(speed);
+            m_rotator.set(speed);
         }
     }
     */
