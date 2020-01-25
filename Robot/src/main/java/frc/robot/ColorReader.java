@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 //import edu.wpi.first.wpilibj.DriverStation;
 
 public class ColorReader{
@@ -18,6 +20,6 @@ public class ColorReader{
         if(gameData.length() > 0){
             return gameData.charAt(0);
         }
-        return '0'
+        return '0';
     }
 }
