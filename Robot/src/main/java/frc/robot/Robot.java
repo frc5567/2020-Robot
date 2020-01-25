@@ -31,6 +31,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
  * documentation. If you change the name of this class or the package after
  * creating this project, you must also update the build.gradle file in the
  * project.
+ * 
+ * @version 1/25/2019
  */
 public class Robot extends TimedRobot {
     /**
@@ -39,97 +41,98 @@ public class Robot extends TimedRobot {
    */
 
     //declares our drivetrain motor controllers and a currently unused shooter motor
-    TalonSRX leftTalon;
-    TalonSRX rightTalon;
+    TalonSRX m_leftTalon;
+    TalonSRX m_rightTalon;
 
-    VictorSPX leftVictor;
-    VictorSPX rightVictor;
+    VictorSPX m_leftVictor;
+    VictorSPX m_rightVictor;
 
-    VictorSPX shooterMotor;
+    VictorSPX m_shooterMotor;
 
     //declares our launcher system and our controls for that system over the launcher tab
-    Launcher shooter;
-    ShuffleboardShooterControl shooterControl;
+    Launcher m_shooter;
+    ShuffleboardShooterControl m_shooterControl;
 
     //declares an xbox controller used for testing prototype code
-    XboxController testController;
+    XboxController m_testController;
 
     //declares controllers and drivetrain for testing drive code
-    XboxController driveController;
-    PilotController pilotController;
-    ShiftDrive drivetrain;
+    XboxController m_driveController;
+    PilotController m_pilotController;
+    ShiftDrive m_drivetrain;
 
-    DoubleSolenoid leftPiston;
-    DoubleSolenoid rightPiston;
+    DoubleSolenoid m_leftPiston;
+    DoubleSolenoid m_rightPiston;
 
     //toggle for the limelight
-    boolean isDriverCamera;
+    boolean m_isDriverCamera;
 
     //declares the network table for limelight info so that we can access it
-    NetworkTable limelightTable;
+    NetworkTable m_limelightTable;
 
     //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
-    private ShuffleboardTab cameraTab;
-    private NetworkTableEntry cameraHeight;
-    private NetworkTableEntry cameraAngle;
-    private NetworkTableEntry targetHeight;
-    private NetworkTableEntry distance;
+    private ShuffleboardTab m_cameraTab;
+    private NetworkTableEntry m_cameraHeight;
+    private NetworkTableEntry m_cameraAngle;
+    private NetworkTableEntry m_targetHeight;
+    private NetworkTableEntry m_distance;
 
     public Robot() {
         //instantiates master motors for drive
-        leftTalon = new TalonSRX(1);
-        rightTalon = new TalonSRX(2);
+        m_leftTalon = new TalonSRX(1);
+        m_rightTalon = new TalonSRX(2);
 
         //instantiates slave motors for drive
-        leftVictor = new VictorSPX(11);
-        rightVictor = new VictorSPX(12);
+        m_leftVictor = new VictorSPX(11);
+        m_rightVictor = new VictorSPX(12);
 
         //instantiates the shooter using our drive motors
         //Note that this will need to be fixed when we have all systems on the robot
-        shooter = new Launcher(0.5, leftTalon, rightTalon);
-        shooterControl = new ShuffleboardShooterControl(shooter);
+        m_shooter = new Launcher(0.5, m_leftTalon, m_rightTalon);
+        m_shooterControl = new ShuffleboardShooterControl(m_shooter);
 
         //instantiates currently unused shooter motor
-        shooterMotor = new VictorSPX(15);
+        m_shooterMotor = new VictorSPX(15);
 
         //instantiates our test controller
-        testController = new XboxController(0);
+        m_testController = new XboxController(0);
 
         //instantiate drivetrain for tested
-        driveController = new XboxController(1);
-        leftPiston = new DoubleSolenoid(0,1);
-        rightPiston = new DoubleSolenoid(0,1);
-        drivetrain = new ShiftDrive(leftTalon, rightTalon, leftVictor, rightVictor, leftPiston, rightPiston, true);
+        m_driveController = new XboxController(1);
+        m_leftPiston = new DoubleSolenoid(0,1);
+        m_leftPiston = new DoubleSolenoid(0,1);
+        m_rightPiston = new DoubleSolenoid(2,3);
+        m_drivetrain = new ShiftDrive(m_leftTalon, m_rightTalon, m_leftVictor, m_rightVictor, m_leftPiston, m_rightPiston, true);
 
-        pilotController = new PilotController(driveController, drivetrain, DriveType.kArcade);
+        m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade);
 
         //gives us access to the network table for the limelight
-        limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+        m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
         //sets our default state to the vision pipeline
-        isDriverCamera = false;
+        m_isDriverCamera = false;
 
         //creates a tab on the shuffleboard for the camera
-        cameraTab = Shuffleboard.getTab("Camera");
+        m_cameraTab = Shuffleboard.getTab("Camera");
 
         //Creates editable text fields to set camera height, fixed angle, and target height
-        cameraHeight = cameraTab.addPersistent("Camera Height (m)", 0.0)                
+        m_cameraHeight = m_cameraTab.addPersistent("Camera Height (m)", 0.0)                
                                 .withWidget(BuiltInWidgets.kTextView)             
                                 .withProperties(Map.of("min", 0.0, "max", 6.0)) 
                                 .getEntry();
 
-        cameraAngle = cameraTab.addPersistent("Camera Angle (deg)", 0.0)                
+        m_cameraAngle = m_cameraTab.addPersistent("Camera Angle (deg)", 0.0)                
                                .withWidget(BuiltInWidgets.kTextView)             
                                .withProperties(Map.of("min", 0.0, "max", 90.0)) 
                                .getEntry();
         
-        targetHeight = cameraTab.addPersistent("Target Height (m)", 0.0)                
+        m_targetHeight = m_cameraTab.addPersistent("Target Height (m)", 0.0)                
                                 .withWidget(BuiltInWidgets.kTextView)             
                                 .withProperties(Map.of("min", 0.0, "max", 6.0)) 
                                 .getEntry();
 
         //creates a field to display calculated distance
-        distance = cameraTab.addPersistent("Distance", 0.0)
+        m_distance = m_cameraTab.addPersistent("Distance", 0.0)
                             .getEntry();
 
     }
@@ -137,10 +140,10 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         //zeros used motor contollers
-        leftTalon.set(ControlMode.PercentOutput, 0);
-        rightTalon.set(ControlMode.PercentOutput, 0);
-        leftVictor.set(ControlMode.PercentOutput, 0);
-        rightVictor.set(ControlMode.PercentOutput, 0);
+        m_leftTalon.set(ControlMode.PercentOutput, 0);
+        m_rightTalon.set(ControlMode.PercentOutput, 0);
+        m_leftVictor.set(ControlMode.PercentOutput, 0);
+        m_rightVictor.set(ControlMode.PercentOutput, 0);
     }
 
     @Override
@@ -157,13 +160,13 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        pilotController.controlDriveTrain();
+        m_pilotController.controlDriveTrain();
     }
 
     @Override
     public void testInit() {
         //zeros the shooter
-        shooterControl.zeroSpeed();
+        m_shooterControl.zeroSpeed();
     }
 
     @Override
@@ -177,26 +180,26 @@ public class Robot extends TimedRobot {
         // }
 
         //controls for toggling the camera mode between driver mode and vision mode
-        if(testController.getBButtonReleased()) {
+        if(m_testController.getBButtonReleased()) {
             //if it's in driver mode, set the camera to vision mode
-            if(isDriverCamera) {
-                limelightTable.getEntry("camMode").setNumber(0);
-                limelightTable.getEntry("ledMode").setNumber(0);
+            if(m_isDriverCamera) {
+                m_limelightTable.getEntry("camMode").setNumber(0);
+                m_limelightTable.getEntry("ledMode").setNumber(0);
             }
             //if it's in vision mode, set the camera to driver mode
             else {
-                limelightTable.getEntry("camMode").setNumber(1);
-                limelightTable.getEntry("ledMode").setNumber(1);
+                m_limelightTable.getEntry("camMode").setNumber(1);
+                m_limelightTable.getEntry("ledMode").setNumber(1);
             }
             //toggle the variable
-            isDriverCamera = !isDriverCamera;
+            m_isDriverCamera = !m_isDriverCamera;
         }
 
         //calculates and reports the distance from the robot to the base of the target
-        double netHeight = (targetHeight.getDouble(0) - cameraHeight.getDouble(0));
-        double lengthToHeightRatio = Math.tan((Math.PI / 180) * (cameraAngle.getDouble(0) + limelightTable.getEntry("ty").getDouble(0)));
+        double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
+        double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
         //reports the distance to the smart dashboard
-        distance.setDouble(  netHeight /  lengthToHeightRatio);
+        m_distance.setDouble(netHeight /  lengthToHeightRatio);
     }
 
 }

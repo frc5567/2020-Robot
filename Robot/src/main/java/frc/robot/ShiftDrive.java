@@ -10,6 +10,11 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
+/**
+ * A simple drivetrain that can be controlled via arcade of tank controls and shifted between gears
+ * @author Josh Overbeek
+ * @version 1/25/2019
+ */
 public class ShiftDrive {
 
     /**

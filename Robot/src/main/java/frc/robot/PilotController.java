@@ -4,7 +4,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 /**
- * A class to control the drivetrain with the pilot controller, currently uses arcade drive
+ * A class to control the drivetrain with the pilot controller
+ * @author Josh Overbeek
+ * @version 1/25/2020
  */
 public class PilotController {
     /**
