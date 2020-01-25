@@ -36,6 +36,9 @@ public class ShiftDrive {
     //declare a Gear object to store what gear we are in
     private Gear m_gear;
 
+    //declare a boolean to store whether we have two solenoids
+    private final boolean m_hasTwoSolenoids;
+
     //constructor
     //pass in 2 drive, 2 slave
     /**
@@ -45,9 +48,10 @@ public class ShiftDrive {
      * @param leftSlave The left slave motor contoller
      * @param rightSlave The right slave motor controller
      * @param leftPiston The solenoid for shifting gears on the left gearbox
-     * @param rightPiston THe solenoid for shifting gears on the right gearbox
+     * @param rightPiston The solenoid for shifting gears on the right gearbox
+     * @param hasTwoSolenoids Whether we are using two solenoids
      */
-    public ShiftDrive(TalonSRX leftDrive, TalonSRX rightDrive, VictorSPX leftSlave, VictorSPX rightSlave, DoubleSolenoid leftPiston, DoubleSolenoid rightPiston) {
+    public ShiftDrive(TalonSRX leftDrive, TalonSRX rightDrive, VictorSPX leftSlave, VictorSPX rightSlave, DoubleSolenoid leftPiston, DoubleSolenoid rightPiston, boolean hasTwoSolenoids) {
         m_leftDrive = leftDrive;
         m_rightDrive = rightDrive;
         m_leftSlave = leftSlave;
@@ -55,6 +59,9 @@ public class ShiftDrive {
 
         m_leftPiston = leftPiston;
         m_rightPiston = rightPiston;
+
+        //sets whether we have to solenoids
+        m_hasTwoSolenoids = hasTwoSolenoids;        
 
         //invert the right drive motor, this is arbitrary and should be based on tests
         m_rightDrive.setInverted(true);
@@ -79,8 +86,15 @@ public class ShiftDrive {
      * @param value The value to give to the pistons where kOff removes pressure, kForward is _ gear, and kReverse is _ gear
      */
     private void setPistons(DoubleSolenoid.Value value) {
-        m_leftPiston.set(value);
-        m_rightPiston.set(value);
+        //sets both solenoids if we have two
+        if (m_hasTwoSolenoids) {
+            m_leftPiston.set(value);
+            m_rightPiston.set(value);
+        }
+        //only sets the left solenoid if we have one
+        else {
+            m_leftPiston.set(value);
+        }
     }
 
     /**
