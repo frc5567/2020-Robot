@@ -17,26 +17,25 @@ public class ControlRotator{
     private SpeedController m_rotater;
     //Declares Encoder
     private Encoder m_encoder;
-    //variable for color of wheel to rotate to
-    private char m_fmsColor;
     //variable for number of ticks per 1 revolution of the big wheel. The value that it s currently set to is made up and needs to be changed
     public double TICKS_PER_REVOLUTION = 50;
+    //variable to say if the autorotator is done or not yet
+    boolean doneSpinning;
 
     //constructer
-    public ControlRotator(SpeedController rotater, Encoder rotateEncoder, char fmsColor){
+    public ControlRotator(SpeedController rotater, Encoder rotateEncoder){
         m_rotater = rotater;
-        m_encoder = rotateEncoder;
-        m_fmsColor = fmsColor;
+        m_encoder = rotaterEncoder;
     }
 
     //method for just spinning the wheel on its own
-    public void manualSpin(double speed){
+    public void manualRotate(double speed){
         m_rotater.set(speed);
     }
 
     //method for making the wheel spin about 3 times
     public boolean autoRotate(double speed, boolean doneSpinning){
-        if(m_encoder.get() < 3 * TICKS_PER_REVOLUTION){
+        if(m_encoder.get() < (3 * TICKS_PER_REVOLUTION){
             m_rotater.set(speed);
             doneSpinning = false;
             return doneSpinning;
@@ -60,7 +59,6 @@ public class ControlRotator{
     //method for getting the color recieved from the fms
     public char getRecievedColor(){
         ColorReader color = new ColorReader();
-        m_fmsColor = color.getColor();
-        return m_fmsColor;
+        return color.getColor();
     }      
 }

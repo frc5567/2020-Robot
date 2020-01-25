@@ -1,4 +1,3 @@
-  
 package frc.robot;
 
 import java.util.Map;
@@ -24,7 +23,7 @@ public class ShuffleboardRotatorControl{
         this.controlRotator = controlRotator;
 
         //creates a persistent widget as text for controlling speed
-        setpoint = launcherTab.addPersistent("LaunchSpeed", 0.0)                //creates widget with 0.0 as a default
+        setpoint = controlRotatorTab.addPersistent("RotatorSpeed", 0.0)                //creates widget with 0.0 as a default
                               .withWidget(BuiltInWidgets.kTextView)             //sets widget to a text view
                               .withProperties(Map.of("min", -1.0, "max", 1.0))  //sets min and max values
                               .getEntry();                                      //retrieves the entry to assign our setpoint
@@ -39,14 +38,13 @@ public class ShuffleboardRotatorControl{
         double tempSpeed = setpoint.getDouble(0.0);
 
         //runs the proportional control system based on the aquired speed
-        launcher.proportionalSpeedSetter(tempSpeed);
+        controlRotator.proportionalSpeedSetter(tempSpeed);
     }
 
     /**
      * Sets the setpoint to zero, should be used as a default state
      */
     public void zeroSpeed() {
-        launcher.proportionalSpeedSetter(0.0);
+        controlRotator.proportionalSpeedSetter(0.0);
     }
-
 }
