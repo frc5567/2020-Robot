@@ -99,7 +99,7 @@ public class Robot extends TimedRobot {
         driveController = new XboxController(1);
         leftPiston = new DoubleSolenoid(0,1);
         rightPiston = new DoubleSolenoid(0,1);
-        drivetrain = new ShiftDrive(leftTalon, rightTalon, leftVictor, rightVictor, leftPiston, rightPiston)
+        drivetrain = new ShiftDrive(leftTalon, rightTalon, leftVictor, rightVictor, leftPiston, rightPiston, true);
 
         pilotController = new PilotController(driveController, drivetrain, DriveType.kArcade);
 
