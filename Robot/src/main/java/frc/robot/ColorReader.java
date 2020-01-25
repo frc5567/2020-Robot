@@ -10,7 +10,7 @@ public class ColorReader{
     private String m_gameData;
 
     //Method for either recieving color from fms at comps or manually changing thre recieved color
-    public void colorReader(){
+    public ColorReader(){
         //This can be manually changed from the driver station
         this.m_gameData = DriverStation.getInstance().getGameSpecificMessage();
     }
