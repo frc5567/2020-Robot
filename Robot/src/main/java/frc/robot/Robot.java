@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
     VictorSPX m_leftVictor;
     VictorSPX m_rightVictor;
 
-    VictorSPX m_shooterMotor;
+    // VictorSPX m_intakeMotor;
 
     //declares our launcher system and our controls for that system over the launcher tab
     Launcher m_shooter;
@@ -79,12 +79,12 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         //instantiates master motors for drive
-        m_leftTalon = new TalonSRX(1);
-        m_rightTalon = new TalonSRX(2);
+        m_leftTalon = new TalonSRX(RobotMap.LEFT_TALON_ID);
+        m_rightTalon = new TalonSRX(RobotMap.RIGHT_TALON_ID);
 
         //instantiates slave motors for drive
-        m_leftVictor = new VictorSPX(11);
-        m_rightVictor = new VictorSPX(12);
+        m_leftVictor = new VictorSPX(RobotMap.LEFT_VICTOR_ID);
+        m_rightVictor = new VictorSPX(RobotMap.RIGHT_VICTOR_ID);
 
         //instantiates the shooter using our drive motors
         //Note that this will need to be fixed when we have all systems on the robot
@@ -92,16 +92,16 @@ public class Robot extends TimedRobot {
         m_shooterControl = new ShuffleboardShooterControl(m_shooter);
 
         //instantiates currently unused shooter motor
-        m_shooterMotor = new VictorSPX(15);
+        // m_intakeMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
 
         //instantiates our test controller
-        m_testController = new XboxController(0);
+        m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
 
         //instantiate drivetrain for tested
-        m_driveController = new XboxController(1);
-        m_leftPiston = new DoubleSolenoid(0,1);
-        m_leftPiston = new DoubleSolenoid(0,1);
-        m_rightPiston = new DoubleSolenoid(2,3);
+        m_driveController = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
+
+        m_leftPiston = new DoubleSolenoid(RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
+        m_rightPiston = new DoubleSolenoid(RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
         m_drivetrain = new ShiftDrive(m_leftTalon, m_rightTalon, m_leftVictor, m_rightVictor, m_leftPiston, m_rightPiston, true);
 
         m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade);
