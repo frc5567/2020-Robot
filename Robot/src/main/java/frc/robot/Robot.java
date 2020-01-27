@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -20,6 +21,7 @@ import frc.robot.PilotController.DriveType;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import java.util.Map;
 
@@ -77,7 +79,17 @@ public class Robot extends TimedRobot {
     private NetworkTableEntry m_targetHeight;
     private NetworkTableEntry m_distance;
 
+    //test variables for the falcon test
+    private TalonFX m_masterFalcon;
+    private TalonFX m_slaveFalcon;
+
     public Robot() {
+        //instantiates falcon motors for test
+        m_masterFalcon = new TalonFX(21);
+        m_slaveFalcon = new TalonFX(22);
+
+        m_slaveFalcon.follow(m_masterFalcon);
+
         //instantiates master motors for drive
         m_leftTalon = new TalonSRX(RobotMap.LEFT_TALON_ID);
         m_rightTalon = new TalonSRX(RobotMap.RIGHT_TALON_ID);
@@ -144,6 +156,9 @@ public class Robot extends TimedRobot {
         m_rightTalon.set(ControlMode.PercentOutput, 0);
         m_leftVictor.set(ControlMode.PercentOutput, 0);
         m_rightVictor.set(ControlMode.PercentOutput, 0);
+
+        m_masterFalcon.set(ControlMode.PercentOutput, 0);
+        m_slaveFalcon.follow(m_masterFalcon);
     }
 
     @Override
@@ -160,7 +175,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        m_pilotController.controlDriveTrain();
+        m_masterFalcon.set(ControlMode.PercentOutput, m_driveController.getTriggerAxis(Hand.kRight) - m_driveController.getTriggerAxis(Hand.kLeft));
+        m_slaveFalcon.follow(m_masterFalcon);
+        //m_pilotController.controlDriveTrain();
     }
 
     @Override
