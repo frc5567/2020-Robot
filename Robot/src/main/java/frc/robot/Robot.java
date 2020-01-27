@@ -9,10 +9,13 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+
+import frc.robot.Drivetrain;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,6 +29,9 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
    */
+  Drivetrain m_drivetrain;
+  Pathing m_pather;
+
   TalonSRX leftTalon;
   TalonSRX rightTalon;
 
@@ -53,6 +59,17 @@ public class Robot extends TimedRobot {
 
     testController = new XboxController(0);
 
+    m_drivetrain = new Drivetrain(m_gyro);
+
+    try {
+      m_pather = new Pathing(m_drivetrain, m_gyro, testController);
+    } catch (Exception e) {
+      System.out.println("Pather failed to instantiate");
+    }
+
+    m_drivetrain.talonDriveConfig();
+
+
   }
 
   @Override
@@ -61,10 +78,15 @@ public class Robot extends TimedRobot {
     rightTalon.set(ControlMode.PercentOutput, 0);
     leftVictor.set(ControlMode.PercentOutput, 0);
     rightVictor.set(ControlMode.PercentOutput, 0);
+
+    m_drivetrain.talonDriveConfig();
   }
 
   @Override
   public void autonomousInit() {
+     if (m_pather != null) {
+      m_pather.resetFlags();
+    }
   }
 
   @Override
@@ -73,6 +95,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    if (m_pather != null) {
+      m_pather.resetFlags();
+    }
   }
 
   @Override
@@ -91,5 +116,16 @@ public class Robot extends TimedRobot {
     }
     else shooterControl.zeroSpeed();
   }
+
+  m_drivetrain.talonArcadeDrive((testController.getTriggerAxis(Hand.kRight) - testController.getTriggerAxis(Hand.kLeft)), testController.getX(Hand.kLeft), true);
+
+    // Command for switching between the two solenoid positions. The positions are forward and reverse.
+    if(testController.getXButton()){
+      if(SOLENOID_POSITION == true){
+        solenoidReverse();
+      } else {
+        solenoidForward();
+        }
+    }
 
 }

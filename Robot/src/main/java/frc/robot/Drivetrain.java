@@ -1,78 +1,403 @@
 package frc.robot;
 
 // imports Motor Controllers, Controller group functions, Basic differenctial drive code, solenoid functions, and functions for getting the joystick values
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
-//import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first. wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.command.PIDSubsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SensorCollection;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
+import com.ctre.phoenix.motorcontrol.SensorTerm;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.FollowerType;
+
+import edu.wpi.first.wpilibj.Ultrasonic;
+import edu.wpi.first.wpilibj.Ultrasonic.Unit;
 
 
 
-public class Drivetrain{
+public class Drivetrain implements PIDSubsystem{
+    private NavX m_gyro;
+
+   //Declares turn control PID
+    PIDSubsystem m_rotController;
+
+    boolean m_firstCall = true;
+
+    double m_currentSpeed;
+    double m_currentRotate;
+
+    boolean m_quickTurnEnabled;
 
     // Declare variable for speed
     double m_speed = 0.0;
-    // Declare front left talon
-    WPI_TalonSRX m_frontRightMotor;
-    // Declare back left talon
-    WPI_TalonSRX m_frontLeftMotor;
-    // Declare front right talon
-    WPI_VictorSPX m_backLeftMotor;
-    // Declare back right talon
-    WPI_VictorSPX m_backRightMotor;
+    // Declare master left talon
+    WPI_TalonSRX m_masterRightMotor;
+    // Declare slave left talon
+    WPI_TalonSRX m_masterLeftMotor;
+    // Declare master right talon
+    WPI_VictorSPX m_slaveLeftMotor;
+    // Declare slave right talon
+    WPI_VictorSPX m_slaveRightMotor;
 
-    //Declares speed controller objects (treats front left + back left as one)
-    SpeedControllerGroup m_leftSpeedControllers; 
-    SpeedControllerGroup m_rightSpeedControllers; 
+    private SensorCollection m_leftDriveEncoder;
+    private SensorCollection m_rightDriveEncoder;
 
     //Declares drivetrain object
-    //DifferentialDrive m_driveTrain;
+    private DifferentialDrive m_drivetrain;
 
-    //Declares Xbox controller object
-    XboxController m_driveController;
+    private Ultrasonic ultraLeft;
+    private Ultrasonic ultraRight;
+
+    int m_counter;
 
     //Declares the solenoid as an object
     DoubleSolenoid m_twoSpeedSolenoid;
-
-    //Declares object to represent motor power for the speed controller groups 
-    double m_motorPowerLeft;
-    double m_motorPowerRight;
-
-    //Declares a value for the deadbands
-    public static final double CONTROLLER_STICK_DEADBAND = 0.1; // double check to make sure it is supposed to be public
-
+    
     //Declares a boolean for determining the position of the double solenoid. True = Forward  False = Reverse
     boolean SOLENOID_POSITION;
+    
+    public final double kP;
+    public final double kI;
+    public final double kD;
+    public final double kF;
+    public final int kIzone;
+    public final double kPeakOutput;
 
+    public static final Gains DRIVETRAIN_GAINS = new Gains(0.3, 0.0, 0.0, 0.0, 100, 1.0);
+    public final static Gains GAINS_TURNING = new Gains(0.1, 0.0, 0.0, 0.0, 200, 1.0);
 
-    public Drivetrain(){
+    public Drivetrain(NavX ahrs){
 
         //Instatiates the motor controllers
-        m_frontLeftMotor = new WPI_TalonSRX(1);
-        m_frontRightMotor = new WPI_TalonSRX(2);
-        m_backLeftMotor = new WPI_VictorSPX(3);
-        m_backRightMotor = new WPI_VictorSPX(4);
+        m_masterLeftMotor = new WPI_TalonSRX(1);
+        m_masterRightMotor = new WPI_TalonSRX(2);
+        m_slaveLeftMotor = new WPI_VictorSPX(3);
+        m_slaveRightMotor = new WPI_VictorSPX(4);
 
-        //Instantiates the speed controller groups as an object
-        m_leftSpeedControllers = new SpeedControllerGroup(m_frontLeftMotor, m_backLeftMotor);
-        m_rightSpeedControllers = new SpeedControllerGroup(m_frontRightMotor, m_backRightMotor);
-       
-        //Sets the base motor power (i.e when the robto starts)
-        m_motorPowerLeft = 0.0;
-        m_motorPowerRight = 0.0;
+        m_leftDriveEncoder = new SensorCollection(m_masterLeftMotor);
+        m_rightDriveEncoder = new SensorCollection(m_masterRightMotor);
 
-        // instantiates/ creates the Xbox controller as an object used
-        m_driveController = new XboxController(5);
+        m_leftDriveEncoder.setQuadraturePosition(0, 0);
+        m_rightDriveEncoder.setQuadraturePosition(0, 0);
+
+        m_slaveLeftMotor.follow(m_masterLeftMotor);
+        m_slaveRightMotor.follow(m_masterRightMotor);
+
+        m_drivetrain = new DifferentialDrive(m_masterLeftMotor, m_masterRightMotor);
+
+        m_currentSpeed = 0;
+        m_currentRotate = 0;
+
+        m_gyro = ahrs;
+
+        ultraLeft = new Ultrasonic(2, 1);
+        ultraRight = new Ultrasonic(4, 3);
+        ultraLeft.setEnabled(true);
+        ultraLeft.setAutomaticMode(true);
+        ultraLeft.setDistanceUnits(Unit.kInches);
+        ultraRight.setEnabled(true);
+        ultraRight.setAutomaticMode(true);
+        ultraRight.setDistanceUnits(Unit.kInches);
+
+        m_rotController = new PIDSubsystem(0.035, 0.00, 0.00, 0.00, m_gyro, this, 0.02);
+        m_rotController.setInputRange(-180.00, 180.00);
+
+        m_rotController.setOutputRange(-0.5, 0.5);
+        m_rotController.setAbsoluteTolerance(2);
+        m_rotController.setContinuous();
+        m_rotController.disable();
+
+        m_counter = 0;
+
 
         //instantiates the double solenoid
         m_twoSpeedSolenoid = new DoubleSolenoid(0, 1); //<-We'll need to check the channels to make sure they're right.
 
-        //m_driveTrain = new DifferentialDrive(m_leftSpeedControllers, m_rightSpeedControllers);
     }
+
+    public Gains(double _kP, double _kI, double _kD, double _kF, int _kIzone, double _kPeakOutput){
+        kP = _kP;
+        kI = _kI;
+        kD = _kD;
+        kF = _kF;
+        kIzone = _kIzone;
+        kPeakOutput = _kPeakOutput;
+    }
+
+    public DifferentialDrive getDrivetrain(){
+        return m_drivetrain;
+    }
+
+    public void curvatureDrive(double desiredSpeed, double desiredRotate){
+        if (desiredSpeed > (m_currentSpeed + 0.1)) {
+            m_currentSpeed += 0.1;
+        }
+
+        else if (desiredSpeed < (m_currentSpeed - 0.1)) {
+            m_currentSpeed -= 0.1;
+        }
+
+        else {
+            m_currentSpeed = desiredSpeed;
+        }
+
+
+
+        if (desiredRotate > (m_currentRotate + 0.1)) {
+            m_currentRotate += 0.1;
+        }
+
+        else if (desiredRotate < (m_currentRotate - 0.1)){
+            m_currentRotate -= 0.1;
+        }
+
+        else {
+            m_currentRotate = desiredRotate;
+        }
+
+
+        if ((m_currentSpeed < 0.1) && (m_currentSpeed > 0.1)) {
+            m_quickTurnEnabled = true;
+        } else {
+            m_quickTurnEnabled = false;
+        }
+
+        m_drivetrain.curvatureDrive(m_currentSpeed, m_currentRotate, m_quickTurenEnabled);
+    }
+
+    public boolean rotateToAngle(double tragetAngle) {
+        boolean isFinished = false;
+
+        if (m_firstCall) {
+            m_rotController.reset();
+
+            m_rotController.enable();
+
+            m_rotController.setSetpoint(targetAngle);
+
+            m_firstCall = false;
+
+            m_counter = 0;
+        }
+
+        double returnedRotate = m_rotController.get();
+
+        talonArcadeDrive(0, returnedRotate, false);
+
+
+        if ( ((returnedRotate < 0.15) && (returnedRotate > -0.15)) && (m_counter > 10)){
+            isFinished = true;
+            m_firstCall = true;
+            System.out.println("FINISHED");
+        }
+
+        if (isFinished) {
+            m_counter = 0;
+        }
+        else {
+            m_counter++;
+        }
+
+        return isFinished;
+    }
+
+    public boolean rotateDriveAngle(double targetAngle, double target) {
+        boolean isFinished = false;
+
+        if (m_firstCall) {
+            m_rotController.reset();
+
+            m_rotController.enable();
+
+            m_firstCall = false;
+        }
+
+        if (m_rotController.getSetpoint() != targetAngle) {
+            m_rotController.reset();
+
+            m_rotController.enable();
+
+            m_rotController.setSetpoint(targetAngle);
+        }
+
+        double returnedRotate = m_rotController.get();
+
+        System.out.println("Returned Rotate: \t" + returnedRotate);
+
+        talonArcadeDrive(0.2, returnedRotate, false);
+
+        if (ultraLeft.getRangeInches() > target && ultraRight.getRangeInches() > target) {
+            talonArcadeDrive(0.2, returnedRotate, false);
+            isFinished = false;
+        }
+        else {
+            talonArcadeDrive(0.2, 0, false);
+            isFinished = true;
+        }
+
+        return isFinished;
+    }
+
+
+    public void talonDriveConfig(){
+
+        m_masterLeftMotor.set(ControlMode.PercentOutput, 0);
+        m_masterRightMotor.set(ControlMode.PercentOutput, 0);
+
+        m_masterLeftMotor.setNeutralMode(NeutralMode.Brake);
+        m_masterRightMotor.setNeutralMode(NeutralMode.Brake);
+
+        m_slaveLeftMotor.setNeutralMode(NeutralMode.Brake);
+        m_slaveRightMotor.setNeuetralMode(NeutralMode.brake);
+
+
+        m_masterLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 30);
+
+        m_masterRightMotor.configRemoteFeedbackFilter(m_masterLeftMotor.getDeviceID(), RemoteSensorSource.TalonSRX_SelectedSensor, 1, 30);
+
+
+        m_masterRightMotor.configSensorTerm(SensorTerm.Sum0, FeedbackDevice.RemoteSensor1, 30);
+
+        m_masterRightMotor.configSensorTerm(SensorTerm.Sum1, FeedbackDevice.QuadEncoder, 30);
+
+        m_masterRightMotor.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.RemoteSensor1, 30);
+        m_masterRightMotor.configSensorTerm(SensorTerm.Diff0, FeedbackDevice.QuadEncoder, 30);
+
+        m_masterRightMotor.configSelectedFeedbackSensor(FeedbackDevice.SensorSum, 0, 30);
+
+        m_masterRightMotor.configSelectedFeedbackCoefficient(0.5, 0, 30);
+
+        m_masterRightMotor.configSelectedFeedbackSensor(FeedbackDevice.SensorDifference, 1, 30);
+
+        m_masterRightMotor.configSelectedFeedbackCoefficient(1, 1, 30);
+
+        m_masterRightMotor.setSelectedSensorPosition(0, 0, 30);
+        m_masterRightMotor.setSelectedSensorPosition(0, 1, 30);
+        m_masterLeftMotor.setSelectedSensorPosition(0);
+
+        m_masterLeftMotor.setInverted(false);
+        m_masterLeftMotor.setSensorPhase(true);
+        m_masterRightMotor.setInverted(false);
+        m_masterRightMotor.setSensorPhase(true);
+
+        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, 30);
+        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 20, 30);
+        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 20, 30);
+        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_10_Tagets, 20, 30);
+        m_masterLeftMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 30);
+
+        m_masterRightMotor.configNeutralDeadband(0.001, 30);
+        m_masterLeftMotor.configNeutralDeadband(0.001, 30);
+
+
+        m_masterLeftMotor.configPeakOutputForward(+1.0, 30);
+        m_masterLeftMotor.configPeakOutputReverse(-1.0, 30);
+        m_masterRightMotor.configPeakOutputForward(+1.0, 30);
+        m_masterRightMotor.configPeakOutputReverse(-1.0, 30);
+
+        m_masterRightMotor.configMotionAcceleration(2000, 30);
+        m_masterRightMotor.configMotionCruiseVelocity(2000, 30);
+
+
+        m_masterRightMotor.config_kP(0, DRIVETRAIN_GAINS.kP, 30);
+        m_masterRightMotor.config_kI(0, DRIVETRAIN_GAINS.kI, 30);
+        m_masterRightMotor.config_kD(0, DRIVETRAIN_GAINS.kD, 30);
+        m_masterRightMotor.config_kf(0, DRIVETRAIN_GAINS.kF, 30);
+        m_masterRightMotor.config_IntegralZone(0, DRIVETRAIN_GAINS.kPeakOutput, 30);
+        m_masterRightMotr.configAllowableClosedloopError(0, 0,30);
+
+        m_masterRightMotor.config_kP(1, GAINS_TURNING.kP, 30);
+        m_masterRightMotor.config_kI(1, GAINS_TURNING.kI, 30);
+        m_masterRightMotor.config_kD(1, GAINS_TURNING.kD, 30);
+        m_masterRightMotor.config_kF(1, GAINS_TURNING.kF, 30);
+        m_masterRightMotor.config_IntegralZone(1, GAINS_TURNING.kIzone, 30);
+        m_masterRightMotor.configColsedLoopoPeakOutput(1, GAINS_TURNING.kPeakOutput, 30);
+        m_masterRightMotor.configAllowableClosedloopError(1, 0, 30);
+
+        m_masterRightMotor.configClosedLoopPeriod(0, 10, 30);
+        m_masterRightMotor.configClosedLoopPeriod(1, 10, 30);
+
+        m_masterRightMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 10);
+
+
+        m_masterRightMotor.configAuxPIDPolarity(false, 30);
+
+        m_masterRightMotor.selectProfileSlot(0, 0);
+        m_masterRightMotor.selectProgileSlot(1, 1);
+        
+    }
+
+    public void talonArcadeDrive (double forward, double turn, boolean setter) {
+        if (setter) {
+            if (forward > (m_currentSpeed + 0.1)) {
+                m_currentSpeed += 0.1;
+            }
+
+            else if (forward < (m_currentSpeed - 0.1)) {
+                m_currentSpeed -= 0.1;
+            }
+
+            else {
+                m_currentSpeed = forward;
+            }
+
+
+            if (turn > (m_currentRotate + 0.1)) {
+                m_currentRotate += 0.1;
+            }
+
+            else if (turn < (m_currentRotate - 0.1)) {
+                m_currentRotate -= 0.1;
+            }
+
+            else {
+                m_currentRotate = turn;
+            }
+            m_masterLeftMotor.set(CotrolMode.PercentOutput, m_currentRotate, DemandType.ArbitraryFeedForward, +m_currentSpeed);
+            m_masterRightMotor.set(ControlMode.PercentOutput, m_currentRotate, DemandType.ArbiitraryFeedForward, -m_currentSpeed);
+        }
+        else {
+            m_masterLeftMotor.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, +forward);
+            m_masterRightMotor.set(ContrlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, -forrward);
+        }
+    }
+
+    private double inToTics(double inches){
+        return inches*(4096 / (6*3.14159265359));
+    }
+
+    //do we need?
+    public Ultrasonic getLeftUltra() {
+        return ultraLeft;
+    }
+
+    //do we need?
+    public Ultrasonic getRightUltra() {
+        return ultraRight;
+    }
+
+    public int getRightDriveEncoderPosition() {
+        return m_rightDriveEncoder.getQuadraturePosition();
+    }
+
+    public int getLeftDriveEncoderVelocity(){
+        return m_leftDriveEncoder.getQuadratureVelocity();
+    }
+
+    public int getRightDriveEncoderVelocity(){
+        return m_rightDriveEncoder.getQuadratureVelocity();
+    }
+
 
 
        //Creates a function for setting the solenoid 1 (aka forward)
@@ -86,7 +411,7 @@ public class Drivetrain{
             SOLENOID_POSITION = false;
        }
 
-       // Function for switching between the two solenoid positions
+       // Function for switching between the two solenoid positions. The positions are forward and reverse.
        public void switchSolenoidGear(){
            if(m_driveController.getXButton()){
                if(SOLENOID_POSITION == true){
@@ -95,74 +420,6 @@ public class Drivetrain{
                     solenoidForward();
                }
            }
-       }
-
-       // Function that gets the y value for the left joystick on the controller with the use of a deadband
-       public double getY(){
-           //Declares the double for the stickYValue
-           double stickYValue;
-
-           // If the position of the joystick is within the deadband the value is set to 0. If not it is set to the value of the joystick's position
-           if ((m_driveController.getY(Hand.kLeft) < CONTROLLER_STICK_DEADBAND) && (m_driveController.getY(Hand.kLeft) > - CONTROLLER_STICK_DEADBAND)){
-               stickYValue = 0.00;
-           } else {
-               stickYValue = m_driveController.getY(Hand.kLeft);
-           }
-
-           // Returns the Y stick value
-           return stickYValue;
-       }
-
-
-       // Function to get the x value for the right joystick on the controller with the use of a deadband
-       public double getX(){
-           //Declares the double for the stickXValue
-           double stickXValue;
-
-        // If the position of the joystick is within the deadband the value is set to 0. If not it is set to the value of the joystick's position
-           if((m_driveController.getX(Hand.kRight) < CONTROLLER_STICK_DEADBAND) && (m_driveController.getX(Hand.kRight) > - CONTROLLER_STICK_DEADBAND)){
-               stickXValue = 0.00;
-           } else {
-               stickXValue = m_driveController.getX(Hand.kRight);
-           }
-
-           //Returns the X stick value
-           return stickXValue;
-       }
-       
-
-
-    // Makes the robot move forward and backward by setting both motors to the joystick's Y value
-    public void linearDrive(){
-            m_motorPowerLeft = getY();
-            m_motorPowerRight = - getY();
-            m_leftSpeedControllers.set(m_motorPowerLeft);
-            m_rightSpeedControllers.set(m_motorPowerRight); 
-    }
-
-
-    // Makes the Robot Turn Right by setting both motors to the joystick's X value.
-    public void rightTurn(){
-        if (m_driveController.getX(Hand.kRight) > CONTROLLER_STICK_DEADBAND){
-            m_motorPowerLeft = - getX();
-            m_motorPowerRight = - getX();
-            m_leftSpeedControllers.set(m_motorPowerLeft);
-            m_rightSpeedControllers.set(m_motorPowerRight);
-        } else {
-            m_leftSpeedControllers.stopMotor(); //Might not need, see through testing
-            m_rightSpeedControllers.stopMotor(); //Might not need, see through testing
         }
-    }
-    // Makes the Robot turn Left y setting both to the joystick's x value
-    public void leftTurn(){
-        if (m_driveController.getX(Hand.kRight) < CONTROLLER_STICK_DEADBAND){
-            m_motorPowerLeft = getX();
-            m_motorPowerRight = getX();
-            m_leftSpeedControllers.set(m_motorPowerLeft);
-            m_rightSpeedControllers.set(m_motorPowerRight); 
-        } else {
-            m_leftSpeedControllers.stopMotor(); //Might not need, see through testing
-            m_rightSpeedControllers.stopMotor(); //Might not need, see through testing
-        }
-    }
+
 }
