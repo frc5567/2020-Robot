@@ -3,7 +3,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Encoder;
 
-
+/**
+ * Small wheel used to spin the control panel
+ * 
+ * @version 1/27/2020
+ * @author Caleb Overbeek
+ */
 public class ControlRotator{
 
     //Declares Speedcontroller

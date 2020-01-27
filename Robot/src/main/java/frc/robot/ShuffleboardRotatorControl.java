@@ -7,6 +7,12 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
+/**
+ * Shuffleboard controls for the speed of the control panel spinner
+ * 
+ * @version 1/27/2020
+ * @author Caleb Overbeek
+ */
 public class ShuffleboardRotatorControl{
 
     //declare variables

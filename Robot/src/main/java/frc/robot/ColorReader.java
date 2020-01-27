@@ -4,6 +4,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 //import edu.wpi.first.wpilibj.DriverStation;
 
+/**
+ * For recieving color data sent from the FMS
+ * 
+ * @version 1/27/2020
+ * @author Caleb Overbeek
+ */
 public class ColorReader{
     
     //declares gameData varibale
