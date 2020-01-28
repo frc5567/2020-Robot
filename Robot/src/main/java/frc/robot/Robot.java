@@ -21,11 +21,13 @@ import frc.robot.PilotController.DriveType;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import java.util.Map;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -90,83 +92,90 @@ public class Robot extends TimedRobot {
 
         m_slaveFalcon.follow(m_masterFalcon);
 
-        //instantiates master motors for drive
-        m_leftTalon = new TalonSRX(RobotMap.LEFT_TALON_ID);
-        m_rightTalon = new TalonSRX(RobotMap.RIGHT_TALON_ID);
+        // //instantiates master motors for drive
+        // m_leftTalon = new TalonSRX(RobotMap.LEFT_TALON_ID);
+        // m_rightTalon = new TalonSRX(RobotMap.RIGHT_TALON_ID);
 
-        //instantiates slave motors for drive
-        m_leftVictor = new VictorSPX(RobotMap.LEFT_VICTOR_ID);
-        m_rightVictor = new VictorSPX(RobotMap.RIGHT_VICTOR_ID);
+        // //instantiates slave motors for drive
+        // m_leftVictor = new VictorSPX(RobotMap.LEFT_VICTOR_ID);
+        // m_rightVictor = new VictorSPX(RobotMap.RIGHT_VICTOR_ID);
 
-        //instantiates the shooter using our drive motors
-        //Note that this will need to be fixed when we have all systems on the robot
-        m_shooter = new Launcher(0.5, m_leftTalon, m_rightTalon);
-        m_shooterControl = new ShuffleboardShooterControl(m_shooter);
+        // //instantiates the shooter using our drive motors
+        // //Note that this will need to be fixed when we have all systems on the robot
+        // m_shooter = new Launcher(0.5, m_leftTalon, m_rightTalon);
+        // m_shooterControl = new ShuffleboardShooterControl(m_shooter);
 
-        //instantiates currently unused shooter motor
-        // m_intakeMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
+        // //instantiates currently unused shooter motor
+        // // m_intakeMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
 
-        //instantiates our test controller
-        m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
+        // //instantiates our test controller
+        // m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
 
         //instantiate drivetrain for tested
         m_driveController = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
 
-        m_leftPiston = new DoubleSolenoid(RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
-        m_rightPiston = new DoubleSolenoid(RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
-        m_drivetrain = new ShiftDrive(m_leftTalon, m_rightTalon, m_leftVictor, m_rightVictor, m_leftPiston, m_rightPiston, true);
+        // m_leftPiston = new DoubleSolenoid(RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
+        // m_rightPiston = new DoubleSolenoid(RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
+        // m_drivetrain = new ShiftDrive(m_leftTalon, m_rightTalon, m_leftVictor, m_rightVictor, m_leftPiston, m_rightPiston, true);
 
-        m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade);
+        // m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade);
 
-        //gives us access to the network table for the limelight
-        m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+        // //gives us access to the network table for the limelight
+        // m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
-        //sets our default state to the vision pipeline
-        m_isDriverCamera = false;
+        // //sets our default state to the vision pipeline
+        // m_isDriverCamera = false;
 
-        //creates a tab on the shuffleboard for the camera
-        m_cameraTab = Shuffleboard.getTab("Camera");
+        // //creates a tab on the shuffleboard for the camera
+        // m_cameraTab = Shuffleboard.getTab("Camera");
 
-        //Creates editable text fields to set camera height, fixed angle, and target height
-        m_cameraHeight = m_cameraTab.addPersistent("Camera Height (m)", 0.0)                
-                                .withWidget(BuiltInWidgets.kTextView)             
-                                .withProperties(Map.of("min", 0.0, "max", 6.0)) 
-                                .getEntry();
+        // //Creates editable text fields to set camera height, fixed angle, and target height
+        // m_cameraHeight = m_cameraTab.addPersistent("Camera Height (m)", 0.0)                
+        //                         .withWidget(BuiltInWidgets.kTextView)             
+        //                         .withProperties(Map.of("min", 0.0, "max", 6.0)) 
+        //                         .getEntry();
 
-        m_cameraAngle = m_cameraTab.addPersistent("Camera Angle (deg)", 0.0)                
-                               .withWidget(BuiltInWidgets.kTextView)             
-                               .withProperties(Map.of("min", 0.0, "max", 90.0)) 
-                               .getEntry();
+        // m_cameraAngle = m_cameraTab.addPersistent("Camera Angle (deg)", 0.0)                
+        //                        .withWidget(BuiltInWidgets.kTextView)             
+        //                        .withProperties(Map.of("min", 0.0, "max", 90.0)) 
+        //                        .getEntry();
         
-        m_targetHeight = m_cameraTab.addPersistent("Target Height (m)", 0.0)                
-                                .withWidget(BuiltInWidgets.kTextView)             
-                                .withProperties(Map.of("min", 0.0, "max", 6.0)) 
-                                .getEntry();
+        // m_targetHeight = m_cameraTab.addPersistent("Target Height (m)", 0.0)                
+        //                         .withWidget(BuiltInWidgets.kTextView)             
+        //                         .withProperties(Map.of("min", 0.0, "max", 6.0)) 
+        //                         .getEntry();
 
-        //creates a field to display calculated distance
-        m_distance = m_cameraTab.addPersistent("Distance", 0.0)
-                            .getEntry();
+        // //creates a field to display calculated distance
+        // m_distance = m_cameraTab.addPersistent("Distance", 0.0)
+        //                     .getEntry();
 
     }
 
     @Override
     public void robotInit() {
         //zeros used motor contollers
-        m_leftTalon.set(ControlMode.PercentOutput, 0);
-        m_rightTalon.set(ControlMode.PercentOutput, 0);
-        m_leftVictor.set(ControlMode.PercentOutput, 0);
-        m_rightVictor.set(ControlMode.PercentOutput, 0);
+        // m_leftTalon.set(ControlMode.PercentOutput, 0);
+        // m_rightTalon.set(ControlMode.PercentOutput, 0);
+        // m_leftVictor.set(ControlMode.PercentOutput, 0);
+        // m_rightVictor.set(ControlMode.PercentOutput, 0);
 
+        m_masterFalcon.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+        m_masterFalcon.config_kP(0, 0);
+        m_masterFalcon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         m_masterFalcon.set(ControlMode.PercentOutput, 0);
         m_slaveFalcon.follow(m_masterFalcon);
     }
 
     @Override
     public void autonomousInit() {
+        m_masterFalcon.configMotionAcceleration(20);
+        m_masterFalcon.configMotionCruiseVelocity(100);
     }
 
     @Override
     public void autonomousPeriodic() {
+        m_masterFalcon.set(ControlMode.MotionMagic, 10000);
+        m_slaveFalcon.follow(m_masterFalcon);
     }
 
     @Override
@@ -197,26 +206,26 @@ public class Robot extends TimedRobot {
         // }
 
         //controls for toggling the camera mode between driver mode and vision mode
-        if(m_testController.getBButtonReleased()) {
-            //if it's in driver mode, set the camera to vision mode
-            if(m_isDriverCamera) {
-                m_limelightTable.getEntry("camMode").setNumber(0);
-                m_limelightTable.getEntry("ledMode").setNumber(0);
-            }
-            //if it's in vision mode, set the camera to driver mode
-            else {
-                m_limelightTable.getEntry("camMode").setNumber(1);
-                m_limelightTable.getEntry("ledMode").setNumber(1);
-            }
-            //toggle the variable
-            m_isDriverCamera = !m_isDriverCamera;
-        }
+        // if(m_testController.getBButtonReleased()) {
+        //     //if it's in driver mode, set the camera to vision mode
+        //     if(m_isDriverCamera) {
+        //         m_limelightTable.getEntry("camMode").setNumber(0);
+        //         m_limelightTable.getEntry("ledMode").setNumber(0);
+        //     }
+        //     //if it's in vision mode, set the camera to driver mode
+        //     else {
+        //         m_limelightTable.getEntry("camMode").setNumber(1);
+        //         m_limelightTable.getEntry("ledMode").setNumber(1);
+        //     }
+        //     //toggle the variable
+        //     m_isDriverCamera = !m_isDriverCamera;
+        // }
 
-        //calculates and reports the distance from the robot to the base of the target
-        double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
-        double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
-        //reports the distance to the smart dashboard
-        m_distance.setDouble(netHeight /  lengthToHeightRatio);
+        // //calculates and reports the distance from the robot to the base of the target
+        // double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
+        // double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
+        // //reports the distance to the smart dashboard
+        // m_distance.setDouble(netHeight /  lengthToHeightRatio);
     }
 
 }
