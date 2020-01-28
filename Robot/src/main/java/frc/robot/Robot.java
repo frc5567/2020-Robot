@@ -28,6 +28,8 @@ import java.util.Map;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.FollowerType;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -160,22 +162,25 @@ public class Robot extends TimedRobot {
         // m_rightVictor.set(ControlMode.PercentOutput, 0);
 
         m_masterFalcon.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-        m_masterFalcon.config_kP(0, 0);
+        m_masterFalcon.config_kP(0, 1);
         m_masterFalcon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         m_masterFalcon.set(ControlMode.PercentOutput, 0);
-        m_slaveFalcon.follow(m_masterFalcon);
-    }
-
-    @Override
-    public void autonomousInit() {
+        m_slaveFalcon.follow(m_masterFalcon, FollowerType.PercentOutput);
         m_masterFalcon.configMotionAcceleration(20);
         m_masterFalcon.configMotionCruiseVelocity(100);
     }
 
     @Override
+    public void autonomousInit() {
+    }
+
+    @Override
     public void autonomousPeriodic() {
-        m_masterFalcon.set(ControlMode.MotionMagic, 10000);
+        System.out.println("in auton");
+        m_masterFalcon.set(TalonFXControlMode.MotionMagic, 10000);
         m_slaveFalcon.follow(m_masterFalcon);
+
+
     }
 
     @Override
@@ -184,7 +189,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        m_masterFalcon.set(ControlMode.PercentOutput, m_driveController.getTriggerAxis(Hand.kRight) - m_driveController.getTriggerAxis(Hand.kLeft));
+        m_masterFalcon.set(TalonFXControlMode.PercentOutput, m_driveController.getTriggerAxis(Hand.kRight) - m_driveController.getTriggerAxis(Hand.kLeft));
         m_slaveFalcon.follow(m_masterFalcon);
         //m_pilotController.controlDriveTrain();
     }
@@ -197,6 +202,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
+        if (m_driveController.getAButton()) {
+            m_masterFalcon.set(TalonFXControlMode.MotionMagic, 10000);
+            m_slaveFalcon.follow(m_masterFalcon);
+        }
+        else if (m_driveController.getBButton()) {
+            m_masterFalcon.set(TalonFXControlMode.Velocity, 100);
+            m_slaveFalcon.follow(m_masterFalcon);
+        }
         //commented out for limelight testing, uncomment for shooter testing
         // if(testController.getAButton()) {
         //     shooterControl.setSpeed();
