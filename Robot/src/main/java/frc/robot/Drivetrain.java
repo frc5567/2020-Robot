@@ -4,7 +4,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first. wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.XboxController;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -24,12 +26,10 @@ import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.Ultrasonic.Unit;
 
 
-
-public class Drivetrain implements PIDSubsystem{
+public class Drivetrain  {
     private NavX m_gyro;
 
-   //Declares turn control PID
-    PIDSubsystem m_rotController;
+  XboxController m_driveController;
 
     boolean m_firstCall = true;
 
@@ -72,9 +72,8 @@ public class Drivetrain implements PIDSubsystem{
     public final double kF;
     public final int kIzone;
     public final double kPeakOutput;
-
-    public static final Gains DRIVETRAIN_GAINS = new Gains(0.3, 0.0, 0.0, 0.0, 100, 1.0);
-    public final static Gains GAINS_TURNING = new Gains(0.1, 0.0, 0.0, 0.0, 200, 1.0);
+    
+    
 
     public Drivetrain(NavX ahrs){
 
@@ -109,7 +108,8 @@ public class Drivetrain implements PIDSubsystem{
         ultraRight.setAutomaticMode(true);
         ultraRight.setDistanceUnits(Unit.kInches);
 
-        m_rotController = new PIDSubsystem(0.035, 0.00, 0.00, 0.00, m_gyro, this, 0.02);
+        //Declares turn control PID----------Chech to see if correct
+    PIDController m_rotController = new PIDController(kP, kI, kD,kIzone, kPeakOutput);
         m_rotController.setInputRange(-180.00, 180.00);
 
         m_rotController.setOutputRange(-0.5, 0.5);
@@ -123,15 +123,6 @@ public class Drivetrain implements PIDSubsystem{
         //instantiates the double solenoid
         m_twoSpeedSolenoid = new DoubleSolenoid(0, 1); //<-We'll need to check the channels to make sure they're right.
 
-    }
-
-    public Gains(double _kP, double _kI, double _kD, double _kF, int _kIzone, double _kPeakOutput){
-        kP = _kP;
-        kI = _kI;
-        kD = _kD;
-        kF = _kF;
-        kIzone = _kIzone;
-        kPeakOutput = _kPeakOutput;
     }
 
     public DifferentialDrive getDrivetrain(){
@@ -172,10 +163,10 @@ public class Drivetrain implements PIDSubsystem{
             m_quickTurnEnabled = false;
         }
 
-        m_drivetrain.curvatureDrive(m_currentSpeed, m_currentRotate, m_quickTurenEnabled);
+        m_drivetrain.curvatureDrive(m_currentSpeed, m_currentRotate, m_quickTurnEnabled);
     }
 
-    public boolean rotateToAngle(double tragetAngle) {
+    public boolean rotateToAngle(double targetAngle) {
         boolean isFinished = false;
 
         if (m_firstCall) {
@@ -258,7 +249,7 @@ public class Drivetrain implements PIDSubsystem{
         m_masterRightMotor.setNeutralMode(NeutralMode.Brake);
 
         m_slaveLeftMotor.setNeutralMode(NeutralMode.Brake);
-        m_slaveRightMotor.setNeuetralMode(NeutralMode.brake);
+        m_slaveRightMotor.setNeutralMode(NeutralMode.Brake);
 
 
         m_masterLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 30);
@@ -293,7 +284,7 @@ public class Drivetrain implements PIDSubsystem{
         m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, 30);
         m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 20, 30);
         m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 20, 30);
-        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_10_Tagets, 20, 30);
+        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_10_Targets, 20, 30);
         m_masterLeftMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 30);
 
         m_masterRightMotor.configNeutralDeadband(0.001, 30);
@@ -309,19 +300,19 @@ public class Drivetrain implements PIDSubsystem{
         m_masterRightMotor.configMotionCruiseVelocity(2000, 30);
 
 
-        m_masterRightMotor.config_kP(0, DRIVETRAIN_GAINS.kP, 30);
-        m_masterRightMotor.config_kI(0, DRIVETRAIN_GAINS.kI, 30);
-        m_masterRightMotor.config_kD(0, DRIVETRAIN_GAINS.kD, 30);
-        m_masterRightMotor.config_kf(0, DRIVETRAIN_GAINS.kF, 30);
-        m_masterRightMotor.config_IntegralZone(0, DRIVETRAIN_GAINS.kPeakOutput, 30);
-        m_masterRightMotr.configAllowableClosedloopError(0, 0,30);
+        m_masterRightMotor.config_kP(0, RobotMap.DRIVETRAIN_GAINS.kP, 30);
+        m_masterRightMotor.config_kI(0, RobotMap.DRIVETRAIN_GAINS.kI, 30);
+        m_masterRightMotor.config_kD(0, RobotMap.DRIVETRAIN_GAINS.kD, 30);
+        m_masterRightMotor.config_kf(0, RobotMap.DRIVETRAIN_GAINS.kF, 30);
+        m_masterRightMotor.config_IntegralZone(0, RobotMap.DRIVETRAIN_GAINS.kPeakOutput, 30);
+        m_masterRightMotor.configAllowableClosedloopError(0, 0,30);
 
-        m_masterRightMotor.config_kP(1, GAINS_TURNING.kP, 30);
-        m_masterRightMotor.config_kI(1, GAINS_TURNING.kI, 30);
-        m_masterRightMotor.config_kD(1, GAINS_TURNING.kD, 30);
-        m_masterRightMotor.config_kF(1, GAINS_TURNING.kF, 30);
-        m_masterRightMotor.config_IntegralZone(1, GAINS_TURNING.kIzone, 30);
-        m_masterRightMotor.configColsedLoopoPeakOutput(1, GAINS_TURNING.kPeakOutput, 30);
+        m_masterRightMotor.config_kP(1, RobotMap.GAINS_TURNING.kP, 30);
+        m_masterRightMotor.config_kI(1, RobotMap.GAINS_TURNING.kI, 30);
+        m_masterRightMotor.config_kD(1, RobotMap.GAINS_TURNING.kD, 30);
+        m_masterRightMotor.config_kF(1, RobotMap.GAINS_TURNING.kF, 30);
+        m_masterRightMotor.config_IntegralZone(1, RobotMap.GAINS_TURNING.kIzone, 30);
+        m_masterRightMotor.configClosedLoopPeakOutput(1, RobotMap.GAINS_TURNING.kPeakOutput, 30);
         m_masterRightMotor.configAllowableClosedloopError(1, 0, 30);
 
         m_masterRightMotor.configClosedLoopPeriod(0, 10, 30);
@@ -333,8 +324,7 @@ public class Drivetrain implements PIDSubsystem{
         m_masterRightMotor.configAuxPIDPolarity(false, 30);
 
         m_masterRightMotor.selectProfileSlot(0, 0);
-        m_masterRightMotor.selectProgileSlot(1, 1);
-        
+        m_masterRightMotor.selectProfileSlot(1, 1);
     }
 
     public void talonArcadeDrive (double forward, double turn, boolean setter) {
@@ -363,12 +353,12 @@ public class Drivetrain implements PIDSubsystem{
             else {
                 m_currentRotate = turn;
             }
-            m_masterLeftMotor.set(CotrolMode.PercentOutput, m_currentRotate, DemandType.ArbitraryFeedForward, +m_currentSpeed);
-            m_masterRightMotor.set(ControlMode.PercentOutput, m_currentRotate, DemandType.ArbiitraryFeedForward, -m_currentSpeed);
+            m_masterLeftMotor.set(ControlMode.PercentOutput, m_currentRotate, DemandType.ArbitraryFeedForward, +m_currentSpeed);
+            m_masterRightMotor.set(ControlMode.PercentOutput, m_currentRotate, DemandType.ArbitraryFeedForward, -m_currentSpeed);
         }
         else {
             m_masterLeftMotor.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, +forward);
-            m_masterRightMotor.set(ContrlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, -forrward);
+            m_masterRightMotor.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, -forward);
         }
     }
 

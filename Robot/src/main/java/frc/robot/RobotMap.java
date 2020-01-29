@@ -13,11 +13,18 @@ public class RobotMap {
     public static final int TEST_CONTROLLER_PORT = 0;
     public static final int DRIVE_CONTROLLER_PORT = 1;
 
+    
+
     //****************************************
     //*                                      *
     //*        DRIVETRAIN CONSTANTS          *
     //*                                      *
     //****************************************
+    //Drivetrain, turning, and velocity gains
+    public static final Gains  DRIVETRAIN_GAINS = new Gains(0.3, 0.0, 0.0, 0.0, 100, 1.0);
+    public static final Gains GAINS_TURNING = new Gains(0.1, 0.0, 0.0, 0.0, 200, 1.0);
+    public static final Gains GAINS_VELOCIT = new Gains(0.1, 0.0, 0.0, 0.0, 300, 1.0);
+    
     //the time it takes the drive train to ramp to full speed in open loop control in seconds
     public static final double DRIVE_RAMP_TIME = 0.5;
 
