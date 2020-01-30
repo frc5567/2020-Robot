@@ -73,5 +73,12 @@ public class RobotMap {
     //This is temporary and will need to be assigned on our final bot
     public static final double CAMERA_HEIGHT_INCHES = 45d;
 
+    //****************************************
+    //*                                      *
+    //*           GENERAL CONSTANTS          *
+    //*                                      *
+    //****************************************
+    public static final int PCM_CAN_ID = 20;
+
 
 }
