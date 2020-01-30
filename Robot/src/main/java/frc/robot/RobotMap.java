@@ -63,5 +63,11 @@ public class RobotMap {
     //****************************************
     public static final int INTAKE_VICTOR_ID = 15;
 
+    //****************************************
+    //*                                      *
+    //*          CONTROL ROTATOR CONSTANTS   *
+    //*                                      *
+    //****************************************
+    public static final double TICKS_PER_REVOLUTION = 50;
 
 }

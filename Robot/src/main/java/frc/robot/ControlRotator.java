@@ -15,8 +15,6 @@ public class ControlRotator{
     private SpeedController m_rotator;
     //Declares Encoder
     private Encoder m_encoder;
-    //Declares a variable for number of ticks per 1 revolution of the big wheel. The value that it s currently set to is made up and needs to be changed
-    public double TICKS_PER_REVOLUTION = 50;
     //difference between current speed and target speed (set point)
     private double m_error;
     //current set speed of the motor
@@ -39,7 +37,7 @@ public class ControlRotator{
     public boolean autoRotate(double speed){
         //variable to say if the autorotator is done or not yet
         boolean doneSpinning = false;
-        if(m_encoder.get() < (3 * TICKS_PER_REVOLUTION)){
+        if(m_encoder.get() < (3 * RobotMap.TICKS_PER_REVOLUTION)){
             m_rotator.set(speed);
         }
         else{
