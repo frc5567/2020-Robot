@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 /**
@@ -30,8 +31,8 @@ public class ShiftDrive {
     private TalonSRX m_rightDrive;
 
     //declare our slave motors
-    private VictorSPX m_leftSlave;
-    private VictorSPX m_rightSlave;
+    private TalonSRX m_leftSlave;
+    private TalonSRX m_rightSlave;
 
     //declare the solenoids used to shift gears
     //note that this may be one solenoid in the future
@@ -56,7 +57,7 @@ public class ShiftDrive {
      * @param rightPiston The solenoid for shifting gears on the right gearbox
      * @param hasTwoSolenoids Whether we are using two solenoids
      */
-    public ShiftDrive(TalonSRX leftDrive, TalonSRX rightDrive, VictorSPX leftSlave, VictorSPX rightSlave, DoubleSolenoid leftPiston, DoubleSolenoid rightPiston, boolean hasTwoSolenoids) {
+    public ShiftDrive(TalonSRX leftDrive, TalonSRX rightDrive, TalonSRX leftSlave, TalonSRX rightSlave, DoubleSolenoid leftPiston, DoubleSolenoid rightPiston, boolean hasTwoSolenoids) {
         m_leftDrive = leftDrive;
         m_rightDrive = rightDrive;
         m_leftSlave = leftSlave;
