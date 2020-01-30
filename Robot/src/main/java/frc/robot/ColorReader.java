@@ -1,6 +1,6 @@
 package frc.robot;
 
-//import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class ColorReader{
 
@@ -11,7 +11,7 @@ public class ColorReader{
 
     //Method for either recieving color from fms at comps or manually changing thre recieved color
     public void colorReader(String gameData){
-        //this.gameData = DriverStation.getInstance().getGameSpecificMessage();
+        this.gameData = DriverStation.getInstance().getGameSpecificMessage();
         this.gameData = "B";
     }
 
