@@ -7,11 +7,22 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.PilotController.DriveType;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+import java.util.Map;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 /**
@@ -20,76 +31,175 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
  * documentation. If you change the name of this class or the package after
  * creating this project, you must also update the build.gradle file in the
  * project.
+ * 
+ * @version 1/25/2019
  */
 public class Robot extends TimedRobot {
-  /**
+    /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
    */
-  TalonSRX leftTalon;
-  TalonSRX rightTalon;
 
-  VictorSPX leftVictor;
-  VictorSPX rightVictor;
+    //declares our drivetrain motor controllers and a currently unused shooter motor
+    TalonSRX m_leftTalon;
+    TalonSRX m_rightTalon;
 
-  VictorSPX shooterMotor;
+    VictorSPX m_leftVictor;
+    VictorSPX m_rightVictor;
 
-  Launcher shooter;
-  ShuffleboardShooterControl shooterControl;
+    // VictorSPX m_intakeMotor;
 
-  XboxController testController;
+    //declares our launcher system and our controls for that system over the launcher tab
+    Launcher m_shooter;
+    ShuffleboardShooterControl m_shooterControl;
 
-  public Robot() {
-    leftTalon = new TalonSRX(1);
-    rightTalon = new TalonSRX(2);
+    //declares an xbox controller used for testing prototype code
+    XboxController m_testController;
 
-    leftVictor = new VictorSPX(11);
-    rightVictor = new VictorSPX(12);
+    //declares controllers and drivetrain for testing drive code
+    XboxController m_driveController;
+    PilotController m_pilotController;
+    ShiftDrive m_drivetrain;
 
-    shooterMotor = new VictorSPX(15);
+    DoubleSolenoid m_leftPiston;
+    DoubleSolenoid m_rightPiston;
 
-    shooter = new Launcher(0.5, shooterMotor);
-    shooterControl = new ShuffleboardShooterControl(shooter);
+    //toggle for the limelight
+    boolean m_isDriverCamera;
 
-    testController = new XboxController(0);
+    //declares the network table for limelight info so that we can access it
+    NetworkTable m_limelightTable;
 
-  }
+    //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
+    private ShuffleboardTab m_cameraTab;
+    private NetworkTableEntry m_cameraHeight;
+    private NetworkTableEntry m_cameraAngle;
+    private NetworkTableEntry m_targetHeight;
+    private NetworkTableEntry m_distance;
 
-  @Override
-  public void robotInit() {
-    leftTalon.set(ControlMode.PercentOutput, 0);
-    rightTalon.set(ControlMode.PercentOutput, 0);
-    leftVictor.set(ControlMode.PercentOutput, 0);
-    rightVictor.set(ControlMode.PercentOutput, 0);
-  }
+    public Robot() {
+        //instantiates master motors for drive
+        m_leftTalon = new TalonSRX(RobotMap.LEFT_TALON_ID);
+        m_rightTalon = new TalonSRX(RobotMap.RIGHT_TALON_ID);
 
-  @Override
-  public void autonomousInit() {
-  }
+        //instantiates slave motors for drive
+        m_leftVictor = new VictorSPX(RobotMap.LEFT_VICTOR_ID);
+        m_rightVictor = new VictorSPX(RobotMap.RIGHT_VICTOR_ID);
 
-  @Override
-  public void autonomousPeriodic() {
-  }
+        //instantiates the shooter using our drive motors
+        //Note that this will need to be fixed when we have all systems on the robot
+        m_shooter = new Launcher(0.5, m_leftTalon, m_rightTalon);
+        m_shooterControl = new ShuffleboardShooterControl(m_shooter);
 
-  @Override
-  public void teleopInit() {
-  }
+        //instantiates currently unused shooter motor
+        // m_intakeMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
 
-  @Override
-  public void teleopPeriodic() {
-  }
+        //instantiates our test controller
+        m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
 
-  @Override
-  public void testInit() {
-    shooterControl.zeroSpeed();
-  }
+        //instantiate drivetrain for tested
+        m_driveController = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
 
-  @Override
-  public void testPeriodic() {
-    if(testController.getAButton()) {
-      shooterControl.setSpeed();
+        m_leftPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
+        m_rightPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
+        m_drivetrain = new ShiftDrive(m_leftTalon, m_rightTalon, m_leftVictor, m_rightVictor, m_leftPiston, m_rightPiston, true);
+
+        m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade);
+
+        //gives us access to the network table for the limelight
+        m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+
+        //sets our default state to the vision pipeline
+        m_isDriverCamera = false;
+
+        //creates a tab on the shuffleboard for the camera
+        m_cameraTab = Shuffleboard.getTab("Camera");
+
+        //Creates editable text fields to set camera height, fixed angle, and target height
+        m_cameraHeight = m_cameraTab.addPersistent("Camera Height (m)", 0.0)                
+                                .withWidget(BuiltInWidgets.kTextView)             
+                                .withProperties(Map.of("min", 0.0, "max", 6.0)) 
+                                .getEntry();
+
+        m_cameraAngle = m_cameraTab.addPersistent("Camera Angle (deg)", 0.0)                
+                               .withWidget(BuiltInWidgets.kTextView)             
+                               .withProperties(Map.of("min", 0.0, "max", 90.0)) 
+                               .getEntry();
+        
+        m_targetHeight = m_cameraTab.addPersistent("Target Height (m)", 0.0)                
+                                .withWidget(BuiltInWidgets.kTextView)             
+                                .withProperties(Map.of("min", 0.0, "max", 6.0)) 
+                                .getEntry();
+
+        //creates a field to display calculated distance
+        m_distance = m_cameraTab.addPersistent("Distance", 0.0)
+                            .getEntry();
+
     }
-    else shooterControl.zeroSpeed();
-  }
+
+    @Override
+    public void robotInit() {
+        //zeros used motor contollers
+        m_leftTalon.set(ControlMode.PercentOutput, 0);
+        m_rightTalon.set(ControlMode.PercentOutput, 0);
+        m_leftVictor.set(ControlMode.PercentOutput, 0);
+        m_rightVictor.set(ControlMode.PercentOutput, 0);
+    }
+
+    @Override
+    public void autonomousInit() {
+    }
+
+    @Override
+    public void autonomousPeriodic() {
+    }
+
+    @Override
+    public void teleopInit() {
+    }
+
+    @Override
+    public void teleopPeriodic() {
+        m_pilotController.controlDriveTrain();
+    }
+
+    @Override
+    public void testInit() {
+        //zeros the shooter
+        m_shooterControl.zeroSpeed();
+    }
+
+    @Override
+    public void testPeriodic() {
+        //commented out for limelight testing, uncomment for shooter testing
+        // if(testController.getAButton()) {
+        //     shooterControl.setSpeed();
+        // }
+        // else {
+        //     shooterControl.zeroSpeed();
+        // }
+
+        //controls for toggling the camera mode between driver mode and vision mode
+        if(m_testController.getBButtonReleased()) {
+            //if it's in driver mode, set the camera to vision mode
+            if(m_isDriverCamera) {
+                m_limelightTable.getEntry("camMode").setNumber(0);
+                m_limelightTable.getEntry("ledMode").setNumber(0);
+            }
+            //if it's in vision mode, set the camera to driver mode
+            else {
+                m_limelightTable.getEntry("camMode").setNumber(1);
+                m_limelightTable.getEntry("ledMode").setNumber(1);
+            }
+            //toggle the variable
+            m_isDriverCamera = !m_isDriverCamera;
+        }
+
+        //calculates and reports the distance from the robot to the base of the target
+        double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
+        double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
+        //reports the distance to the smart dashboard
+        m_distance.setDouble(netHeight /  lengthToHeightRatio);
+    }
 
 }

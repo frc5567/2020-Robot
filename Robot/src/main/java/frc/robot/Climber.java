@@ -7,36 +7,37 @@ import edu.wpi.first.wpilibj.Encoder;
  * Climber with one or more motors
  * <p>Utilizes a scrapped together proportionality controller to adjust speed
  * 
- * @version 1/11/2020
+ * @version 1/25/2020
  * @author Owen Morrow
  */
 public class Climber {
 
     // current speed of the motor
-    private double currentSpd = 0;
+    private double m_currentSpeed = 0;
   
     // speed controller used to move climber
-    private SpeedController motor;
+    private SpeedController m_motor;
   
     // encoder for the motor
-    private Encoder encoder;
+    private Encoder m_encoder;
   
     //difference between current speed and target speed (set point)
-    private double error;
+    private double m_error;
   
-    //proportionality constant - error times this gives you the increase in speed 
-    private double p;
+    //error times this gives you the increase in speed 
+    private double m_adjustmentValue;
 
     /**
      * Constructor for climber objects
      * 
-     * @param motorSpeed
-     * @param motor
-     * @param encoder
+     * @param motor The motor that runs the climber
+     * @param encoder The encoder for our climber
+     * @param adjustmentValue The value we use to adjust speed
      */
-    public Climber(SpeedController motor, Encoder encoder) {
-        this.motor = motor;
-        this.encoder = encoder;
+    public Climber(SpeedController motor, Encoder encoder, double adjustmentValue) {
+        m_motor = motor;
+        m_encoder = encoder;
+        m_adjustmentValue = adjustmentValue;
     }
 
     /**
@@ -44,7 +45,7 @@ public class Climber {
      * @param motorSpeed A value between -1.0 and 1.0 where 1.0 is full speed forward
      */
     public void setSpeed(double motorSpeed) {
-        motor.set(motorSpeed);
+        m_motor.set(motorSpeed);
     }
     
     /**
@@ -53,38 +54,38 @@ public class Climber {
      */
     public void proportionalSpeedSetter(double setpoint) {
         //calculates error based on the difference between current and target speeds
-        error = setpoint - currentSpd;
+        m_error = setpoint - m_currentSpeed;
         //adjusts the current speed proportionally to the error
-        currentSpd += (error * p);
+        m_currentSpeed += (m_error * m_adjustmentValue);
 
         //sets the speed of the motors based on the adjusted current speed
-        setSpeed(currentSpd);
+        setSpeed(m_currentSpeed);
     }
   
     // resets encoder values
     public void encoderReset() {
-        encoder.reset();
+        m_encoder.reset();
     }
 
     /**
      * @return The value given by the encoder
      */
     public int getEncoder() {
-      return encoder.get();
+      return m_encoder.get();
     }
 
     // sets climber to encoder target position
     public void setClimberPos(int targetPos){
-        if (encoder.get() < targetPos) {
-            motor.set(.5);
+        if (m_encoder.get() < targetPos) {
+            m_motor.set(RobotMap.CLIMBER_SPEED);
 
         }
-        else if (encoder.get() > targetPos){
-            motor.set(-.5);
+        else if (m_encoder.get() > targetPos){
+            m_motor.set(-RobotMap.CLIMBER_SPEED);
 
         }
         else {
-            motor.set(0);
+            m_motor.set(0);
         }
 
     } 
