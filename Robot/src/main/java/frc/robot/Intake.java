@@ -30,9 +30,9 @@ public class Intake {
     //declare the number of encoder ticks -change number to correct number
     double maxEncoderTick = 22;
 
+    // 
     //declare the number of ticks left untill max Encoder tick value
     double ticksLeft = maxEncoderTick - encoder.get();
-
     //declare DropBarMotor
     private SpeedController dropBarMotor;
     
@@ -118,66 +118,5 @@ public class Intake {
         }
     }
     
-/**             //all the things used here
-     *              
-     *              declare DropBarButtonDown
-     *              declare DropBarButtonUp
-     *              declare boolean dropBarButtonDownPressed
-     *              declare boolean dropBarButtonUpPressed
-     *              
-     *              // encoder on DropBarMotor
-     *              declare DropBarEncoder
-     * 
-     * 
-     * // resets the encoder value
-     * public void encoderReset(){
-     * DropBarEncoder.reset
-     * }
-     *               
-     * // general class in which the motor will be told to move
-     * public void setDropBarMotor(double DropBarMotorSpeed){
-     * 
-     *      initiate variable DropBarMotorSpeed = 0
-     * 
-     *      // buttons on the controller controlling the drop bar
-     *      initiate boolean dropBarButtonDownPressed = 0
-     *      initiate boolean dropBarButtonUpPressed = 0
-     * 
-     *      // to move down, conditions in this will have to be met
-     *      while DropBarButtonDownPressed = activated {
-     * 
-     *      // checks bar's position
-     *      get() encoder count
-     * 
-     *            // if the bar is already down, then the bar won't move. else, it will move down when pressed
-     *            if encoder value = down encoder value{
-     *         
-     *            set dropBarMotorSpeed = 0
-     * 
-     *            } else {
-     * 
-     *            set dropBarMotorSpeed = (positive or negative depending on how the motor is mounted)
-     *         }
-     *      } 
-     *       // to move up, conditions in this will have to be met
-     *       while DropBarButtonUpPressed = activated{
-     * 
-     *       // checks bar's position
-     *       get() encoder count
-     * 
-     *            // if the bar is already up, then the bar won't move. else, it will move up when pressed
-     *            if encoder value = up encoder value (0){
-     *         
-     *            set dropBarMotor speed = 0
-     * 
-     *            }else{
-     * 
-     *      set motorSpeed = (positive or negative depending on how the motor is mounted)
-     * 
-     *              }
-     * 
-     *      }
-     * } 
-    **/
 
 }

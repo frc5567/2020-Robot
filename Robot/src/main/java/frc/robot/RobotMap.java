@@ -28,6 +28,10 @@ public class RobotMap {
     //the time it takes the drive train to ramp to full speed in open loop control in seconds
     public static final double DRIVE_RAMP_TIME = 0.5;
 
+    public static final double PI = 3.14159265359;
+    // the 6 has to be changed to the diameter of our wheels
+    public static final double DRIVE_TICS_PER_INCH = (4096 / (6*RobotMap.PI));
+
     //can IDs for drive motors
     public static final int LEFT_TALON_ID = 1;
     public static final int RIGHT_TALON_ID = 2;
