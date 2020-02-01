@@ -33,7 +33,7 @@ public class LimelightReader {
         return m_limelightTable.getEntry("tx").getDouble(0);
     }
 
-    /**TODO:Work out the modification to the target based on target yaw, until then this is unfinished
+    /**TODO:Correct the inner target offset and the degrees to hit inner target
      * This method should adjust the x degrees to target based on target's yaw
      * <p>This is designed to hit the inner target when shooting at an angle.
      * <p>Note that we should only adjust within a certain window, past that we should just target the center of mass
@@ -42,13 +42,14 @@ public class LimelightReader {
     public double getModifiedDegreesToTarget() {
        // return m_limelightTable.getEntry("tx").getDouble(0);
         double targetAngle;
-        targetAngle = getRawDegreesToTarget();
         // Checks to make sure we have a target
         if (hasTargets() == true) {
             // Gets skew and checks if target is turned to the right
             if (getSkew() <= -70) {
+                System.out.println("right");
                 // Checks skew to see if we can hit the inner target
                 if(getSkew() <= -85.5){
+                    System.out.println("right inner");
                     // offset left for inner target
                     targetAngle = getRawDegreesToTarget()*RobotMap.OFFSET_TARGET_DEGREES;
                 }
@@ -56,14 +57,16 @@ public class LimelightReader {
             }
             // Gets skew and checks if target is turned to the left
             else if (getSkew() >= -20) {
+                System.out.println("left");
                 // Checks skew to see if we can hit the inner target
                 if(getSkew() >= -4.5){
+                    System.out.println("left inner");
                     // offset right for inner target
                     targetAngle = getRawDegreesToTarget()*RobotMap.OFFSET_TARGET_DEGREES;
                 }
                 else targetAngle = getRawDegreesToTarget(); //target center of target
             }
-        }
+        }else System.out.println("None");
         return targetAngle;
     }
 

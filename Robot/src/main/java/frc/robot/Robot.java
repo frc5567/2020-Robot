@@ -40,6 +40,7 @@ public class Robot extends TimedRobot {
    * for any initialization code.
    */
 
+
     //declares our drivetrain motor controllers and a currently unused shooter motor
     TalonSRX m_leftTalon;
     TalonSRX m_rightTalon;
@@ -69,6 +70,7 @@ public class Robot extends TimedRobot {
 
     //declares the network table for limelight info so that we can access it
     NetworkTable m_limelightTable;
+    LimelightReader m_LimelightReader;
 
     //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
     private ShuffleboardTab m_cameraTab;
@@ -108,6 +110,8 @@ public class Robot extends TimedRobot {
 
         //gives us access to the network table for the limelight
         m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+
+        m_LimelightReader = new LimelightReader(m_limelightTable);
 
         //sets our default state to the vision pipeline
         m_isDriverCamera = false;
@@ -193,8 +197,9 @@ public class Robot extends TimedRobot {
             }
             //toggle the variable
             m_isDriverCamera = !m_isDriverCamera;
+           
         }
-
+        m_LimelightReader.getModifiedDegreesToTarget();
         //calculates and reports the distance from the robot to the base of the target
         double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
         double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
