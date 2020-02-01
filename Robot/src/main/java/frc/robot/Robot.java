@@ -104,8 +104,8 @@ public class Robot extends TimedRobot {
         //instantiate drivetrain for tested
         m_driveController = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
 
-        m_leftPiston = new DoubleSolenoid(RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
-        m_rightPiston = new DoubleSolenoid(RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
+        m_leftPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
+        m_rightPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
         m_drivetrain = new ShiftDrive(m_leftTalon, m_rightTalon, m_leftVictor, m_rightVictor, m_leftPiston, m_rightPiston, true);
 
         m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade);

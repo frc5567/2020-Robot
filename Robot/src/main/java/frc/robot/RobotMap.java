@@ -74,5 +74,22 @@ public class RobotMap {
     //****************************************
     public static final int INTAKE_VICTOR_ID = 15;
 
+    //****************************************
+    //*                                      *
+    //*          LIMELIGHT CONSTANTS         *
+    //*                                      *
+    //****************************************
+    //This is the height of the
+    public static final double TARGET_HEIGHT_INCHES = 98.25;
+    //This is temporary and will need to be assigned on our final bot
+    public static final double CAMERA_HEIGHT_INCHES = 45d;
+
+    //****************************************
+    //*                                      *
+    //*           GENERAL CONSTANTS          *
+    //*                                      *
+    //****************************************
+    public static final int PCM_CAN_ID = 20;
+
 
 }
