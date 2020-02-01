@@ -167,8 +167,8 @@ public class ShiftDrive {
      */
     public void arcadeDrive(double speed, double turn){
         //this references last year's code, may need to be revised
-        m_leftDrive.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, speed);
-        m_rightDrive.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, speed);
+        m_leftDrive.set(ControlMode.PercentOutput, speed, DemandType.ArbitraryFeedForward, turn);
+        m_rightDrive.set(ControlMode.PercentOutput, speed, DemandType.ArbitraryFeedForward, -turn);
         m_leftSlave.follow(m_leftDrive);
         m_rightSlave.follow(m_rightDrive);
     }
