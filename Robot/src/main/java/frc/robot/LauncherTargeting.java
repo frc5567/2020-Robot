@@ -92,7 +92,7 @@ public class LauncherTargeting {
      * <p>This should only be called in init methods in the robot so as to avoid any weird results
      */
     public void setPID() {
-        //passes in the values off of the 
-        m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_D), m_dEntry.getDouble(RobotMap.TARGETING_D));
+        //passes in the values off of the shuffleboard Netwrok Table Entries
+        m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_I), m_dEntry.getDouble(RobotMap.TARGETING_D));
     }
 }
