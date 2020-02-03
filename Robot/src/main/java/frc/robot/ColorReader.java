@@ -20,8 +20,11 @@ public class ColorReader{
         //This can be manually changed from the driver station
         this.m_gameData = DriverStation.getInstance().getGameSpecificMessage();
     }
-
-    //method for getting the color recieved from fms or the manually inputted color. If 0 is returned, no color was recieved
+    
+    /**
+     *
+     * @return what color the field sends us. Returns 0 if no color was recieved
+     */
     public char getColor(){
         if(m_gameData.length() > 0){
             return m_gameData.charAt(0);
