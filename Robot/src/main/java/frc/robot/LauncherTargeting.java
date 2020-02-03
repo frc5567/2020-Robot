@@ -31,6 +31,9 @@ public class LauncherTargeting {
     /**Network table entry for reading desired D constant off of the shuffleboard */
     private NetworkTableEntry m_dEntry;
 
+    /**Network table entry to publish whether we are currently on target */
+    private NetworkTableEntry m_onTargetEntry;
+
     /**
      * Contructor for LauncherTargeting objects
      * @param drivetrain The drivetrain of the robot
@@ -74,6 +77,11 @@ public class LauncherTargeting {
                             .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
                             .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
                             .getEntry();  
+
+        //create a widget to display whether we are currently on target
+        m_onTargetEntry = m_targetingTab.add("On Target?", false)               //creates the widget that is false by default as by default we are not on target
+                                        .withWidget(BuiltInWidgets.kBooleanBox) //set widget to a boolean box to easily display the value
+                                        .getEntry();
     }
 
     /**
@@ -89,7 +97,22 @@ public class LauncherTargeting {
         m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0));
         
         //returns whether the PID believes that we are on target
-        return m_targetController.atSetpoint();
+        return onTarget();
+    }
+
+    /**
+     * Checks whether we are currently on target and sets the shuffleboard value
+     * @return whether or not we are within our acceptable error
+     */
+    public boolean onTarget() {
+        //read whether we are on target once
+        boolean onTarget = m_targetController.atSetpoint();
+
+        //sets the entry to whether we are on target
+        m_onTargetEntry.setBoolean(onTarget);
+
+        //return whether we are currently on target
+        return onTarget;
     }
 
     /**
