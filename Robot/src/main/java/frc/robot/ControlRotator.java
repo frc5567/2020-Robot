@@ -22,18 +22,31 @@ public class ControlRotator{
     //error times this gives you the increase in speed 
     private double m_adjustmentValue;
 
-    //Constructer; make sure to pass in paramaters when created in the Robot class
+    /**
+     *
+     * Constructer; make sure to pass in paramaters when created in the Robot class
+     * @param rotator The speedcontroller powering the wheel that spins the control panel
+     * @param rotatorEncoder The the encoder used to track ticks on rotator
+     */
     public ControlRotator(SpeedController rotator, Encoder rotatorEncoder){
         m_rotator = rotator;
         m_encoder = rotatorEncoder;
     }
-
-    //method for just spinning the wheel manually
+    
+    /**
+     *
+     * method for just spinning the wheel manually
+     * @param speed Double for setting the speed of the rotator
+     */
     public void manualRotate(double speed){
         m_rotator.set(speed);
     }
-
-    //method for making the wheel spin about 3 times
+    
+    /**
+     *
+     * method for making the wheel spin about 3 times
+     * @param speed Double for setting the speed of the rotator
+     */
     public boolean autoRotate(double speed){
         //variable to say if the autorotator is done or not yet
         boolean doneSpinning = false;
@@ -49,7 +62,11 @@ public class ControlRotator{
     }
     
     /*
-    //method for spinning to a certain color
+    /**
+     *
+     * method for spinning to a certain color
+     * @param speed Double for setting the speed of the rotator
+     */
     public void autoColor(double speed){
         if(/*Color Sensor Output* != getRecievedColor(){
             m_rotator.set(speed);
@@ -63,7 +80,11 @@ public class ControlRotator{
         return color.getColor();
     }
 
-    //method to make the spinner speed up more and more over time
+    /**
+     *
+     * method to make the spinner speed up more and more over time
+     * @param setPoint Double for the speed we eventually want to get to at any given moment
+     */
     public void proportionalSpeedSetter(double setpoint) {
         //calculates error based on the difference between current and target speeds
         m_error = setpoint - m_currentSpeed;
