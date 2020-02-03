@@ -40,40 +40,29 @@ public class LimelightReader {
      * @return The adjusted degrees to the inner target
      */
     public double getModifiedDegreesToTarget() {
-       // return m_limelightTable.getEntry("tx").getDouble(0);
-        double targetAngle;
+        // Sets targetAngle to tx the degrees off from center in the x direction
+        double targetAngle = m_limelightTable.getEntry("tx").getDouble(0);
+        
+        // Sets a variable equal to the targets skew
+        double targetSkew = getSkew();
+
         // Checks to make sure we have a target
         if (hasTargets() == true) {
-            // Gets skew and checks if target is turned to the right
-            if (getSkew() <= -70) {
-                System.out.println("right");
+
                 // Checks skew to see if we can hit the inner target
-                if(getSkew() <= -85.5){
-                    System.out.println("right inner");
-                    // offset left for inner target
-                    targetAngle = getRawDegreesToTarget()*RobotMap.OFFSET_TARGET_DEGREES;
-                }
-                else targetAngle = getRawDegreesToTarget(); //target center of target
-            }
-            // Gets skew and checks if target is turned to the left
-            else if (getSkew() >= -20) {
-                System.out.println("left");
-                // Checks skew to see if we can hit the inner target
-                if(getSkew() >= -4.5){
-                    System.out.println("left inner");
-                    // offset right for inner target
-                    targetAngle = getRawDegreesToTarget()*RobotMap.OFFSET_TARGET_DEGREES;
-                }
-                else targetAngle = getRawDegreesToTarget(); //target center of target
-            }
-        }else System.out.println("None");
+                if(targetSkew <= -90 + RobotMap.INNER_TARGET_DEGREES && targetSkew >= 0 - RobotMap.INNER_TARGET_DEGREES){
+                    
+                    // Offset for inner target
+                    targetAngle *= RobotMap.OFFSET_TARGET_DEGREES;
+                    
+                    // Test print outs
+                    System.out.println("Inner Target");
+                }else System.out.println("Outer Target");
+        }
         return targetAngle;
     }
 
-    
-
     /**
-     * TODO: This value needs to be further researched/investigated
      * @return The skew of the target in degrees, only returns negative values
      * 0 to -20 degrees is the range the target is to the left of us
      *  -90 to -70 degrees is range the target is to the right of us

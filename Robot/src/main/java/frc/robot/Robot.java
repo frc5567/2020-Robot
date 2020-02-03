@@ -70,6 +70,7 @@ public class Robot extends TimedRobot {
 
     //declares the network table for limelight info so that we can access it
     NetworkTable m_limelightTable;
+
     LimelightReader m_LimelightReader;
 
     //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
@@ -199,6 +200,7 @@ public class Robot extends TimedRobot {
             m_isDriverCamera = !m_isDriverCamera;
            
         }
+        //calls GetModifiedDegrees in order to test and receive the print outs of either left or right
         m_LimelightReader.getModifiedDegreesToTarget();
         //calculates and reports the distance from the robot to the base of the target
         double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));

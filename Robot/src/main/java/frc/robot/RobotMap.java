@@ -74,6 +74,8 @@ public class RobotMap {
     public static final double CAMERA_HEIGHT_INCHES = 45d;
     //This is the offset we make for inner target TODO:Needs to be tested and tuned
     public static final double OFFSET_TARGET_DEGREES = 0.8;
+    //This is the range on either side in degrees where we can still hit the inner target
+    public static final double INNER_TARGET_DEGREES = 4.5;
 
     //****************************************
     //*                                      *
