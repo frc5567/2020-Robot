@@ -22,10 +22,19 @@ public class RobotMap {
     public static final double DRIVE_RAMP_TIME = 0.5;
 
     //can IDs for drive motors
+    //This is for the original can setup
+    //this is still here as documentation for why the TalonFXs have these can ID's +1
     public static final int LEFT_TALON_ID = 1;
     public static final int RIGHT_TALON_ID = 2;
     public static final int LEFT_VICTOR_ID = 11;
     public static final int RIGHT_VICTOR_ID = 12;
+
+    //can IDs for Falcon drive motors
+    //this is current
+    public static final int MASTER_LEFT_FALCON_ID = 3;
+    public static final int MASTER_RIGHT_FALCON_ID = 4;
+    public static final int SLAVE_LEFT_FALCON_ID = 13;
+    public static final int SLAVE_RIGHT_FALCON_ID = 4;
 
     //solenoid ports
     public static final int LEFT_SOLENOID_FORWARD_PORT = 0;
