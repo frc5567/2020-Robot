@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
@@ -39,6 +40,8 @@ public class Robot extends TimedRobot {
 
   XboxController testController;
 
+  DigitalInput m_switchIR;
+
   public Robot() {
     leftTalon = new TalonSRX(1);
     rightTalon = new TalonSRX(2);
@@ -52,7 +55,7 @@ public class Robot extends TimedRobot {
     shooterControl = new ShuffleboardShooterControl(shooter);
 
     testController = new XboxController(0);
-
+    m_switchIR = new DigitalInput(0);
   }
 
   @Override
@@ -77,6 +80,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    System.out.println(m_switchIR.get());
   }
 
   @Override
