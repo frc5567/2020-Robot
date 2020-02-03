@@ -14,9 +14,9 @@
 | -------------- | ------------- |
 | Drive Forward  | R. Trigger    |
 | Drive Reverse  | L. Trigger    |
+| Turn Control   | Left Stick X  |
 | Shift Gear     | X Button      |
 | Lock-on Target | B Button      |
-|                |               |
 
 ### Current Can Port Numbers
 | Device Name   |  Port Number  |
