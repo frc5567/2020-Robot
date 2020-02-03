@@ -19,8 +19,12 @@ public class ShuffleboardRotatorControl{
     private ShuffleboardTab controlRotatorTab;
     private ControlRotator controlRotator;
     private NetworkTableEntry setpoint;
-
-    //constructor
+    
+    /**
+     *
+     * Constructor
+     * @param controlRotator Intstance of the ControlRotator class
+     */
     public ShuffleboardRotatorControl(ControlRotator controlRotator) {
         //creates a tab on the shuffleboard for all our rotator needs
         controlRotatorTab = Shuffleboard.getTab("controlRotator");
