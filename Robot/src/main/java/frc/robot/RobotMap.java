@@ -13,6 +13,9 @@ public class RobotMap {
     public static final int TEST_CONTROLLER_PORT = 0;
     public static final int DRIVE_CONTROLLER_PORT = 1;
 
+    //the deadband on our controller sticks to prevent drift
+    public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.05;
+
     //****************************************
     //*                                      *
     //*        DRIVETRAIN CONSTANTS          *
