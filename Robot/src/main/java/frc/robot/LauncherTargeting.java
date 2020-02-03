@@ -22,6 +22,9 @@ public class LauncherTargeting {
     private LimelightReader m_limelight;
     private PIDController m_targetController;
 
+    //declares a robot to let us look at what method (auton, teleop, test) we are currently in
+    private Robot m_robot;
+
     //declare private variables for creating a tab, and setting widgets
     private ShuffleboardTab m_targetingTab;
     /**Network table entry for reading desired P constant off of the shuffleboard */
@@ -38,10 +41,12 @@ public class LauncherTargeting {
      * Contructor for LauncherTargeting objects
      * @param drivetrain The drivetrain of the robot
      * @param limelight The limelight reader that gives us our target
+     * @param robot The main Robot that this constructed in
      */
-    public LauncherTargeting(ShiftDrive drivetrain, LimelightReader limelight) {
+    public LauncherTargeting(ShiftDrive drivetrain, LimelightReader limelight, Robot robot) {
         m_drivetrain = drivetrain;
         m_limelight = limelight;
+        m_robot = robot;
 
         //Instatiate a new PID controller with PID values passed in from the robot map
         m_targetController = new PIDController(RobotMap.TARGETING_P, RobotMap.TARGETING_I, RobotMap.TARGETING_D, RobotMap.TARGETING_PERIOD_S);
@@ -117,10 +122,13 @@ public class LauncherTargeting {
 
     /**
      * Sets the P, I, and D constants based on shuffleboard input
-     * <p>This should only be called in init methods in the robot so as to avoid any weird results
+     * <p>This can only be called in the test method in the robot
      */
     public void setPID() {
-        //passes in the values off of the shuffleboard Netwrok Table Entries
-        m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_I), m_dEntry.getDouble(RobotMap.TARGETING_D));
+        //only allows the user to set PID values when in test
+        if (m_robot.isTest()) {
+            //passes in the values off of the shuffleboard Netwrok Table Entries
+            m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_I), m_dEntry.getDouble(RobotMap.TARGETING_D));
+        }
     }
 }

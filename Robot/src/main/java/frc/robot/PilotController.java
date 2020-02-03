@@ -19,6 +19,8 @@ public class PilotController {
     //declare our drivetrain and our controller
     private XboxController m_controller;
     private ShiftDrive m_drivetrain;
+
+    private LauncherTargeting m_launcherTargeting;
     private final DriveType m_driveType;
 
     /**
@@ -27,11 +29,13 @@ public class PilotController {
      * @param controller The pilot controller to control the drive train with
      * @param drivetrain The robot drivetrain
      * @param driveType The type of drive control that the pilot wants (tank or arcade)
+     * @param launcherTargting The targeting object used to lock on to our target
      */
-    public PilotController(XboxController controller, ShiftDrive drivetrain, DriveType driveType) {
+    public PilotController(XboxController controller, ShiftDrive drivetrain, DriveType driveType, LauncherTargeting launcherTargeting) {
         m_controller = controller;
         m_drivetrain = drivetrain;
         m_driveType = driveType;
+        m_launcherTargeting = launcherTargeting;
     }
 
     /**
@@ -58,16 +62,24 @@ public class PilotController {
             m_drivetrain.switchGear();
         }
     }
+    
     /**
      * Controls all pilot controlled systems
      */
     public void controlDriveTrain() {
-        //runs our drivetrain based on control scheme passed in
-        if (m_driveType == DriveType.kArcade) {
-            arcadeDrive();
+        //if the b button is pressed, lock onto the high target
+        if (m_controller.getBButton()) {
+            m_launcherTargeting.target();
         }
-        else if (m_driveType == DriveType.kTank) {
-            tankDrive();
+        //when the b button isn't pressed, run the drive train as normal
+        else {
+            //runs our drivetrain based on control scheme passed in
+            if (m_driveType == DriveType.kArcade) {
+                arcadeDrive();
+            }
+            else if (m_driveType == DriveType.kTank) {
+                tankDrive();
+            }
         }
 
         //Controls shifting the gears off of the x button

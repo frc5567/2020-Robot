@@ -70,6 +70,12 @@ public class Robot extends TimedRobot {
     //declares the network table for limelight info so that we can access it
     NetworkTable m_limelightTable;
 
+    //declare our limelight reader object
+    LimelightReader m_limelightReader;
+
+    //declare our launcher targeting object
+    LauncherTargeting m_launcherTargeting;
+
     //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
     private ShuffleboardTab m_cameraTab;
     private NetworkTableEntry m_cameraHeight;
@@ -104,10 +110,17 @@ public class Robot extends TimedRobot {
         m_rightPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
         m_drivetrain = new ShiftDrive(m_leftTalon, m_rightTalon, m_leftVictor, m_rightVictor, m_leftPiston, m_rightPiston, true);
 
-        m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade);
-
         //gives us access to the network table for the limelight
         m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+
+        //create an object to read values off of our limelight
+        m_limelightReader = new LimelightReader(m_limelightTable);
+
+        //create our targeting object
+        //"this" is the current robot, we pass it in so that the targeting can see what periodic function we are in
+        m_launcherTargeting = new LauncherTargeting(m_drivetrain, m_limelightReader, this);
+
+        m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade, m_launcherTargeting);
 
         //sets our default state to the vision pipeline
         m_isDriverCamera = false;
