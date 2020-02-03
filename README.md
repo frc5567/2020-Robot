@@ -9,6 +9,15 @@
 * Method names should always start with a lower-case letter
 * Variable names should always start with a lower-case letter
 
+### Current Drive Controls
+| System         | Control       |
+| -------------- | ------------- |
+| Drive Forward  | R. Trigger    |
+| Drive Reverse  | L. Trigger    |
+| Shift Gear     | X Button      |
+| Lock-on Target | B Button      |
+|                |               |
+
 ### Current Can Port Numbers
 | Device Name   |  Port Number  |
 | ------------- | ------------- |
