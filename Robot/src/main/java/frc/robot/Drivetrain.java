@@ -2,10 +2,8 @@ package frc.robot;
 
 // imports Motor Controllers, Controller group functions, Basic differenctial drive code, solenoid functions, and functions for getting the joystick values
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -20,10 +18,8 @@ import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.FollowerType;
 
-import edu.wpi.first.wpilibj.Ultrasonic;
-import edu.wpi.first.wpilibj.Ultrasonic.Unit;
+
 
 
 public class Drivetrain {
@@ -70,15 +66,22 @@ public class Drivetrain {
     //Counter for buying time for the PID
     int m_counter;
 
-    //Declares the solenoid as an object
+    //Declares the solenoid/Piston as an object which is used to switch between the two gears
     DoubleSolenoid m_twoSpeedSolenoid;
     
-    //Declares a boolean for determining the position of the double solenoid. True = Forward  False = Reverse
-    private enum SolenoidPosition{
-        
+   
+    //Declares an enum for determining the position of the double solenoid. 
+    public enum Gear{
+        kFirstSpeed, kSecondSpeed;
     }
+    //Declares a Gear object to store the gear that we are in
+    private Gear m_gear;
     
 
+    /**
+     * Constructor for the drivetrain that uses double solenoids to shift speeds/gears
+     * @param ahrs the NavX used to instantiate the gyro
+     */
     public Drivetrain(NavX ahrs){
 
         //Instatiates the motor controllers and their ports
@@ -116,10 +119,10 @@ public class Drivetrain {
 
         //Initializes rotate PID controller with the PIDF constants ----------See if there is a way to add the m_gyro
         m_rotController = new PIDController(RobotMap.DRIVETRAIN_GAINS.kP, RobotMap.DRIVETRAIN_GAINS.kI, RobotMap.DRIVETRAIN_GAINS.kD, RobotMap.DRIVETRAIN_GAINS.kF);
-        m_rotController.enableContinuousInput(-180.00, 180.00);
+        m_rotController.enableContinuousInput(-RobotMap.PID_INPUT_RANGE, RobotMap.PID_INPUT_RANGE);
 
-        m_rotController.setIntegratorRange(-0.5, 0.5);
-        m_rotController.setTolerance(2);
+        m_rotController.setIntegratorRange(-RobotMap.PID_OUTPUT_RANGE, RobotMap.PID_OUTPUT_RANGE);
+        m_rotController.setTolerance(RobotMap.TOLERANCE_ROTATE_CONROLLER);
         m_rotController.disableContinuousInput();
 
         m_counter = 0;
@@ -153,14 +156,14 @@ public class Drivetrain {
         //If desired speed is higher than current speed by a margin larder than
         //kMaxDeltaSpeed,
         //Increase current speed by kMaxDeltaSpeed's amount
-        if (desiredSpeed > (m_currentSpeed + 0.1)) {
-            m_currentSpeed += 0.1;
+        if (desiredSpeed > (m_currentSpeed + RobotMap.DRIVE_MAX_DELTA_SPEED)) {
+            m_currentSpeed += RobotMap.DRIVE_MAX_DELTA_SPEED;
         }
         //If desired speed is less than curren speed by a margin larger than
         //kMaxDeltaSpeed
         //Decrease current speed by kMaxDeltaSpeed's amount
-        else if (desiredSpeed < (m_currentSpeed - 0.1)) {
-            m_currentSpeed -= 0.1;
+        else if (desiredSpeed < (m_currentSpeed - RobotMap.DRIVE_MAX_DELTA_SPEED)) {
+            m_currentSpeed -= RobotMap.DRIVE_MAX_DELTA_SPEED;
         }
 
         //If desired speed is within kMaxDeltaSpeed's margin to current speed,
@@ -172,14 +175,14 @@ public class Drivetrain {
         //If desired rotate is higher than current rotate by a margin larger than
         //kMaxDeltaSpeed,
         // Increase current rotate by kMaxDeltaSpeed's amount
-        if (desiredRotate > (m_currentRotate + 0.1)) {
-            m_currentRotate += 0.1;
+        if (desiredRotate > (m_currentRotate + RobotMap.DRIVE_MAX_DELTA_SPEED)) {
+            m_currentRotate += RobotMap.DRIVE_MAX_DELTA_SPEED;
         }
         //If desired torate is less than current rotate by a margin larger than
         //kMaxDeltaspeed
         //Decrease current rotate by kMaxDeltaSpeed's amount
-        else if (desiredRotate < (m_currentRotate - 0.1)){
-            m_currentRotate -= 0.1;
+        else if (desiredRotate < (m_currentRotate - RobotMap.DRIVE_MAX_DELTA_SPEED)){
+            m_currentRotate -= RobotMap.DRIVE_MAX_DELTA_SPEED;
         }
         //If desired rotate is within kMaxDeltaSpeed's margin to current rotate,
         //set current rotate to match desired speed
@@ -188,7 +191,7 @@ public class Drivetrain {
         }
 
         //If the curent speed is at the kMaxQuickTurnSpeed quickTurnEnabled is true
-        if ((m_currentSpeed < 0.1) && (m_currentSpeed > 0.1)) {
+        if ((m_currentSpeed < RobotMap.DRIVE_MAX_QUICK_TURN_SPEED) && (m_currentSpeed > RobotMap.DRIVE_MAX_QUICK_TURN_SPEED)) {
             m_quickTurnEnabled = true;
         } else {
             m_quickTurnEnabled = false;
@@ -216,7 +219,7 @@ public class Drivetrain {
             m_rotController.reset();
 
             //Enables the PID with the minimum and maximum input values
-            m_rotController.enableContinuousInput(-180.00, 180.00);
+            m_rotController.enableContinuousInput(-RobotMap.PID_INPUT_RANGE, RobotMap.PID_INPUT_RANGE);
 
             //sets the target to our target angle
             m_rotController.setSetpoint(targetAngle);
@@ -233,7 +236,7 @@ public class Drivetrain {
         talonArcadeDrive(0, returnedRotate, false);
 
         // Checks to see if he PID is finished or close enough
-        if ( ((returnedRotate < 0.15) && (returnedRotate > -0.15)) && (m_counter > 10)){
+        if ( ((returnedRotate < RobotMap.FINISHED_PID_THRESHOLD) && (returnedRotate > -RobotMap.FINISHED_PID_THRESHOLD)) && (m_counter > 10)){
             isFinished = true;
             m_firstCall = true;
             System.out.println("FINISHED");
@@ -250,7 +253,7 @@ public class Drivetrain {
     }
 
     
-
+    
     public boolean rotateDriveAngle(double targetAngle, double target) {
         // flag for checking if the method is finished
         boolean isFinished = false;
@@ -260,7 +263,7 @@ public class Drivetrain {
             m_rotController.reset();
 
             //Enables the PID with the minimun and maximum input
-            m_rotController.enableContinuousInput(-180.00, 180.00);
+            m_rotController.enableContinuousInput(-RobotMap.PID_INPUT_RANGE, RobotMap.PID_INPUT_RANGE);
             // Prevents repeating the reset until the method is run again seperately
             m_firstCall = false;
         }
@@ -270,7 +273,7 @@ public class Drivetrain {
             m_rotController.reset();
 
             //Enables the PID with the minimum and maximum input values
-            m_rotController.enableContinuousInput(-180.00, 180.00);
+            m_rotController.enableContinuousInput(-RobotMap.PID_INPUT_RANGE, RobotMap.PID_INPUT_RANGE);
 
             //Sets the target to our target angle
             m_rotController.setSetpoint(targetAngle);
@@ -282,7 +285,7 @@ public class Drivetrain {
         System.out.println("Returned Rotate: \t" + returnedRotate);
 
         //Runs the drivetrain with an auto speed of 0.2, and a rotate speed set by the PID
-        talonArcadeDrive(0.2, returnedRotate, false);
+        talonArcadeDrive(RobotMap.AUTO_SPEED, returnedRotate, false);
 
         /////////////////////////////////////////////////////
         double startingValue = 1440;
@@ -336,7 +339,7 @@ public class Drivetrain {
         /** Feedback Sensor Configuration */
 
         //Configure the left Talon's selected sensor to a Quad encoder
-        m_masterLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 30);
+        m_masterLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, RobotMap.PID_PRIMARY, RobotMap.TIMEOUT_MS);
 
         //Configure the Remote Talon's selected sensor as a remote for the right Talon
         m_masterRightMotor.configRemoteFeedbackFilter(m_masterLeftMotor.getDeviceID(), RemoteSensorSource.TalonSRX_SelectedSensor, 1, 30);
@@ -435,29 +438,51 @@ public class Drivetrain {
         m_masterRightMotor.selectProfileSlot(1, 1);
     }
 
+    /**
+     * An arcade drive using the integrated velocity PID on the talons
+     * @param forward -1.0 to 1.0, the speed at which you want the robot to move forward
+     * @param turn turn -1.0 to 1.0, the rate of rotation
+     * @param setter If this is true, use speed setters to adjust aspeed and conserve battery. If false, use raw input
+     */
     public void talonArcadeDrive (double forward, double turn, boolean setter) {
         if (setter) {
+            //If desired speed is higher than current speed by a margin larger than
+            //kMaxdeltaSpeed,
+            //Increase current speed by kMaxDeltaSpeed's amount
             if (forward > (m_currentSpeed + 0.1)) {
                 m_currentSpeed += 0.1;
             }
 
+            //If desired speed is less than current speed by a margin larger than
+            //kMaxDeltaSpeed
+            //Decrease current speed by kMaxDeltaSpeed's amount
             else if (forward < (m_currentSpeed - 0.1)) {
                 m_currentSpeed -= 0.1;
             }
 
+            //If desired speed is within kMaxDeltaSpeed's margin to current speed,
+            //Set current Speed to match desired speed
             else {
                 m_currentSpeed = forward;
             }
 
 
+            //If desired rotate is higher than current rotate by a margin larger than
+            //kMaxDeltaSpeed,
+            //Increase current rotate by kMaxDeltaSpeed's amount
             if (turn > (m_currentRotate + 0.1)) {
                 m_currentRotate += 0.1;
             }
 
+            //If desired rotate is less than current rotate by a margin larger than
+            //kMaxDeltaSpeed
+            // Decrease current rotate by kMaxDeltaSpeed's amount
             else if (turn < (m_currentRotate - 0.1)) {
                 m_currentRotate -= 0.1;
             }
 
+            //If desired rotate is within kMaxDeltaSpeed's margin to current rotate,
+            //Set current rotate to match desired speed
             else {
                 m_currentRotate = turn;
             }
@@ -470,43 +495,61 @@ public class Drivetrain {
         }
     }
 
-    private double inToTics(double inches){
-        return inches*(4096 / (6*3.14159265359));
+    /**
+     * Returns the encoder position of the drivetrain left side encoder
+     * @return The position of the left side encoder
+     */
+    public int getLeftDriveEncoderPosition(){
+        return m_leftDriveEncoder.getQuadraturePosition();
     }
 
+    /**
+     * Returns the encoder position of the drivetrain right side encoder
+     * @return The position of the right side encoder
+     */
     public int getRightDriveEncoderPosition() {
         return m_rightDriveEncoder.getQuadraturePosition();
     }
 
+    /**
+     * Returns the encoder velocity of the drivetrain left side encoder
+     * @return The velocity of the left side encoder
+     */
     public int getLeftDriveEncoderVelocity(){
         return m_leftDriveEncoder.getQuadratureVelocity();
     }
 
+    /**
+     * Returns the encoder velocity of the drivetrain right side encoder
+     * @return The velocity of the right side encoder
+     */
     public int getRightDriveEncoderVelocity(){
         return m_rightDriveEncoder.getQuadratureVelocity();
     }
 
 
 
-       //Creates a function for setting the solenoid 1 (aka forward)
-       public void solenoidForward(){
-           m_twoSpeedSolenoid.set(DoubleSolenoid.Value.kForward);
-           SOLENOID_POSITION = true;
-       }
-       //Creates a function for setting the solenoid into mode 2 (aka reverse)
-       public void solenoidReverse(){
-            m_twoSpeedSolenoid.set(DoubleSolenoid.Value.kReverse);
-            SOLENOID_POSITION = false;
-       }
+    //Creates a function for setting the solenoid 1 (aka forward)
+    public void solenoidForward(){
+        m_twoSpeedSolenoid.set(DoubleSolenoid.Value.kForward);
+        m_gear = Gear.kFirstSpeed;
+   }
+    //Creates a function for setting the solenoid into mode 2 (aka reverse)
+    public void solenoidReverse(){
+        m_twoSpeedSolenoid.set(DoubleSolenoid.Value.kReverse);
+        m_gear = Gear.kSecondSpeed;
+    }
 
-       // Function for switching between the two solenoid positions. The positions are forward and reverse.
-       public void switchSolenoidGear(){
-           if(m_driveController.getXButton()){
-               if(SOLENOID_POSITION == true){
-                    solenoidReverse();
-               } else {
-                    solenoidForward();
-               }
-           }
+    // Function for switching between the two solenoid positions. The positions are forward and reverse.
+    public void switchSolenoidGear(){
+        //If X button it pressed, if the drivetrain is in first gear/speed the gear switches to second gear/speed
+        //else the gear/speed switches to first gear/speed
+        if(m_driveController.getXButton()){
+            if(m_gear == Gear.kFirstSpeed){
+                solenoidReverse();
+            } else {
+                solenoidForward();
+            }
         }
+    }
 }

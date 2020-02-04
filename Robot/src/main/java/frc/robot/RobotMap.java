@@ -25,6 +25,19 @@ public class RobotMap {
     public static final Gains GAINS_TURNING = new Gains(0.1, 0.0, 0.0, 0.0, 200, 1.0);
     public static final Gains GAINS_VELOCIT = new Gains(0.1, 0.0, 0.0, 0.0, 300, 1.0);
     
+    //PIDF constants----Could change
+    public static final double PID_INPUT_RANGE = 180.00;
+    public static final double PID_OUTPUT_RANGE = 180.00;
+    public static final double TOLERANCE_ROTATE_CONROLLER = 2.00;
+    public static final double FINISHED_PID_THRESHOLD = 0.15;
+    public static final int PID_PRIMARY = 0;
+
+    public static final int TIMEOUT_MS = 30;
+
+    public static final double DRIVE_MAX_DELTA_SPEED = 0.1;
+    public static final double DRIVE_MAX_QUICK_TURN_SPEED = 0.1;
+    public static final double AUTO_SPEED = 0.2;
+
     //the time it takes the drive train to ramp to full speed in open loop control in seconds
     public static final double DRIVE_RAMP_TIME = 0.5;
 
