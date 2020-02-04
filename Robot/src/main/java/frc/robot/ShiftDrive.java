@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
@@ -26,12 +27,12 @@ public class ShiftDrive {
     }
 
     //declare our drive motors
-    private TalonSRX m_leftDrive;
-    private TalonSRX m_rightDrive;
+    private TalonFX m_leftDrive;
+    private TalonFX m_rightDrive;
 
     //declare our slave motors
-    private VictorSPX m_leftSlave;
-    private VictorSPX m_rightSlave;
+    private TalonFX m_leftSlave;
+    private TalonFX m_rightSlave;
 
     //declare the solenoids used to shift gears
     //note that this may be one solenoid in the future
@@ -56,7 +57,7 @@ public class ShiftDrive {
      * @param rightPiston The solenoid for shifting gears on the right gearbox
      * @param hasTwoSolenoids Whether we are using two solenoids
      */
-    public ShiftDrive(TalonSRX leftDrive, TalonSRX rightDrive, VictorSPX leftSlave, VictorSPX rightSlave, DoubleSolenoid leftPiston, DoubleSolenoid rightPiston, boolean hasTwoSolenoids) {
+    public ShiftDrive(TalonFX leftDrive, TalonFX rightDrive, TalonFX leftSlave, TalonFX rightSlave, DoubleSolenoid leftPiston, DoubleSolenoid rightPiston, boolean hasTwoSolenoids) {
         m_leftDrive = leftDrive;
         m_rightDrive = rightDrive;
         m_leftSlave = leftSlave;
@@ -83,6 +84,14 @@ public class ShiftDrive {
         m_rightSlave.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
 
         m_gear = Gear.kLow;
+    }
+    
+    /**
+     * This should be run in robot init in order to configure the falcons/talons
+     * This method will be filled in with our PID config methods
+     */
+    public void configDriveTrain() {
+
     }
 
     /**

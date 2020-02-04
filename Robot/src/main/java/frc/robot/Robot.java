@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.PilotController.DriveType;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
@@ -41,11 +42,11 @@ public class Robot extends TimedRobot {
    */
 
     //declares our drivetrain motor controllers and a currently unused shooter motor
-    TalonSRX m_leftTalon;
-    TalonSRX m_rightTalon;
+    TalonFX m_masterLeftFalcon;
+    TalonFX m_masterRightFalcon;
 
-    VictorSPX m_leftVictor;
-    VictorSPX m_rightVictor;
+    TalonFX m_slaveLeftFalcon;
+    TalonFX m_slaveRightFalcon;
 
     // VictorSPX m_intakeMotor;
 
@@ -70,6 +71,12 @@ public class Robot extends TimedRobot {
     //declares the network table for limelight info so that we can access it
     NetworkTable m_limelightTable;
 
+    //declare our limelight reader object
+    LimelightReader m_limelightReader;
+
+    //declare our launcher targeting object
+    LauncherTargeting m_launcherTargeting;
+
     //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
     private ShuffleboardTab m_cameraTab;
     private NetworkTableEntry m_cameraHeight;
@@ -79,17 +86,12 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         //instantiates master motors for drive
-        m_leftTalon = new TalonSRX(RobotMap.LEFT_TALON_ID);
-        m_rightTalon = new TalonSRX(RobotMap.RIGHT_TALON_ID);
+        m_masterLeftFalcon = new TalonFX(RobotMap.MASTER_LEFT_FALCON_ID);
+        m_masterRightFalcon = new TalonFX(RobotMap.MASTER_RIGHT_FALCON_ID);
 
         //instantiates slave motors for drive
-        m_leftVictor = new VictorSPX(RobotMap.LEFT_VICTOR_ID);
-        m_rightVictor = new VictorSPX(RobotMap.RIGHT_VICTOR_ID);
-
-        //instantiates the shooter using our drive motors
-        //Note that this will need to be fixed when we have all systems on the robot
-        m_shooter = new Launcher(0.5, m_leftTalon, m_rightTalon);
-        m_shooterControl = new ShuffleboardShooterControl(m_shooter);
+        m_slaveLeftFalcon = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
+        m_slaveRightFalcon = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
 
         //instantiates currently unused shooter motor
         // m_intakeMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
@@ -102,12 +104,19 @@ public class Robot extends TimedRobot {
 
         m_leftPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
         m_rightPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
-        m_drivetrain = new ShiftDrive(m_leftTalon, m_rightTalon, m_leftVictor, m_rightVictor, m_leftPiston, m_rightPiston, true);
-
-        m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade);
+        m_drivetrain = new ShiftDrive(m_masterLeftFalcon, m_masterRightFalcon, m_slaveLeftFalcon, m_slaveRightFalcon, m_leftPiston, m_rightPiston, true);
 
         //gives us access to the network table for the limelight
         m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+
+        //create an object to read values off of our limelight
+        m_limelightReader = new LimelightReader(m_limelightTable);
+
+        //create our targeting object
+        //"this" is the current robot, we pass it in so that the targeting can see what periodic function we are in
+        m_launcherTargeting = new LauncherTargeting(m_drivetrain, m_limelightReader, this);
+
+        m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade, m_launcherTargeting);
 
         //sets our default state to the vision pipeline
         m_isDriverCamera = false;
@@ -140,10 +149,10 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         //zeros used motor contollers
-        m_leftTalon.set(ControlMode.PercentOutput, 0);
-        m_rightTalon.set(ControlMode.PercentOutput, 0);
-        m_leftVictor.set(ControlMode.PercentOutput, 0);
-        m_rightVictor.set(ControlMode.PercentOutput, 0);
+        m_masterLeftFalcon.set(ControlMode.PercentOutput, 0);
+        m_masterRightFalcon.set(ControlMode.PercentOutput, 0);
+        m_slaveLeftFalcon.set(ControlMode.PercentOutput, 0);
+        m_slaveRightFalcon.set(ControlMode.PercentOutput, 0);
     }
 
     @Override
