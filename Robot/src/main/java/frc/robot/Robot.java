@@ -42,11 +42,11 @@ public class Robot extends TimedRobot {
    */
 
     //declares our drivetrain motor controllers and a currently unused shooter motor
-    TalonFX m_masterLeftFalcon;
-    TalonFX m_masterRightFalcon;
+    TalonFX m_masterLeftDriveFalcon;
+    TalonFX m_masterRightDriveFalcon;
 
-    TalonFX m_slaveLeftFalcon;
-    TalonFX m_slaveRightFalcon;
+    TalonFX m_slaveLeftDriveFalcon;
+    TalonFX m_slaveRightDriveFalcon;
 
     // VictorSPX m_intakeMotor;
 
@@ -86,12 +86,12 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         //instantiates master motors for drive
-        m_masterLeftFalcon = new TalonFX(RobotMap.MASTER_LEFT_FALCON_ID);
-        m_masterRightFalcon = new TalonFX(RobotMap.MASTER_RIGHT_FALCON_ID);
+        m_masterLeftDriveFalcon = new TalonFX(RobotMap.MASTER_LEFT_FALCON_ID);
+        m_masterRightDriveFalcon = new TalonFX(RobotMap.MASTER_RIGHT_FALCON_ID);
 
         //instantiates slave motors for drive
-        m_slaveLeftFalcon = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
-        m_slaveRightFalcon = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
+        m_slaveLeftDriveFalcon = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
+        m_slaveRightDriveFalcon = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
 
         //instantiates currently unused shooter motor
         // m_intakeMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
@@ -104,7 +104,7 @@ public class Robot extends TimedRobot {
 
         m_leftPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
         m_rightPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
-        m_drivetrain = new ShiftDrive(m_masterLeftFalcon, m_masterRightFalcon, m_slaveLeftFalcon, m_slaveRightFalcon, m_leftPiston, m_rightPiston, true);
+        m_drivetrain = new ShiftDrive(m_masterLeftDriveFalcon, m_masterRightDriveFalcon, m_slaveLeftDriveFalcon, m_slaveRightDriveFalcon, m_leftPiston, m_rightPiston, true);
 
         //gives us access to the network table for the limelight
         m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
@@ -149,10 +149,10 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         //zeros used motor contollers
-        m_masterLeftFalcon.set(ControlMode.PercentOutput, 0);
-        m_masterRightFalcon.set(ControlMode.PercentOutput, 0);
-        m_slaveLeftFalcon.set(ControlMode.PercentOutput, 0);
-        m_slaveRightFalcon.set(ControlMode.PercentOutput, 0);
+        m_masterLeftDriveFalcon.set(ControlMode.PercentOutput, 0);
+        m_masterRightDriveFalcon.set(ControlMode.PercentOutput, 0);
+        m_slaveLeftDriveFalcon.set(ControlMode.PercentOutput, 0);
+        m_slaveRightDriveFalcon.set(ControlMode.PercentOutput, 0);
     }
 
     @Override
