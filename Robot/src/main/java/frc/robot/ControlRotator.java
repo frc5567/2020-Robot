@@ -65,11 +65,12 @@ public class ControlRotator{
     /**
      *
      * method for spinning to a certain color
+     * Currently commented out because we don't know what color sensor we will be using, and we also don't currently have a class for any color sensors
      * @param speed Double for setting the speed of the rotator
      */
     /*
     public void autoColor(double speed){
-        if(Color Sensor Output* != getRecievedColor()) {
+        if(*Color Sensor Output* != getRecievedColor()) {
             m_rotator.set(speed);
         }
     }
