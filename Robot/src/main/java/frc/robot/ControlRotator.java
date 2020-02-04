@@ -61,14 +61,15 @@ public class ControlRotator{
         return doneSpinning;
     }
     
-    /*
+    
     /**
      *
      * method for spinning to a certain color
      * @param speed Double for setting the speed of the rotator
      */
+    /*
     public void autoColor(double speed){
-        if(/*Color Sensor Output* != getRecievedColor(){
+        if(Color Sensor Output* != getRecievedColor()) {
             m_rotator.set(speed);
         }
     }
