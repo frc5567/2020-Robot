@@ -35,14 +35,11 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
    */
-<<<<<<< HEAD
-  Drivetrain m_drivetrain;
+  Drivetrain.m_drivetrain;
   Pathing m_pather;
 
   TalonSRX leftTalon;
   TalonSRX rightTalon;
-=======
->>>>>>> 138e5b91832f43218931a19c9ff02299c6e73ac7
 
     //declares our drivetrain motor controllers and a currently unused shooter motor
     TalonSRX m_leftTalon;
@@ -113,7 +110,6 @@ public class Robot extends TimedRobot {
         //gives us access to the network table for the limelight
         m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
-<<<<<<< HEAD
     m_drivetrain = new Drivetrain(m_gyro);
 
     try {
@@ -143,7 +139,6 @@ public class Robot extends TimedRobot {
       m_pather.resetFlags();
     }
   }
-=======
         //sets our default state to the vision pipeline
         m_isDriverCamera = false;
 
@@ -155,7 +150,6 @@ public class Robot extends TimedRobot {
                                 .withWidget(BuiltInWidgets.kTextView)             
                                 .withProperties(Map.of("min", 0.0, "max", 6.0)) 
                                 .getEntry();
->>>>>>> 138e5b91832f43218931a19c9ff02299c6e73ac7
 
         m_cameraAngle = m_cameraTab.addPersistent("Camera Angle (deg)", 0.0)                
                                .withWidget(BuiltInWidgets.kTextView)             

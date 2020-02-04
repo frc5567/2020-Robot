@@ -32,7 +32,7 @@ public class Intake {
 
     // 
     //declare the number of ticks left untill max Encoder tick value
-    double ticksLeft = maxEncoderTick - encoder.get();
+    double ticksLeft = maxEncoderTick - encoder.getQuadraturePosition();
     //declare DropBarMotor
     private SpeedController dropBarMotor;
     
@@ -99,15 +99,15 @@ public class Intake {
     //lowers and raises the drop bar for intake
     public void dropBarButton(){ //the button can change
         if (testController.getYButton()){
-            if (encoder.get() < maxEncoderTick){
+            if (encoder.getQuadraturePosition() < maxEncoderTick){
                 //double check for loop
                 for (i = ticksLeft; i < ticksLeft; i++){
                     dropBarMotor.set(dropBarMotorSpeedDown);
                 } 
             } else {
-                if(encoder.get() = maxEncoderTick){
+                if(encoder.getQuadraturePosition() == maxEncoderTick){
                     // Double check for loop
-                    for(i = encoder.get(); i > 0; i--){
+                    for(i = encoder.getQuadraturePosition(); i > 0; i--){
                        dropBarMotor.set(dropBarMotorSpeedUp); 
                     } 
                 }

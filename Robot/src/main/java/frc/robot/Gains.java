@@ -1,6 +1,7 @@
 package frc.robot;
 
 public class Gains {
+    //Declares the 
     public final double kP;
     public final double kI;
     public final double kD;
