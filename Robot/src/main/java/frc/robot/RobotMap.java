@@ -77,6 +77,13 @@ public class RobotMap {
 
     //****************************************
     //*                                      *
+    //*          CONTROL ROTATOR CONSTANTS   *
+    //*                                      *
+    //****************************************
+    public static final double TICKS_PER_REVOLUTION = 50;
+
+    //****************************************
+    //*                                      *
     //*          LIMELIGHT CONSTANTS         *
     //*                                      *
     //****************************************
