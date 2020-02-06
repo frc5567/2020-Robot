@@ -41,6 +41,7 @@ public class Robot extends TimedRobot {
    * for any initialization code.
    */
 
+
     //declares our drivetrain motor controllers and a currently unused shooter motor
     TalonFX m_masterLeftDriveFalcon;
     TalonFX m_masterRightDriveFalcon;
@@ -117,6 +118,7 @@ public class Robot extends TimedRobot {
         m_launcherTargeting = new LauncherTargeting(m_drivetrain, m_limelightReader, this);
 
         m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade, m_launcherTargeting);
+
 
         //sets our default state to the vision pipeline
         m_isDriverCamera = false;
@@ -202,8 +204,10 @@ public class Robot extends TimedRobot {
             }
             //toggle the variable
             m_isDriverCamera = !m_isDriverCamera;
+           
         }
-
+        //calls GetModifiedDegrees in order to test and receive the print outs of either left or right
+        m_LimelightReader.getModifiedDegreesToTarget();
         //calculates and reports the distance from the robot to the base of the target
         double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
         double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
