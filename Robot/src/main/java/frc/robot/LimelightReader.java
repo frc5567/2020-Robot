@@ -11,6 +11,11 @@ public class LimelightReader {
     //declares the network table for limelight info so that we can access it
     private NetworkTable m_limelightTable;
 
+    //flags for running needed pipeline
+    private boolean m_3Times = false;
+    private boolean m_2Times = false;
+    private boolean m_stand = false;
+
     /**
      * Constructor for our limelight reader object
      * @param limelightTable The network table that stores limelight data
@@ -90,5 +95,54 @@ public class LimelightReader {
         double lengthToHeightRatio = Math.tan((Math.PI / 180) * (cameraDegreesFromGround + getYDegreesToTarget()));
         return (netHeight / lengthToHeightRatio);
     }
+    // creates a enum for our pipeline modes
+    public enum Pipeline{
+        kStandard,
+        kZoomX2,
+        kZoomX3,
+        kDriver;
+    }
+    // declare object to store pipeline
+    public Pipeline m_pipeline;
+    public void setPipeline(Pipeline pipeline){
 
+        m_pipeline = pipeline;
+
+        // changes pipeline mode depending on what we set it to
+        if(m_pipeline == Pipeline.kStandard){
+            m_limelightTable.getEntry("standardVision").setNumber(0);
+        }
+        else if(m_pipeline == Pipeline.kZoomX2){
+            m_limelightTable.getEntry("2Zoom").setNumber(1);
+        }
+        else if(m_pipeline == Pipeline.kZoomX3){
+            m_limelightTable.getEntry("3Zoom").setNumber(2);
+        }
+        else if(m_pipeline == Pipeline.kDriver){
+            m_limelightTable.getEntry("driver").setNumber(3);
+        }
+    }
+
+    public void searchTarget(){
+        m_pipeline = Pipeline.kZoomX3;
+        
+        if(hasTargets() && m_pipeline == Pipeline.kZoomX3){
+            m_3Times = true;
+        }
+        else if(!hasTargets() && m_3Times == false){
+            m_pipeline = Pipeline.kZoomX2;
+            m_2Times = true;
+        }
+        else if(!hasTargets() && m_2Times == false){
+            m_pipeline = Pipeline.kStandard;
+            m_stand = true;
+        }
+        
+    }
+
+    public void flagReset(){
+        m_3Times = false;
+        m_2Times = false;
+        m_stand = false;
+    }
 }

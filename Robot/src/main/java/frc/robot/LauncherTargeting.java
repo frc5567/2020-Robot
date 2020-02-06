@@ -127,7 +127,7 @@ public class LauncherTargeting {
     public void setPID() {
         //only allows the user to set PID values when in test
         if (m_robot.isTest()) {
-            //passes in the values off of the shuffleboard Netwrok Table Entries
+            //passes in the values off of the shuffleboard Network Table Entries
             m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_I), m_dEntry.getDouble(RobotMap.TARGETING_D));
         }
     }

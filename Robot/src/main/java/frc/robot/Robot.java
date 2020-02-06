@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.LimelightReader.Pipeline;
 import frc.robot.PilotController.DriveType;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -155,6 +156,9 @@ public class Robot extends TimedRobot {
         m_masterRightDriveFalcon.set(ControlMode.PercentOutput, 0);
         m_slaveLeftDriveFalcon.set(ControlMode.PercentOutput, 0);
         m_slaveRightDriveFalcon.set(ControlMode.PercentOutput, 0);
+
+        //starts camera in driver mode. This should be our default camera mode
+        m_limelightReader.setPipeline(Pipeline.kDriver);
     }
 
     @Override
@@ -207,7 +211,7 @@ public class Robot extends TimedRobot {
            
         }
         //calls GetModifiedDegrees in order to test and receive the print outs of either left or right
-        m_LimelightReader.getModifiedDegreesToTarget();
+        m_limelightReader.getModifiedDegreesToTarget();
         //calculates and reports the distance from the robot to the base of the target
         double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
         double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
