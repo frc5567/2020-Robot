@@ -76,6 +76,8 @@ public class ShiftDrive {
         //set the motors to brake when not given an active command
         m_leftDrive.setNeutralMode(NeutralMode.Brake);
         m_rightDrive.setNeutralMode(NeutralMode.Brake);
+        m_leftSlave.setNeutralMode(NeutralMode.Brake);
+        m_rightDrive.setNeutralMode(NeutralMode.Brake);
 
         //configs the drive train to have an acceleration based on the RobotMap constant
         m_leftDrive.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
