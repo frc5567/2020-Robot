@@ -57,9 +57,13 @@ public class RobotMap {
     public static final double LAUNCHER_D = 0;
     public static final double LAUNCHER_F = 0;
 
-    //launcher target speed in encoder ticks per 100 ms
-    //temporary value - needs to be tuned based on encoder
-    public static final double LAUNCHER_SPEED = 0;
+    //Calculated free spin angular velocity of our shooter based on specs (-10%) divided by three for gear reduction
+    //measured in rev/100ms, specs found at https://www.vexrobotics.com/775pro.html#Other_Info
+    public static final double LAUNCHER_FREESPIN_ANGULAR_VELOCITY = 9.356;
+    
+    //The maximum distance that the launcher can be shot from and still make the target (given max power)
+    //this number is currently arbitrary (25 feet)
+    public static final double MAX_LAUNCHER_DISTANCE_IN = 300;
 
     //****************************************
     //*                                      *
