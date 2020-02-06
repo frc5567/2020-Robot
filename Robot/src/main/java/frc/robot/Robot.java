@@ -180,14 +180,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-        //commented out for limelight testing, uncomment for shooter testing
-        // if(testController.getAButton()) {
-        //     shooterControl.setSpeed();
-        // }
-        // else {
-        //     shooterControl.zeroSpeed();
-        // }
-
         //controls for toggling the camera mode between driver mode and vision mode
         if(m_testController.getBButtonReleased()) {
             //if it's in driver mode, set the camera to vision mode
