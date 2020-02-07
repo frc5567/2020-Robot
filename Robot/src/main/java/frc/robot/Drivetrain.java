@@ -3,28 +3,29 @@ package frc.robot;
 // imports Motor Controllers, Controller group functions, Basic differenctial drive code, solenoid functions, and functions for getting the joystick values
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-
+import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.InvertType;
 
 
 
 
 public class Drivetrain {
     //Declares the NavX for rotational control
-    private NavX m_gyro;
+    NavX m_gyro;
 
     //Declares the Xbox controller used to toggle the double solenoid
     XboxController m_driveController;
@@ -44,16 +45,18 @@ public class Drivetrain {
     // Declares the boolean to determine if the speed is low enough to enable quick turn
     boolean m_quickTurnEnabled;
 
+    private final boolean m_hasTwoSolenoids;
+
     // Declare variable for speed
     double m_speed = 0.0;
     // Declare master left talon
-    WPI_TalonSRX m_masterRightMotor;
+    TalonFX m_masterRightMotor;
     // Declare slave left talon
-    WPI_TalonSRX m_masterLeftMotor;
+    TalonFX m_masterLeftMotor;
     // Declare master right talon
-    WPI_VictorSPX m_slaveLeftMotor;
+    TalonFX m_slaveLeftMotor;
     // Declare slave right talon
-    WPI_VictorSPX m_slaveRightMotor;
+    TalonFX m_slaveRightMotor;
 
     //Declares the encoder used for the master left motor
     private SensorCollection m_leftDriveEncoder;
@@ -66,29 +69,56 @@ public class Drivetrain {
     //Counter for buying time for the PID
     int m_counter;
 
-    //Declares the solenoid/Piston as an object which is used to switch between the two gears
-    DoubleSolenoid m_twoSpeedSolenoid;
-    
+    //Declares the solenoids/Pistons as objects which is used to switch between the two gears
+    DoubleSolenoid m_leftSolenoid;
+    DoubleSolenoid m_rightSolenoid;
    
     //Declares an enum for determining the position of the double solenoid. 
     public enum Gear{
-        kFirstSpeed, kSecondSpeed;
+        kLowGear, 
+            kHighGear;
+
+        //see if someone put this here
+		public static Object kFirstSpeedetEntry(String string) {
+			return null;
+		}
     }
     //Declares a Gear object to store the gear that we are in
     private Gear m_gear;
-    
+
+   
 
     /**
      * Constructor for the drivetrain that uses double solenoids to shift speeds/gears
      * @param ahrs the NavX used to instantiate the gyro
      */
-    public Drivetrain(NavX ahrs){
+    public Drivetrain(TalonFX leftDrive, TalonFX rightDrive, TalonFX leftSlave, TalonFX rightSlave, DoubleSolenoid rightPiston, DoubleSolenoid leftPiston, boolean hasTwoSolenoids, SerialPort.Port i2c_port_id){
 
         //Instatiates the motor controllers and their ports
-        m_masterLeftMotor = new WPI_TalonSRX(RobotMap.LEFT_TALON_ID);
-        m_masterRightMotor = new WPI_TalonSRX(RobotMap.RIGHT_TALON_ID);
-        m_slaveLeftMotor = new WPI_VictorSPX(RobotMap.LEFT_VICTOR_ID);
-        m_slaveRightMotor = new WPI_VictorSPX(RobotMap.RIGHT_VICTOR_ID);
+        m_masterLeftMotor = new TalonFX(RobotMap.MASTER_LEFT_FALCON_ID);
+        m_masterRightMotor = new TalonFX(RobotMap.MASTER_RIGHT_FALCON_ID);
+
+        m_slaveLeftMotor = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
+        m_slaveRightMotor = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
+
+        
+        m_masterLeftMotor = leftDrive;
+        m_masterRightMotor = rightDrive;
+        m_slaveLeftMotor = leftSlave;
+        m_slaveRightMotor = rightSlave;
+
+        //Inverts the right drive motors, this is arbitrary and should be based on tests
+        m_masterRightMotor.setInverted(true);
+        m_slaveRightMotor.setInverted(InvertType.FollowMaster);
+        
+        //instantiates the left double solenoid used for switch gears
+        m_leftSolenoid = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT); //<-We'll need to check the channels to make sure they're right.
+        m_rightSolenoid = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
+        
+        m_leftSolenoid = leftPiston;
+        m_rightSolenoid = rightPiston;
+
+        m_hasTwoSolenoids = hasTwoSolenoids;
 
         // Initializes classes to call encoders connected to TalonSRXs
         m_leftDriveEncoder = new SensorCollection(m_masterLeftMotor);
@@ -98,6 +128,16 @@ public class Drivetrain {
         m_leftDriveEncoder.setQuadraturePosition(0, 0);
         m_rightDriveEncoder.setQuadraturePosition(0, 0);
 
+        //sets the motors to brake when not given an active command
+        m_masterLeftMotor.setNeutralMode(NeutralMode.Brake);
+        m_masterRightMotor.setNeutralMode(NeutralMode.Brake);
+
+        //configs the drive train to have an acceleration based on the RobotMap constant
+        m_masterLeftMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        m_masterRightMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        m_slaveLeftMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        m_slaveRightMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+
         //Sets VistorSPX to follow TalonSRXs output
         m_slaveLeftMotor.follow(m_masterLeftMotor);
         m_slaveRightMotor.follow(m_masterRightMotor);
@@ -105,16 +145,14 @@ public class Drivetrain {
         //Initializes the XboxConroller in order for the two speed transmission to switch
         m_driveController = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
 
-        //Initializes the drivetrain with the TalonSRX as the Motors (VictorSPX follows TalonSRX output)
-        m_drivetrain = new DifferentialDrive(m_masterLeftMotor, m_masterRightMotor);
-
         //Initializes feedback variables for speed setter and rotate setter
         //Setters use variables as feedback in order to "ramp" the output gradually
         m_currentSpeed = 0;
         m_currentRotate = 0;
 
+        
         //Instatiates the NavX
-        m_gyro = ahrs;
+        m_gyro = new NavX(i2c_port_id);
 
 
         //Initializes rotate PID controller with the PIDF constants ----------See if there is a way to add the m_gyro
@@ -127,64 +165,102 @@ public class Drivetrain {
 
         m_counter = 0;
 
+        m_gear = Gear.kLowGear; 
 
-        //instantiates the double solenoid used for switch gears
-        m_twoSpeedSolenoid = new DoubleSolenoid(0, 1); //<-We'll need to check the channels to make sure they're right.
     }
 
     /**
-     * || In place if access is needed to the DifferentialDrive methods ||
-     * Gets the drivetrain ogject to use DifferentialDrive methods
-     * 
-     * @return The drivetrain object (DifferentialDrive)
+     * This should be run in robo init in order o configure the falcons/talons
+     * This method will be filled in with our PID config methods
+     * ???talonDriveConfig- is it the same thing -ask Josh
      */
-    public DifferentialDrive getDrivetrain(){
-        return m_drivetrain;
+    public void configDriveTrain(){
+
     }
+
+
+    public void setPistons(DoubleSolenoid.Value value) {
+        //sets both solenoids if we have two
+        if (m_hasTwoSolenoids) {
+            m_leftSolenoid.set(value);
+            m_rightSolenoid.set(value);
+        }
+        //only sets the left solenoid if we have one
+        else {
+            m_leftSolenoid.set(value);
+        }
+    }
+
+
+    //Creates a function for setting the solenoid 1 (aka forward)
+    public void solenoidForward(){
+        m_leftSolenoid.set(DoubleSolenoid.Value.kForward);
+        m_gear = Gear.kLowGear;
+   }
+
+    //Creates a function for setting the solenoid into mode 2 (aka reverse)
+    public void solenoidReverse(){
+        m_leftSolenoid.set(DoubleSolenoid.Value.kReverse);
+        m_gear = Gear.kHighGear;
+    }
+
+    // Function for switching between the two solenoid positions. The positions are forward and reverse.
+    public void switchSolenoidGear(){
+        //If X button it pressed, if the drivetrain is in first gear/speed the gear switches to second gear/speed
+        //else the gear/speed switches to first gear/speed
+        if(m_driveController.getXButton()){
+            if(m_gear == Gear.kLowGear){
+                solenoidReverse();
+            } else {
+                solenoidForward();
+            }
+        }
+    }
+
 
     /**
      * Sets the drivetrain motor to desired settings. Acceleration limiter is 
      * implemented to prevent current spikes from puting robot in brownout
      * condition
      * 
-     * @param desiredSpeed The desired robot speed along the x-axis [-1.0.1.0] forward 
+     * @param desiredSpeed The desired robot speed along the x-axis [-1.0..1.0] forward 
      * is positive
      * @param desiredRotate The desired robot turning speed along z-axis [-1.0..1.0]
      * clockwise is positive
      */
     public void curvatureDrive(double desiredSpeed, double desiredRotate){
         //If desired speed is higher than current speed by a margin larder than
-        //kMaxDeltaSpeed,
-        //Increase current speed by kMaxDeltaSpeed's amount
+        //DRIVE_MAX_DELTA_SPEED,
+        //Increase current speed by DRIVE_MAX_DELTA_SPEED's amount
         if (desiredSpeed > (m_currentSpeed + RobotMap.DRIVE_MAX_DELTA_SPEED)) {
             m_currentSpeed += RobotMap.DRIVE_MAX_DELTA_SPEED;
         }
-        //If desired speed is less than curren speed by a margin larger than
-        //kMaxDeltaSpeed
-        //Decrease current speed by kMaxDeltaSpeed's amount
+        //If desired speed is less than current speed by a margin larger than
+        //DRIVE_MAX_DELTA_SPEED
+        //Decrease current speed by DRIVE_MAX_DELTA_SPEED's amount
         else if (desiredSpeed < (m_currentSpeed - RobotMap.DRIVE_MAX_DELTA_SPEED)) {
             m_currentSpeed -= RobotMap.DRIVE_MAX_DELTA_SPEED;
         }
 
-        //If desired speed is within kMaxDeltaSpeed's margin to current speed,
+        //If desired speed is within DRIVE_MAX_DELTA_SPEED's margin to current speed,
         //set current speed to match desired speed
         else {
             m_currentSpeed = desiredSpeed;
         }
 
         //If desired rotate is higher than current rotate by a margin larger than
-        //kMaxDeltaSpeed,
-        // Increase current rotate by kMaxDeltaSpeed's amount
+        //DRIVE_MAX_DELTA_SPEED,
+        // Increase current rotate by DRIVE_MAX_DELTA_SPEED's amount
         if (desiredRotate > (m_currentRotate + RobotMap.DRIVE_MAX_DELTA_SPEED)) {
             m_currentRotate += RobotMap.DRIVE_MAX_DELTA_SPEED;
         }
         //If desired torate is less than current rotate by a margin larger than
-        //kMaxDeltaspeed
-        //Decrease current rotate by kMaxDeltaSpeed's amount
+        //DRIVE_MAX_DELTA_SPEED
+        //Decrease current rotate by DRIVE_MAX_DELTA_SPEED's amount
         else if (desiredRotate < (m_currentRotate - RobotMap.DRIVE_MAX_DELTA_SPEED)){
             m_currentRotate -= RobotMap.DRIVE_MAX_DELTA_SPEED;
         }
-        //If desired rotate is within kMaxDeltaSpeed's margin to current rotate,
+        //If desired rotate is within DRIVE_MAX_DELTA_SPEED's margin to current rotate,
         //set current rotate to match desired speed
         else {
             m_currentRotate = desiredRotate;
@@ -288,7 +364,7 @@ public class Drivetrain {
         talonArcadeDrive(RobotMap.AUTO_SPEED, returnedRotate, false);
 
         /////////////////////////////////////////////////////
-        double startingValue = 1440;
+        double startingValue = RobotMap.STARTING_TICK_VALUE;
         double leftDiffValue;
         double rightDiffValue;
         if ((m_leftDriveEncoder.getQuadraturePosition() < startingValue) && (m_rightDriveEncoder.getQuadraturePosition() < startingValue)){
@@ -302,11 +378,11 @@ public class Drivetrain {
             double rightInches = rightDiffValue / RobotMap.DRIVE_TICS_PER_INCH;
 
             if ( leftInches > target && rightInches > target) {
-                talonArcadeDrive(0.2, returnedRotate, false);
+                talonArcadeDrive(RobotMap.AUTO_SPEED, returnedRotate, false);
                 isFinished = false;
             }
             else {
-                talonArcadeDrive(0.2, 0, false);
+                talonArcadeDrive(RobotMap.AUTO_SPEED, 0, false);
              isFinished = true;
         }
         
@@ -342,33 +418,33 @@ public class Drivetrain {
         m_masterLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, RobotMap.PID_PRIMARY, RobotMap.TIMEOUT_MS);
 
         //Configure the Remote Talon's selected sensor as a remote for the right Talon
-        m_masterRightMotor.configRemoteFeedbackFilter(m_masterLeftMotor.getDeviceID(), RemoteSensorSource.TalonSRX_SelectedSensor, 1, 30);
+        m_masterRightMotor.configRemoteFeedbackFilter(m_masterLeftMotor.getDeviceID(), RemoteSensorSource.TalonSRX_SelectedSensor, 1, RobotMap.TIMEOUT_MS);
 
-        // Setip Sum Signal to be used for Distance
+        // Setup Sum Signal to be used for Distance
         //Feedback Device of Remote Talon
-        m_masterRightMotor.configSensorTerm(SensorTerm.Sum0, FeedbackDevice.RemoteSensor1, 30);
+        m_masterRightMotor.configSensorTerm(SensorTerm.Sum0, FeedbackDevice.RemoteSensor1, RobotMap.TIMEOUT_MS);
 
         //Quadrature Encodere of current Talon
-        m_masterRightMotor.configSensorTerm(SensorTerm.Sum1, FeedbackDevice.QuadEncoder, 30);
+        m_masterRightMotor.configSensorTerm(SensorTerm.Sum1, FeedbackDevice.QuadEncoder, RobotMap.TIMEOUT_MS);
 
         // Setup Difference signal to be used for turn
-        m_masterRightMotor.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.RemoteSensor1, 30);
-        m_masterRightMotor.configSensorTerm(SensorTerm.Diff0, FeedbackDevice.QuadEncoder, 30);
+        m_masterRightMotor.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.RemoteSensor1, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configSensorTerm(SensorTerm.Diff0, FeedbackDevice.QuadEncoder, RobotMap.TIMEOUT_MS);
 
         //Configure sum [Sum of both QuadEncoders] to be used for Primary PID Index
-        m_masterRightMotor.configSelectedFeedbackSensor(FeedbackDevice.SensorSum, 0, 30);
+        m_masterRightMotor.configSelectedFeedbackSensor(FeedbackDevice.SensorSum, 0, RobotMap.TIMEOUT_MS);
 
         //Scale Feedback by 0.5 to half the sum of Distance
-        m_masterRightMotor.configSelectedFeedbackCoefficient(0.5, 0, 30);
+        m_masterRightMotor.configSelectedFeedbackCoefficient(RobotMap.SCALE_FEEDBACK_COEFFICIENT_VALUE, 0, RobotMap.TIMEOUT_MS);
 
         //Configure Difference [Difference between both QuadEncoders] to be used for Aukiliary PID Index
-        m_masterRightMotor.configSelectedFeedbackSensor(FeedbackDevice.SensorDifference, 1, 30);
+        m_masterRightMotor.configSelectedFeedbackSensor(FeedbackDevice.SensorDifference, 1, RobotMap.TIMEOUT_MS);
 
         //Don't scale the Feedback Sensor (use 1 for 1:1 ration)
-        m_masterRightMotor.configSelectedFeedbackCoefficient(1, 1, 30);
+        m_masterRightMotor.configSelectedFeedbackCoefficient(RobotMap.UNSCALED_FEEDBACK_COEFFICIENT_VALUE, 1, RobotMap.TIMEOUT_MS);
 
-        m_masterRightMotor.setSelectedSensorPosition(0, 0, 30);
-        m_masterRightMotor.setSelectedSensorPosition(0, 1, 30);
+        m_masterRightMotor.setSelectedSensorPosition(0, 0, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.setSelectedSensorPosition(0, 1, RobotMap.TIMEOUT_MS);
         m_masterLeftMotor.setSelectedSensorPosition(0);
 
         //Configure output and sensor direction
@@ -378,50 +454,50 @@ public class Drivetrain {
         m_masterRightMotor.setSensorPhase(true);
 
         //Set status frame periods to ensure we don't have stale data. 20 and 5 are time in ms
-        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, 30);
-        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 20, 30);
-        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 20, 30);
-        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_10_Targets, 20, 30);
-        m_masterLeftMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 30);
+        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, RobotMap.RIGHT_PERIOD_MS, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, RobotMap.RIGHT_PERIOD_MS, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, RobotMap.RIGHT_PERIOD_MS, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_10_Targets, RobotMap.RIGHT_PERIOD_MS, RobotMap.TIMEOUT_MS);
+        m_masterLeftMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, RobotMap.LEFT_PERIOD_MS, RobotMap.TIMEOUT_MS);
 
         //Configure neutral deadband
-        m_masterRightMotor.configNeutralDeadband(0.001, 30);
-        m_masterLeftMotor.configNeutralDeadband(0.001, 30);
+        m_masterRightMotor.configNeutralDeadband(0.001, RobotMap.TIMEOUT_MS);
+        m_masterLeftMotor.configNeutralDeadband(0.001, RobotMap.TIMEOUT_MS);
 
         /**
          * Max out the peak output (for all modes).
          * However you can limit the output of a given PID object with
          * configClosedLoopPeakOutput().
          */
-        m_masterLeftMotor.configPeakOutputForward(+1.0, 30);
-        m_masterLeftMotor.configPeakOutputReverse(-1.0, 30);
-        m_masterRightMotor.configPeakOutputForward(+1.0, 30);
-        m_masterRightMotor.configPeakOutputReverse(-1.0, 30);
+        m_masterLeftMotor.configPeakOutputForward(+1.0, RobotMap.TIMEOUT_MS);
+        m_masterLeftMotor.configPeakOutputReverse(-1.0, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configPeakOutputForward(+1.0, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configPeakOutputReverse(-1.0, RobotMap.TIMEOUT_MS);
 
         //motion magic config
-        m_masterRightMotor.configMotionAcceleration(2000, 30);
-        m_masterRightMotor.configMotionCruiseVelocity(2000, 30);
+        m_masterRightMotor.configMotionAcceleration(2000, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configMotionCruiseVelocity(2000, RobotMap.TIMEOUT_MS);
 
         //FPID Gains for velocity servo
-        m_masterRightMotor.config_kP(0, RobotMap.DRIVETRAIN_GAINS.kP, 30);
-        m_masterRightMotor.config_kI(0, RobotMap.DRIVETRAIN_GAINS.kI, 30);
-        m_masterRightMotor.config_kD(0, RobotMap.DRIVETRAIN_GAINS.kD, 30);
-        m_masterRightMotor.config_kF(0, RobotMap.DRIVETRAIN_GAINS.kF, 30);
-        m_masterRightMotor.config_IntegralZone(0, RobotMap.DRIVETRAIN_GAINS.kIzone, 30);
-        m_masterRightMotor.configClosedLoopPeakOutput(0, RobotMap.DRIVETRAIN_GAINS.kPeakOutput, 30);
-        m_masterRightMotor.configAllowableClosedloopError(0, 0,30);
+        m_masterRightMotor.config_kP(0, RobotMap.DRIVETRAIN_GAINS.kP, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.config_kI(0, RobotMap.DRIVETRAIN_GAINS.kI, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.config_kD(0, RobotMap.DRIVETRAIN_GAINS.kD, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.config_kF(0, RobotMap.DRIVETRAIN_GAINS.kF, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.config_IntegralZone(0, RobotMap.DRIVETRAIN_GAINS.kIzone, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configClosedLoopPeakOutput(0, RobotMap.DRIVETRAIN_GAINS.kPeakOutput, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configAllowableClosedloopError(0, 0, RobotMap.TIMEOUT_MS);
 
         //FPID Gains for turn servo
-        m_masterRightMotor.config_kP(1, RobotMap.GAINS_TURNING.kP, 30);
-        m_masterRightMotor.config_kI(1, RobotMap.GAINS_TURNING.kI, 30);
-        m_masterRightMotor.config_kD(1, RobotMap.GAINS_TURNING.kD, 30);
-        m_masterRightMotor.config_kF(1, RobotMap.GAINS_TURNING.kF, 30);
-        m_masterRightMotor.config_IntegralZone(1, RobotMap.GAINS_TURNING.kIzone, 30);
-        m_masterRightMotor.configClosedLoopPeakOutput(1, RobotMap.GAINS_TURNING.kPeakOutput, 30);
-        m_masterRightMotor.configAllowableClosedloopError(1, 0, 30);
+        m_masterRightMotor.config_kP(1, RobotMap.GAINS_TURNING.kP, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.config_kI(1, RobotMap.GAINS_TURNING.kI, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.config_kD(1, RobotMap.GAINS_TURNING.kD, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.config_kF(1, RobotMap.GAINS_TURNING.kF, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.config_IntegralZone(1, RobotMap.GAINS_TURNING.kIzone, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configClosedLoopPeakOutput(1, RobotMap.GAINS_TURNING.kPeakOutput, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configAllowableClosedloopError(1, 0, RobotMap.TIMEOUT_MS);
 
-        m_masterRightMotor.configClosedLoopPeriod(0, 10, 30);
-        m_masterRightMotor.configClosedLoopPeriod(1, 10, 30);
+        m_masterRightMotor.configClosedLoopPeriod(0, 10, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configClosedLoopPeriod(1, 10, RobotMap.TIMEOUT_MS);
 
         //Sets the status frame period to 10ms
         m_masterRightMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 10);
@@ -431,7 +507,7 @@ public class Drivetrain {
          * 
          * if it was true, the talon's local outpu is PID0 - PID1, and other side Talon is PID0 + PID1
          */
-        m_masterRightMotor.configAuxPIDPolarity(false, 30);
+        m_masterRightMotor.configAuxPIDPolarity(false, RobotMap.TIMEOUT_MS);
 
         //sets profile slot for PID
         m_masterRightMotor.selectProfileSlot(0, 0);
@@ -447,20 +523,20 @@ public class Drivetrain {
     public void talonArcadeDrive (double forward, double turn, boolean setter) {
         if (setter) {
             //If desired speed is higher than current speed by a margin larger than
-            //kMaxdeltaSpeed,
-            //Increase current speed by kMaxDeltaSpeed's amount
-            if (forward > (m_currentSpeed + 0.1)) {
-                m_currentSpeed += 0.1;
+            //DRIVE_MAX_DELTA_SPEED,
+            //Increase current speed by DRIVE_MAX_DELTA_SPEED's amount
+            if (forward > (m_currentSpeed + RobotMap.DRIVE_MAX_DELTA_SPEED)) {
+                m_currentSpeed += RobotMap.DRIVE_MAX_DELTA_SPEED;
             }
 
             //If desired speed is less than current speed by a margin larger than
-            //kMaxDeltaSpeed
-            //Decrease current speed by kMaxDeltaSpeed's amount
-            else if (forward < (m_currentSpeed - 0.1)) {
-                m_currentSpeed -= 0.1;
+            //DRIVE_MAX_DELTA_SPEED
+            //Decrease current speed by DRIVE_MAX_DELTA_SPEED's amount
+            else if (forward < (m_currentSpeed - RobotMap.DRIVE_MAX_DELTA_SPEED)) {
+                m_currentSpeed -= RobotMap.DRIVE_MAX_DELTA_SPEED;
             }
 
-            //If desired speed is within kMaxDeltaSpeed's margin to current speed,
+            //If desired speed is within DRIVE_MAX_DELTA_SPEED's margin to current speed,
             //Set current Speed to match desired speed
             else {
                 m_currentSpeed = forward;
@@ -468,30 +544,30 @@ public class Drivetrain {
 
 
             //If desired rotate is higher than current rotate by a margin larger than
-            //kMaxDeltaSpeed,
-            //Increase current rotate by kMaxDeltaSpeed's amount
-            if (turn > (m_currentRotate + 0.1)) {
-                m_currentRotate += 0.1;
+            //DRIVE_MAX_DELTA_SPEED,
+            //Increase current rotate by DRIVE_MAX_DELTA_SPEED's amount
+            if (turn > (m_currentRotate + RobotMap.DRIVE_MAX_DELTA_SPEED)) {
+                m_currentRotate += RobotMap.DRIVE_MAX_DELTA_SPEED;
             }
 
             //If desired rotate is less than current rotate by a margin larger than
-            //kMaxDeltaSpeed
-            // Decrease current rotate by kMaxDeltaSpeed's amount
-            else if (turn < (m_currentRotate - 0.1)) {
-                m_currentRotate -= 0.1;
+            //DRIVE_MAX_DELTA_SPEED
+            // Decrease current rotate by DRIVE_MAX_DELTA_SPEED's amount
+            else if (turn < (m_currentRotate - RobotMap.DRIVE_MAX_DELTA_SPEED)) {
+                m_currentRotate -= RobotMap.DRIVE_MAX_DELTA_SPEED;
             }
 
-            //If desired rotate is within kMaxDeltaSpeed's margin to current rotate,
+            //If desired rotate is within DRIVE_MAX_DELTA_SPEED's margin to current rotate,
             //Set current rotate to match desired speed
             else {
                 m_currentRotate = turn;
             }
-            m_masterLeftMotor.set(ControlMode.PercentOutput, m_currentRotate, DemandType.ArbitraryFeedForward, +m_currentSpeed);
-            m_masterRightMotor.set(ControlMode.PercentOutput, m_currentRotate, DemandType.ArbitraryFeedForward, -m_currentSpeed);
+            m_masterLeftMotor.set(ControlMode.PercentOutput, m_currentRotate, DemandType.ArbitraryFeedForward, m_currentSpeed);
+            m_masterRightMotor.set(ControlMode.PercentOutput, m_currentRotate, DemandType.ArbitraryFeedForward, m_currentSpeed);
         }
         else {
-            m_masterLeftMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
-            m_masterRightMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
+            m_masterLeftMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, turn);
+            m_masterRightMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, turn);
         }
     }
 
@@ -525,31 +601,5 @@ public class Drivetrain {
      */
     public int getRightDriveEncoderVelocity(){
         return m_rightDriveEncoder.getQuadratureVelocity();
-    }
-
-
-
-    //Creates a function for setting the solenoid 1 (aka forward)
-    public void solenoidForward(){
-        m_twoSpeedSolenoid.set(DoubleSolenoid.Value.kForward);
-        m_gear = Gear.kFirstSpeed;
-   }
-    //Creates a function for setting the solenoid into mode 2 (aka reverse)
-    public void solenoidReverse(){
-        m_twoSpeedSolenoid.set(DoubleSolenoid.Value.kReverse);
-        m_gear = Gear.kSecondSpeed;
-    }
-
-    // Function for switching between the two solenoid positions. The positions are forward and reverse.
-    public void switchSolenoidGear(){
-        //If X button it pressed, if the drivetrain is in first gear/speed the gear switches to second gear/speed
-        //else the gear/speed switches to first gear/speed
-        if(m_driveController.getXButton()){
-            if(m_gear == Gear.kFirstSpeed){
-                solenoidReverse();
-            } else {
-                solenoidForward();
-            }
-        }
     }
 }

@@ -2,8 +2,8 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS; //see if fixed after getting phoenix
 
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 
 public class NavX extends AHRS {
