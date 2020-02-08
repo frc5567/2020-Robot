@@ -197,7 +197,7 @@ public class Robot extends TimedRobot {
            
         }
         //calls GetModifiedDegrees in order to test and receive the print outs of either left or right
-        m_LimelightReader.getModifiedDegreesToTarget();
+        m_limelightReader.getModifiedDegreesToTarget();
         //calculates and reports the distance from the robot to the base of the target
         double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
         double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
