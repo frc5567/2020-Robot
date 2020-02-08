@@ -92,9 +92,6 @@ public class Robot extends TimedRobot {
         m_slaveLeftDriveFalcon = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
         m_slaveRightDriveFalcon = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
 
-        //instantiates currently unused shooter motor
-        // m_intakeMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
-
         //instantiates our test controller
         m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
 
