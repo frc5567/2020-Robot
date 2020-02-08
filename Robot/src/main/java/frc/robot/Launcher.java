@@ -1,8 +1,13 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.FollowerType;
+import com.ctre.phoenix.motorcontrol.SensorCollection;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 /**
  * A launcher that uses one or multiple motors to launch a projectile
@@ -23,7 +28,7 @@ public class Launcher {
 
     //speed controllers used to launch 
     //the master controller drives the other motors in closed loop velocity control
-    private BaseMotorController m_masterMotor;
+    private TalonSRX m_masterMotor;
 
     /**The slave on the same side as the master motor controller */
     private BaseMotorController m_closeSlaveMotor;
@@ -31,15 +36,21 @@ public class Launcher {
     /**The slaves on the further side from the master motor, and inverted */
     private BaseMotorController m_farSlaveMotor1, m_farSlaveMotor2;
 
+    //the encoder plugged into the master Talon
+    SensorCollection m_encoder;
+
     /**
      * Constructor for Launcher objects
      * 
      * <p> To be used for any system that launches a projectile
      * 
      * @param adjustmentValue The proportionality constant used to control this launcher's speed
-     * @param leftMotor The speed controller used to launch the projectile
+     * @param masterMotor The master speed controller used to launch the projectile
+     * @param closeSlaveMotor The slave motor controller on the same side of the shooter as the master
+     * @param farSlaveMotor1 One of the slave motors on the far side of the launcher (from the master)
+     * @param farSlaveMotor2 The other slave motor on the far side of the launcher
      */
-    public Launcher(double adjustmentValue, BaseMotorController masterMotor, BaseMotorController closeSlaveMotor, BaseMotorController farSlaveMotor1, BaseMotorController farSlaveMotor2) {
+    public Launcher(double adjustmentValue, TalonSRX masterMotor, BaseMotorController closeSlaveMotor, BaseMotorController farSlaveMotor1, BaseMotorController farSlaveMotor2) {
         m_adjustmentValue = adjustmentValue;
 
         m_masterMotor = masterMotor;
@@ -51,6 +62,9 @@ public class Launcher {
         //Sets the far motors to be inverted so that they don't work against the close ones
         m_farSlaveMotor1.setInverted(true);
         m_farSlaveMotor2.setInverted(true);
+
+        //Instantiates the encoder as the encoder plugged into the master
+        m_encoder = new SensorCollection(m_masterMotor);
     }
 
     /**
@@ -107,6 +121,35 @@ public class Launcher {
      */
     public void configVelocityControl() {
         //config remote sensors
+        //sets the sensor to be a quad encoder, sets our feedback device to be that sensor
+        m_masterMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
+
+        //sets whether our motor is inverted
+        //this is currently false but can be switched based on testing
+        m_masterMotor.setInverted(false);
+        m_masterMotor.setSensorPhase(false);
+
+        //this sets how often we pull data from our sensor
+        //as it is currently set, the motor controller will read from the encoder every 10 miliseconds
+        m_masterMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, RobotMap.LAUNCHER_FEEDBACK_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+
+        //this configs the deadband for the PID output. Any output with an absolute value less than this will be treated as zero
+        //curently, this is the factory default (0.04), but should be tuned on testing
+        m_masterMotor.configNeutralDeadband(RobotMap.LAUNCHER_NEUTRAL_DEADBAND, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+
+        //this sets the peak output for our PID. The PID cannot output a value higher than this
+        //this is currently set to 1.0, so the PID can output as much as it wants
+        m_masterMotor.configPeakOutputForward(RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        //this does the same thing but for the reverse direction
+        m_masterMotor.configPeakOutputReverse(-RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        
+        //sets the period of the velocity sample
+        //effectively this defines the amount of time used to calculate the velocity
+        //this selection is currrently arbitrary
+        m_masterMotor.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+
+        //Sets the number of samples used in the rolling average for calculating velocity
+        m_masterMotor.configVelocityMeasurementWindow(RobotMap.LAUNCHER_VELOCITY_MEASUREMENT_WINDOW, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
         
         //set p, i, d, f values
         //the zero is the PID slot, in this case it is zero for the primary PID
@@ -155,6 +198,20 @@ public class Launcher {
     }
 
     /**
+     * @return The velocity of the encoder in units per 100ms
+     */
+    public int getEncoderVelocity() {
+        return m_encoder.getQuadratureVelocity();
+    }
+
+    /**
+     * @return the position of the encoder in encoder units
+     */
+    public int getEncoderPosition() {
+        return m_encoder.getQuadraturePosition();
+    }
+
+    /**
      * @return the current difference between the current speed and the setpoint
      */
     public double getError() {
@@ -162,11 +219,11 @@ public class Launcher {
     }
 
     /**
-     * toString method containing motor, adjustmentValue, current speed and current error
+     * toString method containing motor, encoder, adjustmentValue, current speed and current error
      * 
      * @return the state of the Launcher object summarized in a string
      */
     public String toString() {
-        return "Motor: " + m_masterMotor.toString() + " | Adjustment Value: " + m_adjustmentValue + " | Current Speed: " + m_currentSpeed + " | Current Error: " + m_error;
+        return "Motor: " + m_masterMotor.toString() + " | Encoder: "+ m_encoder + " | Adjustment Value: " + m_adjustmentValue + " | Current Speed: " + m_currentSpeed + " | Current Error: " + m_error;
     }
 }

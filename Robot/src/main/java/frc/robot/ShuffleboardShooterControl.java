@@ -19,6 +19,9 @@ public class ShuffleboardShooterControl {
     private ShuffleboardTab m_launcherTab;
     private Launcher m_launcher;
     private NetworkTableEntry m_setpoint;
+
+    //creates an entry for communicating velocity to the shuffleboard
+    private NetworkTableEntry m_velocityGraph;
     
     /**
      * Constructor for ShuffleboardShooterControl objects
@@ -38,6 +41,12 @@ public class ShuffleboardShooterControl {
                               .withWidget(BuiltInWidgets.kTextView)             //sets widget to a text view
                               .withProperties(Map.of("min", -1.0, "max", 1.0))  //sets min and max values
                               .getEntry();                                      //retrieves the entry to assign our setpoint
+
+        //creates a widget for displaying velocity as a function of time
+        m_velocityGraph = m_launcherTab.add("VelocityGraph", 0.0)                   //creates a widget to store the graph
+                                       .withWidget(BuiltInWidgets.kGraph)           //sets the widget to be a graph
+                                       .withProperties(Map.of("VisibleTime", 30))   //Sets the amount of time data is visable for. 30 is a default value, making it much longer
+                                       .getEntry();
     }
 
     /**
@@ -57,6 +66,13 @@ public class ShuffleboardShooterControl {
      */
     public void zeroSpeed() {
         m_launcher.proportionalSpeedSetter(0.0);
+    }
+
+    /**
+     * Passes the velocity from the encoder onto the network table to be graphed
+     */
+    public void graphVelocity() {
+        m_velocityGraph.setNumber(m_launcher.getEncoderVelocity());
     }
 
 }

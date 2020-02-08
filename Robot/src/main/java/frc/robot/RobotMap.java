@@ -65,6 +65,22 @@ public class RobotMap {
     //this number is currently arbitrary (25 feet)
     public static final double MAX_LAUNCHER_DISTANCE_IN = 300;
 
+    //the launcher timeout for running confing methods
+    public static final int LAUNCHER_CONFIG_TIMEOUT_MS = 30;
+
+    //the period for reading data from the encoders attached to the motor controllers
+    public static final int LAUNCHER_FEEDBACK_PERIOD_MS = 10;
+
+    //the neutral deadband for our launcher PID
+    public static final double LAUNCHER_NEUTRAL_DEADBAND = 0.04;
+
+    //the peak output on our launcher PID
+    public static final double LAUNCHER_PID_PEAK_OUTPUT = 1.0;
+
+    //the number of samples use in rolling average. Valid values are 1,2,4,8,16,32. If another value is specified, it will truncate to nearest support value.
+    //this number is currently arbitrary
+    public static final int LAUNCHER_VELOCITY_MEASUREMENT_WINDOW = 8;
+
     //****************************************
     //*                                      *
     //*           CLIMBER CONSTANTS          *
