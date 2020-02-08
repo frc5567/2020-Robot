@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
    * for any initialization code.
    */
   Drivetrain m_driveTrain;
+  //The pathing class still has to be created
   Pathing m_pather;
 
   NavX m_gyro;
@@ -130,7 +131,7 @@ public class Robot extends TimedRobot {
       System.out.println("Error instantiating navX MXP");
     }
 
-    m_driveTrain.talonDriveConfig();
+    m_driveTrain.configDriveTrain();
     //creates a field to display calculated distance
     m_distance = m_cameraTab.addPersistent("Distance", 0.0)
                           .getEntry();
@@ -174,7 +175,7 @@ public class Robot extends TimedRobot {
     m_masterLeftDriveFalcon.set(ControlMode.PercentOutput, 0);
     m_masterRightDriveFalcon.set(ControlMode.PercentOutput, 0);
 
-    m_drivetrain.talonDriveConfig();
+    m_drivetrain.configDriveTrain();
   }
 
 
@@ -225,7 +226,7 @@ public class Robot extends TimedRobot {
 
 
     //check to see where this goes
-    m_driveTrain.talonArcadeDrive((m_driveController.getTriggerAxis(Hand.kRight) - m_driveController.getTriggerAxis(Hand.kLeft)), m_driveController.getX(Hand.kLeft), true);
+    m_driveTrain.arcadeDrive((m_driveController.getTriggerAxis(Hand.kRight) - m_driveController.getTriggerAxis(Hand.kLeft)), m_driveController.getX(Hand.kLeft), true);
     
     
     //controls for toggling the camera mode between driver mode and vision mode

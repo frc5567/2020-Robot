@@ -18,7 +18,7 @@ public class PilotController {
 
     //declare our drivetrain and our controller
     private XboxController m_controller;
-    private ShiftDrive m_drivetrain;
+    private Drivetrain m_drivetrain;
 
     private LauncherTargeting m_launcherTargeting;
     private final DriveType m_driveType;
@@ -31,7 +31,7 @@ public class PilotController {
      * @param driveType The type of drive control that the pilot wants (tank or arcade)
      * @param launcherTargting The targeting object used to lock on to our target
      */
-    public PilotController(XboxController controller, ShiftDrive drivetrain, DriveType driveType, LauncherTargeting launcherTargeting) {
+    public PilotController(XboxController controller, Drivetrain drivetrain, DriveType driveType, LauncherTargeting launcherTargeting) {
         m_controller = controller;
         m_drivetrain = drivetrain;
         m_driveType = driveType;
@@ -41,8 +41,10 @@ public class PilotController {
     /**
      * Controls our drivetrain with an arcade control system
      * Triggers are forward and back (left trigger is back, right is forward), left x stick is turn
+     * 
+     *  @param setter The setter is true when the speed is being adjusted to conserve battery, if it is false it uses the raw input
      */
-    private void arcadeDrive() {
+    private void arcadeDrive(boolean setter) {
         //read our current turn
         double turnInput =  m_controller.getX(Hand.kLeft);
 
@@ -52,7 +54,7 @@ public class PilotController {
         }
 
         //run our drivetrain with the adjusted input
-        m_drivetrain.arcadeDrive(m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft), turnInput);
+        m_drivetrain.arcadeDrive(m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft), turnInput, setter);
     }
 
     /**

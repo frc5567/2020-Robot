@@ -77,6 +77,7 @@ public class RobotMap {
     public static final int RIGHT_SOLENOID_FORWARD_PORT = 2;
     public static final int RIGHT_SOLENOID_REVERSE_PORT = 3;
 
+
     //****************************************
     //*                                      *
     //*          LAUNCHER CONSTANTS          *
