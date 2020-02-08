@@ -19,8 +19,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.PilotController.DriveType;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import java.util.Map;
 
@@ -40,6 +38,7 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
    */
+
 
     //declares our drivetrain motor controllers and a currently unused shooter motor
     TalonFX m_masterLeftDriveFalcon;
@@ -118,6 +117,7 @@ public class Robot extends TimedRobot {
 
         m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade, m_launcherTargeting);
 
+
         //sets our default state to the vision pipeline
         m_isDriverCamera = false;
 
@@ -180,14 +180,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-        //commented out for limelight testing, uncomment for shooter testing
-        // if(testController.getAButton()) {
-        //     shooterControl.setSpeed();
-        // }
-        // else {
-        //     shooterControl.zeroSpeed();
-        // }
-
         //controls for toggling the camera mode between driver mode and vision mode
         if(m_testController.getBButtonReleased()) {
             //if it's in driver mode, set the camera to vision mode
@@ -202,8 +194,10 @@ public class Robot extends TimedRobot {
             }
             //toggle the variable
             m_isDriverCamera = !m_isDriverCamera;
+           
         }
-
+        //calls GetModifiedDegrees in order to test and receive the print outs of either left or right
+        m_limelightReader.getModifiedDegreesToTarget();
         //calculates and reports the distance from the robot to the base of the target
         double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
         double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
