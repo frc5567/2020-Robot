@@ -23,6 +23,8 @@ public class Launcher {
     //speed controller used to launch 
     private BaseMotorController leftMotor;
     private BaseMotorController rightMotor;
+    private BaseMotorController leftSlaveMotor;
+    private BaseMotorController rightSlaveMotor;
 
     /**
      * Constructor for Launcher objects
@@ -32,10 +34,12 @@ public class Launcher {
      * @param p The proportionality constant used to control this launcher's speed
      * @param leftMotor The speed controller used to launch the projectile
      */
-    public Launcher(double p, BaseMotorController leftMotor, BaseMotorController rightMotor) {
+    public Launcher(double p, BaseMotorController leftMotor, BaseMotorController rightMotor, BaseMotorController leftSlaveMotor, BaseMotorController rightSlaveMotor) {
         this.p = p;
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
+        this.leftSlaveMotor = leftSlaveMotor;
+        this.rightSlaveMotor = rightSlaveMotor;
     }
 
     /**
@@ -45,6 +49,8 @@ public class Launcher {
     public void setMotor(double speed) {
         leftMotor.set(ControlMode.PercentOutput, speed);
         rightMotor.set(ControlMode.PercentOutput, -speed);
+        leftSlaveMotor.follow(leftMotor);
+        rightSlaveMotor.follow(rightMotor);
     }
 
     /**
