@@ -11,10 +11,10 @@ public class LimelightReader {
     //declares the network table for limelight info so that we can access it
     private NetworkTable m_limelightTable;
 
-    //flags for running needed pipeline
-    private boolean m_3Times = false;
-    private boolean m_2Times = false;
-    private boolean m_stand = false;
+    // //flags for running needed pipeline
+    // private boolean m_3Times = false;
+    // private boolean m_2Times = false;
+    // private boolean m_stand = false;
 
     /**
      * Constructor for our limelight reader object
@@ -83,6 +83,13 @@ public class LimelightReader {
         return m_limelightTable.getEntry("ty").getDouble(0);
     }
 
+      /**
+     * @return The percent area of the target
+     */
+    public double getAreaOfTarget() {
+        return m_limelightTable.getEntry("ta").getDouble(0);
+    }
+  
     /**
      * @param cameraDegreesFromGround How far from horizontal the camera is mounted in degrees. This should be passed in from a gyro
      * @return The horizontal distance from the robot to the target
@@ -123,26 +130,26 @@ public class LimelightReader {
         }
     }
 
-    public void searchTarget(){
-        m_pipeline = Pipeline.kZoomX3;
+    // public void searchTarget(){
+    //     m_pipeline = Pipeline.kZoomX3;
         
-        if(hasTargets() && m_pipeline == Pipeline.kZoomX3){
-            m_3Times = true;
-        }
-        else if(!hasTargets() && m_3Times == false){
-            m_pipeline = Pipeline.kZoomX2;
-            m_2Times = true;
-        }
-        else if(!hasTargets() && m_2Times == false){
-            m_pipeline = Pipeline.kStandard;
-            m_stand = true;
-        }
+    //     if(hasTargets() && m_pipeline == Pipeline.kZoomX3){
+    //         m_3Times = true;
+    //     }
+    //     else if(!hasTargets() && m_3Times == false){
+    //         m_pipeline = Pipeline.kZoomX2;
+    //         m_2Times = true;
+    //     }
+    //     else if(!hasTargets() && m_2Times == false){
+    //         m_pipeline = Pipeline.kStandard;
+    //         m_stand = true;
+    //     }
         
-    }
+    // }
 
-    public void flagReset(){
-        m_3Times = false;
-        m_2Times = false;
-        m_stand = false;
-    }
+    // public void flagReset(){
+    //     m_3Times = false;
+    //     m_2Times = false;
+    //     m_stand = false;
+    // }
 }
