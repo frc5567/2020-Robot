@@ -131,21 +131,6 @@ public class ShiftDrive {
     }
 
     /**
-     * Toggles our gear to whatever it is not currently
-     */
-    public void switchGear() {
-        if (m_gear == Gear.kLow) {
-            m_gear = Gear.kHigh;
-        }
-        else if (m_gear == Gear.kHigh) {
-            m_gear = Gear.kLow;
-        }
-
-        //shifts gears to whatever our new gear is
-        shiftGear(m_gear);
-    }
-
-    /**
      * @return The gear that we are currently in (kHigh or kLow)
      */
     public Gear getGear() {
@@ -175,8 +160,8 @@ public class ShiftDrive {
      */
     public void arcadeDrive(double speed, double turn){
         //this references last year's code, may need to be revised
-        m_leftDrive.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, speed);
-        m_rightDrive.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, speed);
+        m_leftDrive.set(ControlMode.PercentOutput, speed, DemandType.ArbitraryFeedForward, turn);
+        m_rightDrive.set(ControlMode.PercentOutput, speed, DemandType.ArbitraryFeedForward, -turn);
         m_leftSlave.follow(m_leftDrive);
         m_rightSlave.follow(m_rightDrive);
     }
