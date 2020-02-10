@@ -33,19 +33,39 @@ public class LimelightReader {
         return m_limelightTable.getEntry("tx").getDouble(0);
     }
 
-    /**TODO:Work out the modification to the target based on target yaw, until then this is unfinished
+    /**TODO:Correct the inner target offset and the degrees to hit inner target
      * This method should adjust the x degrees to target based on target's yaw
      * <p>This is designed to hit the inner target when shooting at an angle.
      * <p>Note that we should only adjust within a certain window, past that we should just target the center of mass
      * @return The adjusted degrees to the inner target
      */
     public double getModifiedDegreesToTarget() {
-        return m_limelightTable.getEntry("tx").getDouble(0);
+        // Sets targetAngle to tx the degrees off from center in the x direction
+        double targetAngle = m_limelightTable.getEntry("tx").getDouble(0);
+        
+        // Sets a variable equal to the targets skew
+        double targetSkew = getSkew();
+
+        // Checks to make sure we have a target
+        if (hasTargets() == true) {
+
+                // Checks skew to see if we can hit the inner target
+                if(targetSkew <= -90 + RobotMap.INNER_TARGET_DEGREES && targetSkew >= 0 - RobotMap.INNER_TARGET_DEGREES){
+                    
+                    // Offset for inner target
+                    targetAngle *= RobotMap.OFFSET_TARGET_DEGREES;
+                    
+                    // Test print outs
+                    System.out.println("Inner Target");
+                }else System.out.println("Outer Target");
+        }
+        return targetAngle;
     }
 
     /**
-     * TODO: This value needs to be further researched/investigated
-     * @return The skew of the target in degrees
+     * @return The skew of the target in degrees, only returns negative values
+     * 0 to -20 degrees is the range the target is to the left of us
+     *  -90 to -70 degrees is range the target is to the right of us
      */
     public double getSkew() {
         return m_limelightTable.getEntry("ts").getDouble(0);

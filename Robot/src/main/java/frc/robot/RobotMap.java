@@ -90,9 +90,13 @@ public class RobotMap {
     public static final double LAUNCHER_D = 0;
     public static final double LAUNCHER_F = 0;
 
-    //launcher target speed in encoder ticks per 100 ms
-    //temporary value - needs to be tuned based on encoder
-    public static final double LAUNCHER_SPEED = 0;
+    //Calculated free spin angular velocity of our shooter based on specs (-10%) divided by three for gear reduction
+    //measured in rev/100ms, specs found at https://www.vexrobotics.com/775pro.html#Other_Info
+    public static final double LAUNCHER_FREESPIN_ANGULAR_VELOCITY = 9.356;
+    
+    //The maximum distance that the launcher can be shot from and still make the target (given max power)
+    //this number is currently arbitrary (25 feet)
+    public static final double MAX_LAUNCHER_DISTANCE_IN = 300;
 
     //****************************************
     //*                                      *
@@ -120,6 +124,13 @@ public class RobotMap {
 
     //****************************************
     //*                                      *
+    //*          CONTROL ROTATOR CONSTANTS   *
+    //*                                      *
+    //****************************************
+    public static final double TICKS_PER_REVOLUTION = 50;
+
+    //****************************************
+    //*                                      *
     //*          LIMELIGHT CONSTANTS         *
     //*                                      *
     //****************************************
@@ -127,6 +138,10 @@ public class RobotMap {
     public static final double TARGET_HEIGHT_INCHES = 98.25;
     //This is temporary and will need to be assigned on our final bot
     public static final double CAMERA_HEIGHT_INCHES = 45d;
+    //This is the offset we make for inner target TODO:Needs to be tested and tuned
+    public static final double OFFSET_TARGET_DEGREES = 0.8;
+    //This is the range on either side in degrees where we can still hit the inner target
+    public static final double INNER_TARGET_DEGREES = 4.5;
 
     //PID values for targeting the vision target
     //TODO: These values are temporary and need to be updated in testing

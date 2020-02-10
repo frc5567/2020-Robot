@@ -123,6 +123,8 @@ public class Robot extends TimedRobot {
 
     m_drivetrain = new Drivetrain(m_masterLeftDriveFalcon, m_masterRightDriveFalcon, m_slaveLeftDriveFalcon, m_slaveRightDriveFalcon, m_leftPiston, m_rightPiston, true);
 
+    //sets our default state to the vision pipeline
+    m_isDriverCamera = false;
 
     //Do we need? Double check on what is does
     try {
@@ -162,9 +164,9 @@ public class Robot extends TimedRobot {
                             .getEntry();
 
     m_targetHeight = m_cameraTab.addPersistent("Target Height (m)", 0.0)                
-                              .withWidget(BuiltInWidgets.kTextView)             
-                              .withProperties(Map.of("min", 0.0, "max", 6.0)) 
-                              .getEntry();
+                            .withWidget(BuiltInWidgets.kTextView)             
+                            .withProperties(Map.of("min", 0.0, "max", 6.0)) 
+                            .getEntry();
   }
 
   @Override
@@ -188,8 +190,6 @@ public class Robot extends TimedRobot {
   }
  
 
-    
-    
   @Override
     public void teleopInit() {
       if (m_pather != null) {
@@ -210,8 +210,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-      //zeros the shooter
-      m_shooterControl.zeroSpeed();
+    //zeros the shooter
+    m_shooterControl.zeroSpeed();
   }
 
   @Override
@@ -243,15 +243,16 @@ public class Robot extends TimedRobot {
       }
       //toggle the variable
       m_isDriverCamera = !m_isDriverCamera;
+        
     }
 
+    //calls GetModifiedDegrees in order to test and receive the print outs of either left or right
+    m_LimelightReader.getModifiedDegreesToTarget();
     //calculates and reports the distance from the robot to the base of the target
     double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
     double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
     //reports the distance to the smart dashboard
     m_distance.setDouble(netHeight /  lengthToHeightRatio);
-    
-    
-
   }
+
 }

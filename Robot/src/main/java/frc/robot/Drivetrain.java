@@ -76,12 +76,7 @@ public class Drivetrain {
     //Declares an enum for determining the position of the double solenoid. 
     public enum Gear{
         kLowGear, 
-            kHighGear;
-
-        //see if someone put this here
-		public static Object kFirstSpeedetEntry(String string) {
-			return null;
-		}
+        kHighGear;
     }
     //Declares a Gear object to store the gear that we are in
     private Gear m_gear;
