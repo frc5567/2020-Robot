@@ -70,14 +70,59 @@ public class RobotMap {
     //*           CLIMBER CONSTANTS          *
     //*                                      *
     //****************************************
+    //the cruise speed for the climber
     public static final double CLIMBER_SPEED = 0.5;
+
+    //the encoder targets for our lift and extension motor
+    public static final int CLIMBER_EXTENSION_ENCODER_TARGET = 0;
+    public static final int CLIMBER_LIFT_ENCODER_TARGET = 0;
+
+    //the climber timeout for running confing methods
+    public static final int CLIMBER_CONFIG_TIMEOUT_MS = 30;
+
+    //the period for reading data from the encoders attached to the motor controllers
+    public static final int CLIMBER_FEEDBACK_PERIOD_MS = 10;
+
+    //the neutral deadband for our climber PIDs
+    public static final double CLIMBER_NEUTRAL_DEADBAND = 0.04;
+
+    //the peak output on our climber PIDs
+    public static final double CLIMBER_PID_PEAK_OUTPUT = 1.0;
+
+    //the acceleration for the climber in units per 100ms per second
+    //1000 is half the value for the elevator last year, this needs to be tuned via testing
+    public static final int CLIMBER_MOTION_MAGIC_ACCEL = 1000;
+
+    //the cruise velocity for the climber in units per second
+    //1000 is half the value for the elevator last year, this needs to be tuned via testing
+    public static final int CLIMBER_MOTION_MAGIC_CRUISE_VELOCITY = 1000;
+
+    //the PIDF values for the extension motor on the climber
+    //these values are temporary and should be tuned through testing
+    public static final double CLIMBER_EXTENSION_P = 0;
+    public static final double CLIMBER_EXTENSION_I = 0;
+    public static final double CLIMBER_EXTENSION_D = 0;
+    public static final double CLIMBER_EXTENSION_F = 0;
+
+    //the acceptable integral zone for the extension motor
+    //100 is the value used last year, this should be adjusted in testing if need be
+    public static final int CLIMBER_EXTENSION_I_ZONE = 100;
+
+    //the acceptable error for the extension PID. Any error less than this will be treated as zero
+    public static final int CLIMBER_EXTENSION_ACCEPTABLE_ERROR = 0;
+
+    //the closed loop period for the extension PID
+    public static final int CLIMBER_EXTENSION_CLOSED_LOOP_PERIOD_MS = 10;
 
     //****************************************
     //*                                      *
     //*           INTAKE CONSTANTS           *
     //*                                      *
     //****************************************
-    public static final int INTAKE_VICTOR_ID = 15;
+    public static final int INTAKE_SPARK_ID = 15;
+
+    //the ramp time in seconds from zero to full speed for the intake motor
+    public static final double INTAKE_OPEN_LOOP_RAMP_TIME_S = 0.75;
 
     //****************************************
     //*                                      *
