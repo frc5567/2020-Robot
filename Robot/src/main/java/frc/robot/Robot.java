@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -106,6 +107,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
+        System.out.println("Left Stick X | Y : " + m_driveController.getX(Hand.kLeft) + " | " + m_driveController.getY(Hand.kLeft) + "\t | \tRight Stick X | Y : " + m_driveController.getX(Hand.kRight) + " | " + m_driveController.getY(Hand.kRight));
+
     }
 
 }
