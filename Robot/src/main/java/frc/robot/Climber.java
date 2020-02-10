@@ -34,6 +34,9 @@ public class Climber {
     //error times this gives you the increase in speed 
     private double m_adjustmentValue;
 
+    //the starting position of the encoder and the value the climber will attempt to return to
+    private int m_startingPosition;
+
     /**
      * Constructor for climber objects
      * <p>The encoders are attached to the talon motor controllers that drive the climber
@@ -51,6 +54,10 @@ public class Climber {
         //sets our encoders to the encoders plugged into the talons
         m_extensionEncoder = new SensorCollection(m_extensionMotor);
         m_liftEncoder = new SensorCollection(m_liftMotor);
+
+        //sets starting position on object contruction
+        //object construction should occur in RobotInit or in Robot contructor
+        m_startingPosition = m_extensionEncoder.getQuadraturePosition();
     }
 
     /**
@@ -87,16 +94,16 @@ public class Climber {
 
     /**
      * Retracts the climber to its starting position
-     * <p>Currently set to zero, may want to set it a hair above zero to protect from mechanocal stops
+     * <p>Currently set to the value read off of the encoder at the start of the robot
      */
     public void retractClimber() {
-        controlClimberExtension(0);
+        controlClimberExtension(m_startingPosition);
     }
 
     /**
      * Retracts the climber to lift the robot
      * <p>This position should probably be defined by a RobotMap constant from testing
-     * 
+     * <p>Currently we assume the encoder direction and motor direction in the comparison, this should be tested before we attempt to actually climb
      * 
      * @param targetPos The target position for the encoder
      * @param extensionSpeed The cruise speed for the lift
