@@ -55,8 +55,7 @@ public class Intake {
         m_motor = intakeMotor;
         m_positionPiston = positionPiston;
 
-        //set our default position to [INSERT DEFAULT POSITION]
-        //this should be updated when we know our default
+        //set our default position to raised
         m_position = Position.kRaised;
 
         //sets the time in seconds from zero to full for the intake motor
@@ -77,6 +76,11 @@ public class Intake {
      * @param position The position the intake should move to
      */
     public void setPosition(Position position) {
+        //breaks out of method if we are already at our target position
+        if(m_position == position) {
+            return;
+        }
+
         //sets our current position to the desired position
         m_position = position;
 
@@ -88,22 +92,6 @@ public class Intake {
         else if (m_position == Position.kRaised) {
             m_positionPiston.set(Value.kReverse);
         }
-    }
-
-    /**
-     * Toggles the position of the intake to whatever it currently isn't
-     */
-    public void togglePosition() {
-        //switches our current position
-        if(m_position == Position.kRaised) {
-            m_position = Position.kLowered;
-        }
-        else if (m_position == Position.kLowered) {
-            m_position = Position.kRaised;
-        }
-
-        //sets our solenoid to the new position
-        setPosition(m_position);
     }
 
     /**
