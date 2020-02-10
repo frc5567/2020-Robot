@@ -159,11 +159,24 @@ public class Launcher {
         m_masterMotor.config_kD(0, RobotMap.LAUNCHER_D);
         m_masterMotor.config_kF(0, RobotMap.LAUNCHER_F);
 
-        //set standard setpoint -> Should be done in robot map?
+        //this sets the acceptable amount of Integral error, where if the absolute accumulated error exceeds this ammount, it resets to zero
+        //this is designed to prevent the PID from going crazy if we move too far from our target
+        m_masterMotor.config_IntegralZone(0, RobotMap.LAUNCHER_I_ZONE, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
-        //config max integral accum and i zone -> should be done
+        //sets the max output of the motor specifically within closed loop control
+        //this is likely redundant, but the values can be set to seperate if needed in testing
+        m_masterMotor.configClosedLoopPeakOutput(0, RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
-        //config peak output and allowable error
+        //this configures an allowable error in closed loop control
+        //any error less than this is treated as zero. We currently set this to zero, but we can increase it if need be
+        m_masterMotor.configAllowableClosedloopError(0, RobotMap.LAUNCHER_ACCEPTABLE_ERROR, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+
+        //configures the period for closed loop calculations in MS 
+        //Currently set to 10, but should be increased if the can bus is haveing issues
+        m_masterMotor.configClosedLoopPeriod(0, RobotMap.LAUNCHER_CLOSED_LOOP_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+
+        //sets our closed loop control to use our primary PID slot
+        m_masterMotor.selectProfileSlot(0, 0);
     }
 
     /**

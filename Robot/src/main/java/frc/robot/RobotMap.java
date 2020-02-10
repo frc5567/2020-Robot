@@ -81,6 +81,16 @@ public class RobotMap {
     //this number is currently arbitrary
     public static final int LAUNCHER_VELOCITY_MEASUREMENT_WINDOW = 8;
 
+    //the acceptable integral zone for the launch master motor
+    //100 is the value used last year, this should be adjusted in testing if need be
+    public static final int LAUNCHER_I_ZONE = 100;
+
+    //the acceptable error for the launcher PID. Any error less than this will be treated as zero
+    public static final int LAUNCHER_ACCEPTABLE_ERROR = 0;
+
+    //the closed loop period for the launcher PID
+    public static final int LAUNCHER_CLOSED_LOOP_PERIOD_MS = 10; 
+
     //****************************************
     //*                                      *
     //*           CLIMBER CONSTANTS          *
