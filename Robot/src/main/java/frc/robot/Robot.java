@@ -47,15 +47,6 @@ public class Robot extends TimedRobot {
     TalonFX m_slaveLeftDriveFalcon;
     TalonFX m_slaveRightDriveFalcon;
 
-    // VictorSPX m_intakeMotor;
-
-    //declares our launcher system and our controls for that system over the launcher tab
-    Launcher m_shooter;
-    ShuffleboardShooterControl m_shooterControl;
-
-    //declares an xbox controller used for testing prototype code
-    XboxController m_testController;
-
     //declares controllers and drivetrain for testing drive code
     XboxController m_driveController;
     PilotController m_pilotController;
@@ -63,25 +54,6 @@ public class Robot extends TimedRobot {
 
     DoubleSolenoid m_leftPiston;
     DoubleSolenoid m_rightPiston;
-
-    //toggle for the limelight
-    boolean m_isDriverCamera;
-
-    //declares the network table for limelight info so that we can access it
-    NetworkTable m_limelightTable;
-
-    //declare our limelight reader object
-    LimelightReader m_limelightReader;
-
-    //declare our launcher targeting object
-    LauncherTargeting m_launcherTargeting;
-
-    //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
-    private ShuffleboardTab m_cameraTab;
-    private NetworkTableEntry m_cameraHeight;
-    private NetworkTableEntry m_cameraAngle;
-    private NetworkTableEntry m_targetHeight;
-    private NetworkTableEntry m_distance;
 
     public Robot() {
         //instantiates master motors for drive
@@ -92,9 +64,6 @@ public class Robot extends TimedRobot {
         m_slaveLeftDriveFalcon = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
         m_slaveRightDriveFalcon = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
 
-        //instantiates our test controller
-        m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
-
         //instantiate drivetrain for tested
         m_driveController = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
 
@@ -102,45 +71,7 @@ public class Robot extends TimedRobot {
         m_rightPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
         m_drivetrain = new ShiftDrive(m_masterLeftDriveFalcon, m_masterRightDriveFalcon, m_slaveLeftDriveFalcon, m_slaveRightDriveFalcon, m_leftPiston, m_rightPiston, true);
 
-        //gives us access to the network table for the limelight
-        m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
-
-        //create an object to read values off of our limelight
-        m_limelightReader = new LimelightReader(m_limelightTable);
-
-        //create our targeting object
-        //"this" is the current robot, we pass it in so that the targeting can see what periodic function we are in
-        m_launcherTargeting = new LauncherTargeting(m_drivetrain, m_limelightReader, this);
-
         m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade, m_launcherTargeting);
-
-
-        //sets our default state to the vision pipeline
-        m_isDriverCamera = false;
-
-        //creates a tab on the shuffleboard for the camera
-        m_cameraTab = Shuffleboard.getTab("Camera");
-
-        //Creates editable text fields to set camera height, fixed angle, and target height
-        m_cameraHeight = m_cameraTab.addPersistent("Camera Height (m)", 0.0)                
-                                .withWidget(BuiltInWidgets.kTextView)             
-                                .withProperties(Map.of("min", 0.0, "max", 6.0)) 
-                                .getEntry();
-
-        m_cameraAngle = m_cameraTab.addPersistent("Camera Angle (deg)", 0.0)                
-                               .withWidget(BuiltInWidgets.kTextView)             
-                               .withProperties(Map.of("min", 0.0, "max", 90.0)) 
-                               .getEntry();
-        
-        m_targetHeight = m_cameraTab.addPersistent("Target Height (m)", 0.0)                
-                                .withWidget(BuiltInWidgets.kTextView)             
-                                .withProperties(Map.of("min", 0.0, "max", 6.0)) 
-                                .getEntry();
-
-        //creates a field to display calculated distance
-        m_distance = m_cameraTab.addPersistent("Distance", 0.0)
-                            .getEntry();
-
     }
 
     @Override
@@ -171,35 +102,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-        //zeros the shooter
-        m_shooterControl.zeroSpeed();
     }
 
     @Override
     public void testPeriodic() {
-        //controls for toggling the camera mode between driver mode and vision mode
-        if(m_testController.getBButtonReleased()) {
-            //if it's in driver mode, set the camera to vision mode
-            if(m_isDriverCamera) {
-                m_limelightTable.getEntry("camMode").setNumber(0);
-                m_limelightTable.getEntry("ledMode").setNumber(0);
-            }
-            //if it's in vision mode, set the camera to driver mode
-            else {
-                m_limelightTable.getEntry("camMode").setNumber(1);
-                m_limelightTable.getEntry("ledMode").setNumber(1);
-            }
-            //toggle the variable
-            m_isDriverCamera = !m_isDriverCamera;
-           
-        }
-        //calls GetModifiedDegrees in order to test and receive the print outs of either left or right
-        m_limelightReader.getModifiedDegreesToTarget();
-        //calculates and reports the distance from the robot to the base of the target
-        double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
-        double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
-        //reports the distance to the smart dashboard
-        m_distance.setDouble(netHeight /  lengthToHeightRatio);
     }
 
 }
