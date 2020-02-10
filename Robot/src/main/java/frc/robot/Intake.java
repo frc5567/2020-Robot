@@ -3,6 +3,7 @@ package frc.robot;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 /**
@@ -37,7 +38,7 @@ public class Intake {
     }
 
     //declare our intake motor controller
-    CANSparkMax m_motor;
+    SpeedController m_motor;
 
     //delcare our position control solenoid
     DoubleSolenoid m_positionPiston;
@@ -47,10 +48,31 @@ public class Intake {
     
     /**
      * Constructor for intake objects
+     * @param intakeMotor A default motor controller for running the intake
+     * @param positionPiston the double solenoid used to control the piston controlling position
+     */
+    public Intake(SpeedController intakeMotor, DoubleSolenoid positionPiston) {
+        //instantiate instance variables
+        m_motor = intakeMotor;
+        m_positionPiston = positionPiston;
+
+        //set our default position to raised
+        m_position = Position.kRaised;
+    }
+
+    /**
+     * Constructor for intake objects
+     * This constructor requires a spark pro motor controller
      * @param intakeMotor A spark pro motor controller for running the intake
      * @param positionPiston the double solenoid used to control the piston controlling position
      */
-    public Intake(CANSparkMax intakeMotor, DoubleSolenoid positionPiston) {
+    public Intake(CANSparkMax intakeMotor, DoubleSolenoid positionPiston) {  
+        //sets the time in seconds from zero to full for the intake motor
+        //acts as a speed setter to control acceleration
+        //this is configured on the passed in variable rather than the member variable because it must be run on a object declared as a CANSparkMax
+        //It should make no difference in the end result
+        intakeMotor.setOpenLoopRampRate(RobotMap.INTAKE_OPEN_LOOP_RAMP_TIME_S);
+
         //instantiate instance variables
         m_motor = intakeMotor;
         m_positionPiston = positionPiston;
@@ -58,9 +80,6 @@ public class Intake {
         //set our default position to raised
         m_position = Position.kRaised;
 
-        //sets the time in seconds from zero to full for the intake motor
-        //acts as a speed setter to control acceleration
-        m_motor.setOpenLoopRampRate(RobotMap.INTAKE_OPEN_LOOP_RAMP_TIME_S);
     }
 
     /**
