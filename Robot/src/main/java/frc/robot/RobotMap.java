@@ -14,7 +14,7 @@ public class RobotMap {
     public static final int DRIVE_CONTROLLER_PORT = 1;
 
     //the deadband on our controller sticks to prevent drift
-    public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.05;
+    public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.08;
 
     //****************************************
     //*                                      *
@@ -37,7 +37,7 @@ public class RobotMap {
     public static final int MASTER_LEFT_FALCON_ID = 3;
     public static final int MASTER_RIGHT_FALCON_ID = 4;
     public static final int SLAVE_LEFT_FALCON_ID = 13;
-    public static final int SLAVE_RIGHT_FALCON_ID = 4;
+    public static final int SLAVE_RIGHT_FALCON_ID = 14;
 
     //solenoid ports
     public static final int LEFT_SOLENOID_FORWARD_PORT = 0;
