@@ -107,7 +107,7 @@ public class PilotController {
     }
 
     /**
-     * Toggles our gear when the x button is pressed
+     * Sets us to high gear on x button input and low gear on y button input
      */
     private void controlGear() {
         if (m_controller.getXButtonReleased()) {
