@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import frc.robot.ShiftDrive.Gear;
 
 /**
  * A class to control the drivetrain with the pilot controller
@@ -51,6 +52,15 @@ public class PilotController {
             turnInput = 0;
         }
 
+        //correct input so that just barely over the deadband is just barely over zero
+        //effectively this centers our input on zero rather than on 0+/- deadband
+        if (turnInput > RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
+            turnInput -= RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
+        }
+        else if (turnInput < -RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
+            turnInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
+        }
+
         //run our drivetrain with the adjusted input
         m_drivetrain.arcadeDrive(m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft), turnInput);
     }
@@ -69,8 +79,26 @@ public class PilotController {
             leftInput = 0;
         }
 
+        //correct input so that just barely over the deadband is just barely over zero
+        //effectively this centers our input on zero rather than on 0+/- deadband
+        if (leftInput > RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
+            leftInput -= RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
+        }
+        else if (leftInput < -RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
+            leftInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
+        }
+
         if (Math.abs(rightInput) < RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
             rightInput = 0;
+        }
+
+        //correct input so that just barely over the deadband is just barely over zero
+        //effectively this centers our input on zero rather than on 0+/- deadband
+        if (rightInput > RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
+            rightInput -= RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
+        }
+        else if (rightInput < -RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
+            rightInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
         }
 
         //run our drivetrain with the adjusted input
@@ -79,11 +107,14 @@ public class PilotController {
     }
 
     /**
-     * Toggles our gear when the x button is pressed
+     * Sets us to high gear on x button input and low gear on y button input
      */
     private void controlGear() {
         if (m_controller.getXButtonReleased()) {
-            m_drivetrain.switchGear();
+            m_drivetrain.shiftGear(Gear.kHigh);
+        }
+        else if (m_controller.getYButtonReleased()) {
+            m_drivetrain.shiftGear(Gear.kLow);
         }
     }
     
