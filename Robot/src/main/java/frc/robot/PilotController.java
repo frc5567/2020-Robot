@@ -91,8 +91,9 @@ public class PilotController {
     
     /**
      * Controls all pilot controlled systems
+     * @param setter The setter is true when the speed is being adjusted to conserve battery, if it is false it uses the raw input
      */
-    public void controlDriveTrain() {
+    public void controlDriveTrain(boolean setter) {
         //if the b button is pressed, lock onto the high target
         if (m_controller.getBButton()) {
             m_launcherTargeting.target();
@@ -101,7 +102,7 @@ public class PilotController {
         else {
             //runs our drivetrain based on control scheme passed in
             if (m_driveType == DriveType.kArcade) {
-                arcadeDrive();
+                arcadeDrive(setter);
             }
             else if (m_driveType == DriveType.kTank) {
                 tankDrive();
