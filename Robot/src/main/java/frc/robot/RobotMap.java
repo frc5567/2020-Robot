@@ -192,6 +192,7 @@ public class RobotMap {
     //*                                      *
     //****************************************
     public static final int PCM_CAN_ID = 20;
+	public static final int CYCLES_TO_MOVE_BALL_ONE_POSITION = 30;
 
 
 }

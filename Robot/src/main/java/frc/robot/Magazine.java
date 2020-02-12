@@ -28,6 +28,9 @@ public class Magazine {
     private boolean m_lastIntakeInput = false;
     private boolean m_lastLaunchInput = false;
 
+    //this counter is used to adjust balls by one position
+    private int m_moveBallsCounter = 0;
+
     /**
      * Constructor for magazine objects
      * @param bottomBelt The motor controller that controls the bottom belt
@@ -55,6 +58,22 @@ public class Magazine {
         //sets percent output on both belts
         m_bottomBelt.set(ControlMode.PercentOutput, speed);
         m_topBelt.set(ControlMode.PercentOutput, speed);
+    }
+
+    /**
+     * This runs both belts for a set duration in order to move the balls approximately one ball-length along the track
+     * @return Whether it has moved a full segment yet
+     */
+    public boolean moveBallsOneSegment(double speed) {
+        if (m_moveBallsCounter < RobotMap.CYCLES_TO_MOVE_BALL_ONE_POSITION) {
+            runBelts(speed);
+            return false;
+        }
+        else {
+            m_moveBallsCounter = 0;
+            runBelts(0);
+            return true;
+        }
     }
 
     /**
