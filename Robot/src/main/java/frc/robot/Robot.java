@@ -198,13 +198,11 @@ public class Robot extends TimedRobot {
         if(m_testController.getBButtonReleased()) {
             //if it's in driver mode, set the camera to vision mode
             if(m_isDriverCamera) {
-                m_limelightTable.getEntry("camMode").setNumber(0);
-                m_limelightTable.getEntry("ledMode").setNumber(0);
+                m_limelightTable.getEntry("pipeline").setNumber(0);
             }
             //if it's in vision mode, set the camera to driver mode
             else {
-                m_limelightTable.getEntry("camMode").setNumber(1);
-                m_limelightTable.getEntry("ledMode").setNumber(1);
+                m_limelightTable.getEntry("pipeline").setNumber(3);
             }
             //toggle the variable
             m_isDriverCamera = !m_isDriverCamera;

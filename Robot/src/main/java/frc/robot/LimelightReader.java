@@ -64,6 +64,7 @@ public class LimelightReader {
                     System.out.println("Inner Target");
                 }else System.out.println("Outer Target");
         }
+        m_limelightTable.getEntry("ModifiedTargetDegrees").setNumber(targetAngle);
         return targetAngle;
     }
 
@@ -88,6 +89,13 @@ public class LimelightReader {
      */
     public double getAreaOfTarget() {
         return m_limelightTable.getEntry("ta").getDouble(0);
+    }
+
+  /**
+     * @return The Results of a 3D position solution, 6 numbers: Translation (x,y,z) Rotation(pitch,yaw,roll)
+     */
+    public double getCamTran() {
+        return m_limelightTable.getEntry("camtran").getDouble(0);
     }
   
     /**
@@ -117,39 +125,41 @@ public class LimelightReader {
 
         // changes pipeline mode depending on what we set it to
         if(m_pipeline == Pipeline.kStandard){
-            m_limelightTable.getEntry("standardVision").setNumber(0);
+            m_limelightTable.getEntry("pipeline").setNumber(0);
         }
         else if(m_pipeline == Pipeline.kZoomX2){
-            m_limelightTable.getEntry("2Zoom").setNumber(1);
+            m_limelightTable.getEntry("pipeline").setNumber(1);
         }
         else if(m_pipeline == Pipeline.kZoomX3){
-            m_limelightTable.getEntry("3Zoom").setNumber(2);
+            m_limelightTable.getEntry("pipeline").setNumber(2);
         }
         else if(m_pipeline == Pipeline.kDriver){
-            m_limelightTable.getEntry("driver").setNumber(3);
+            m_limelightTable.getEntry("pipeline").setNumber(3);
         }
     }
 
-    // public void searchTarget(){
-    //     m_pipeline = Pipeline.kZoomX3;
+    /*
+    public void searchTarget(){
+        m_pipeline = Pipeline.kZoomX3;
         
-    //     if(hasTargets() && m_pipeline == Pipeline.kZoomX3){
-    //         m_3Times = true;
-    //     }
-    //     else if(!hasTargets() && m_3Times == false){
-    //         m_pipeline = Pipeline.kZoomX2;
-    //         m_2Times = true;
-    //     }
-    //     else if(!hasTargets() && m_2Times == false){
-    //         m_pipeline = Pipeline.kStandard;
-    //         m_stand = true;
-    //     }
+        if(hasTargets() && m_pipeline == Pipeline.kZoomX3){
+            m_3Times = true;
+        }
+        else if(!hasTargets() && m_3Times == false){
+            m_pipeline = Pipeline.kZoomX2;
+            m_2Times = true;
+        }
+        else if(!hasTargets() && m_2Times == false){
+            m_pipeline = Pipeline.kStandard;
+            m_stand = true;
+        }
         
-    // }
+    }
 
-    // public void flagReset(){
-    //     m_3Times = false;
-    //     m_2Times = false;
-    //     m_stand = false;
-    // }
+    public void flagReset(){
+        m_3Times = false;
+        m_2Times = false;
+        m_stand = false;
+    }
+    */
 }
