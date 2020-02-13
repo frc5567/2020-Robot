@@ -20,8 +20,6 @@ import frc.robot.LimelightReader.Pipeline;
 import frc.robot.PilotController.DriveType;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import java.util.Map;
 
@@ -94,9 +92,6 @@ public class Robot extends TimedRobot {
         //instantiates slave motors for drive
         m_slaveLeftDriveFalcon = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
         m_slaveRightDriveFalcon = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
-
-        //instantiates currently unused shooter motor
-        // m_intakeMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
 
         //instantiates our test controller
         m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
@@ -186,14 +181,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-        //commented out for limelight testing, uncomment for shooter testing
-        // if(testController.getAButton()) {
-        //     shooterControl.setSpeed();
-        // }
-        // else {
-        //     shooterControl.zeroSpeed();
-        // }
-
         //controls for toggling the camera mode between driver mode and vision mode
         if(m_testController.getBButtonReleased()) {
             //if it's in driver mode, set the camera to vision mode

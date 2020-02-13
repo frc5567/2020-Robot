@@ -5,8 +5,6 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -76,6 +74,8 @@ public class ShiftDrive {
         //set the motors to brake when not given an active command
         m_leftDrive.setNeutralMode(NeutralMode.Brake);
         m_rightDrive.setNeutralMode(NeutralMode.Brake);
+        m_leftSlave.setNeutralMode(NeutralMode.Brake);
+        m_rightDrive.setNeutralMode(NeutralMode.Brake);
 
         //configs the drive train to have an acceleration based on the RobotMap constant
         m_leftDrive.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
@@ -131,21 +131,6 @@ public class ShiftDrive {
     }
 
     /**
-     * Toggles our gear to whatever it is not currently
-     */
-    public void switchGear() {
-        if (m_gear == Gear.kLow) {
-            m_gear = Gear.kHigh;
-        }
-        else if (m_gear == Gear.kHigh) {
-            m_gear = Gear.kLow;
-        }
-
-        //shifts gears to whatever our new gear is
-        shiftGear(m_gear);
-    }
-
-    /**
      * @return The gear that we are currently in (kHigh or kLow)
      */
     public Gear getGear() {
@@ -175,8 +160,8 @@ public class ShiftDrive {
      */
     public void arcadeDrive(double speed, double turn){
         //this references last year's code, may need to be revised
-        m_leftDrive.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, speed);
-        m_rightDrive.set(ControlMode.PercentOutput, turn, DemandType.ArbitraryFeedForward, speed);
+        m_leftDrive.set(ControlMode.PercentOutput, speed, DemandType.ArbitraryFeedForward, turn);
+        m_rightDrive.set(ControlMode.PercentOutput, speed, DemandType.ArbitraryFeedForward, -turn);
         m_leftSlave.follow(m_leftDrive);
         m_rightSlave.follow(m_rightDrive);
     }

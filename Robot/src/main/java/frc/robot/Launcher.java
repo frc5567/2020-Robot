@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 
 /**
@@ -20,9 +21,15 @@ public class Launcher {
     //difference between current speed and target speed (set point)
     private double m_error;
 
-    //speed controller used to launch 
-    private BaseMotorController m_leftMotor;
-    private BaseMotorController m_rightMotor;
+    //speed controllers used to launch 
+    //the master controller drives the other motors in closed loop velocity control
+    private BaseMotorController m_masterMotor;
+
+    /**The slave on the same side as the master motor controller */
+    private BaseMotorController m_closeSlaveMotor;
+
+    /**The slaves on the further side from the master motor, and inverted */
+    private BaseMotorController m_farSlaveMotor1, m_farSlaveMotor2;
 
     /**
      * Constructor for Launcher objects
@@ -32,11 +39,18 @@ public class Launcher {
      * @param adjustmentValue The proportionality constant used to control this launcher's speed
      * @param leftMotor The speed controller used to launch the projectile
      */
-    public Launcher(double adjustmentValue, BaseMotorController leftMotor, BaseMotorController rightMotor) {
+    public Launcher(double adjustmentValue, BaseMotorController masterMotor, BaseMotorController closeSlaveMotor, BaseMotorController farSlaveMotor1, BaseMotorController farSlaveMotor2) {
         m_adjustmentValue = adjustmentValue;
-        m_leftMotor = leftMotor;
-        m_rightMotor = rightMotor;
-        m_rightMotor.setInverted(true);
+
+        m_masterMotor = masterMotor;
+        m_closeSlaveMotor = closeSlaveMotor;
+
+        m_farSlaveMotor1 = farSlaveMotor1;
+        m_farSlaveMotor2 = farSlaveMotor2;
+
+        //Sets the far motors to be inverted so that they don't work against the close ones
+        m_farSlaveMotor1.setInverted(true);
+        m_farSlaveMotor2.setInverted(true);
     }
 
     /**
@@ -44,8 +58,13 @@ public class Launcher {
      * @param speed A value between -1.0 and 1.0 where 1.0 is full speed forward
      */
     public void setMotor(double speed) {
-        m_leftMotor.set(ControlMode.PercentOutput, speed);
-        m_rightMotor.set(ControlMode.PercentOutput, speed);
+        //set the master motor directly
+        m_masterMotor.set(ControlMode.PercentOutput, speed);
+
+        //set all other motors to follow
+        m_closeSlaveMotor.follow(m_masterMotor, FollowerType.PercentOutput);
+        m_farSlaveMotor1.follow(m_masterMotor, FollowerType.PercentOutput);
+        m_farSlaveMotor2.follow(m_masterMotor, FollowerType.PercentOutput);
     }
 
     /**
@@ -63,12 +82,24 @@ public class Launcher {
     }
 
     /**
-     * This revs our launcher to our preset velocity
+     * This revs our launcher to a target velocity as a function of distance
      * <p>Note that this velocity will not be a robot map constant, it will be a result of distance reported by the limelight
+     * @param distance Horizontal distance to the target in inches, this should be a product of our limelight
      */
-    public void revLauncher() {
-        m_leftMotor.set(ControlMode.Velocity, RobotMap.LAUNCHER_SPEED);
-        m_rightMotor.set(ControlMode.Velocity, RobotMap.LAUNCHER_SPEED);
+    public void revLauncher(double distance) {
+        //calculate what percent of our max distance we are from our target
+        double percentMaxDistance = (distance /  RobotMap.MAX_LAUNCHER_DISTANCE_IN);
+
+        //set our target velocity to that same percent of our max speed
+        double targetVelocity = (percentMaxDistance * RobotMap.LAUNCHER_FREESPIN_ANGULAR_VELOCITY);
+
+        //set our motor to the target velocity calculated
+        m_masterMotor.set(ControlMode.Velocity, targetVelocity);
+
+        //set our slave motors to follow master
+        m_closeSlaveMotor.follow(m_masterMotor);
+        m_farSlaveMotor1.follow(m_masterMotor);
+        m_farSlaveMotor2.follow(m_masterMotor);
     }
 
     /**
@@ -80,15 +111,10 @@ public class Launcher {
         //set p, i, d, f values
         //the zero is the PID slot, in this case it is zero for the primary PID
         //the launcher has no auxillary or turning PID control
-        m_leftMotor.config_kP(0, RobotMap.LAUNCHER_P);
-        m_leftMotor.config_kI(0, RobotMap.LAUNCHER_I);
-        m_leftMotor.config_kD(0, RobotMap.LAUNCHER_D);
-        m_leftMotor.config_kF(0, RobotMap.LAUNCHER_F);
-        
-        m_rightMotor.config_kP(0, RobotMap.LAUNCHER_P);
-        m_rightMotor.config_kI(0, RobotMap.LAUNCHER_I);
-        m_rightMotor.config_kD(0, RobotMap.LAUNCHER_D);
-        m_rightMotor.config_kF(0, RobotMap.LAUNCHER_F);
+        m_masterMotor.config_kP(0, RobotMap.LAUNCHER_P);
+        m_masterMotor.config_kI(0, RobotMap.LAUNCHER_I);
+        m_masterMotor.config_kD(0, RobotMap.LAUNCHER_D);
+        m_masterMotor.config_kF(0, RobotMap.LAUNCHER_F);
 
         //set standard setpoint -> Should be done in robot map?
 
@@ -113,19 +139,12 @@ public class Launcher {
     }
     
     /**
-     * Returns a motor based on a string passed in
-     * <p>Will default to left motor
-     * @param motorName The name of the motor to get. Pass in "right" to get the right motor,
-     * otherwise it will return the left motor
+     * Returns the master motor
+     * 
      * @return the motor used to drive the launcher
      */
-    public BaseMotorController getMotor(String motorName) {
-        if (motorName == "right") {
-            return m_rightMotor;
-        }
-        else {
-            return m_leftMotor;
-        }
+    public BaseMotorController getMasterMotor() {
+        return m_masterMotor;
     }
 
     /**
@@ -148,6 +167,6 @@ public class Launcher {
      * @return the state of the Launcher object summarized in a string
      */
     public String toString() {
-        return "Motor: " + m_leftMotor.toString() + " " + m_rightMotor.toString() + " | Adjustment Value: " + m_adjustmentValue + " | Current Speed: " + m_currentSpeed + " | Current Error: " + m_error;
+        return "Motor: " + m_masterMotor.toString() + " | Adjustment Value: " + m_adjustmentValue + " | Current Speed: " + m_currentSpeed + " | Current Error: " + m_error;
     }
 }

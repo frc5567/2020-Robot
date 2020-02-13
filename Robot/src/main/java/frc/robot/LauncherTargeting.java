@@ -96,11 +96,14 @@ public class LauncherTargeting {
      * @return Whether we are currently within our acceptable error (on target)
      */
     public boolean target() {
-        //Passes in a speed of zero to keep us from moving, and sets the turn speed to the calculated output of the PID
-        //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
-        //This way the PID controller should target dead center
-        m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0));
-        
+        //Only allows the drivetrain to rotate if it currently has any targets
+        if (m_limelight.hasTargets()) {
+            //Passes in a speed of zero to keep us from moving, and sets the turn speed to the calculated output of the PID
+            //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
+            //This way the PID controller should target dead center
+            m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0));
+        }
+
         //returns whether the PID believes that we are on target
         return onTarget();
     }
