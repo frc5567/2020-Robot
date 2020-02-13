@@ -123,7 +123,7 @@ public class PilotController {
      */
     public void controlDriveTrain() {
         //if the b button is pressed, lock onto the high target
-        if (m_controller.getBButton()) {
+        if (m_controller.getAButton()) {
             m_launcherTargeting.target();
         }
         //when the b button isn't pressed, run the drive train as normal
