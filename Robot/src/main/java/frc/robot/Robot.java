@@ -211,8 +211,10 @@ public class Robot extends TimedRobot {
             System.out.println("targeting");
             
         }
+        else {
+            m_drivetrain.arcadeDrive(0, 0);
+        }
         m_gTargeting.setPID();
-        m_drivetrain.arcadeDrive(0, 0);
         m_drivetrain.shiftGear(Gear.kLow);
         // m_pilotController.controlDriveTrain();
         // m_launcherTargeting.setPID();
