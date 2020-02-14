@@ -10,6 +10,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -18,8 +20,10 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.LimelightReader.Pipeline;
 import frc.robot.PilotController.DriveType;
+import frc.robot.ShiftDrive.Gear;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 
 import java.util.Map;
 
@@ -76,6 +80,9 @@ public class Robot extends TimedRobot {
 
     //declare our launcher targeting object
     LauncherTargeting m_launcherTargeting;
+
+    GenericTargeting m_gTargeting;
+    AHRS navX;
 
     //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
     private ShuffleboardTab m_cameraTab;
@@ -142,6 +149,10 @@ public class Robot extends TimedRobot {
         m_distance = m_cameraTab.addPersistent("Distance", 0.0)
                             .getEntry();
 
+        navX = new AHRS(Port.kMXP);
+        navX.calibrate();
+        m_gTargeting = new GenericTargeting(m_drivetrain, navX, this);
+
     }
 
     @Override
@@ -176,34 +187,42 @@ public class Robot extends TimedRobot {
     @Override
     public void testInit() {
         //zeros the shooter
-        m_shooterControl.zeroSpeed();
     }
 
     @Override
     public void testPeriodic() {
-        //controls for toggling the camera mode between driver mode and vision mode
-        if(m_testController.getBButtonReleased()) {
-            //if it's in driver mode, set the camera to vision mode
-            if(m_isDriverCamera) {
-                m_limelightTable.getEntry("pipeline").setNumber(0);
-            }
-            //if it's in vision mode, set the camera to driver mode
-            else {
-                m_limelightTable.getEntry("pipeline").setNumber(3);
-            }
-            //toggle the variable
-            m_isDriverCamera = !m_isDriverCamera;
+        // controls for toggling the camera mode between driver mode and vision mode
+        // if(m_driveController.getBButtonReleased()) {
+        //     //if it's in driver mode, set the camera to vision mode
+        //     if(m_isDriverCamera) {
+        //         m_limelightTable.getEntry("pipeline").setNumber(0);
+        //     }
+        //     //if it's in vision mode, set the camera to driver mode
+        //     else {
+        //         m_limelightTable.getEntry("pipeline").setNumber(3);
+        //     }
+        //     //toggle the variable
+        //     m_isDriverCamera = !m_isDriverCamera;
            
+        // }
+        m_gTargeting.setAngleTarget();
+        if (m_testController.getBumper(Hand.kRight)) {
+            m_gTargeting.target();
+            System.out.println("targeting");
+            
         }
-        m_pilotController.controlDriveTrain();
-        m_launcherTargeting.setPID();
-        //calls GetModifiedDegrees in order to test and receive the print outs of either left or right
-        //m_limelightReader.getModifiedDegreesToTarget();
-        //calculates and reports the distance from the robot to the base of the target
-        double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
-        double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
-        //reports the distance to the smart dashboard
-        m_distance.setDouble(netHeight /  lengthToHeightRatio);
+        m_gTargeting.setPID();
+        m_drivetrain.arcadeDrive(0, 0);
+        m_drivetrain.shiftGear(Gear.kLow);
+        // m_pilotController.controlDriveTrain();
+        // m_launcherTargeting.setPID();
+        // //calls GetModifiedDegrees in order to test and receive the print outs of either left or right
+        // //m_limelightReader.getModifiedDegreesToTarget();
+        // //calculates and reports the distance from the robot to the base of the target
+        // double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
+        // double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
+        // //reports the distance to the smart dashboard
+        // m_distance.setDouble(netHeight /  lengthToHeightRatio);
     }
 
 }

@@ -1,8 +1,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 
 import java.util.Map;
+
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -16,28 +19,28 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  * @author Josh Overbeek
  * @version 2/1/2020
  */
-public class LauncherTargeting {
+public class GenericTargeting {
     //Declare our drivetrain, limelight, and PID controller
     private ShiftDrive m_drivetrain;
-    private LimelightReader m_limelight;
+    private AHRS navX;
     private PIDController m_targetController;
 
     //declares a robot to let us look at what method (auton, teleop, test) we are currently in
     private Robot m_robot;
 
     //declare private variables for creating a tab, and setting widgets
-    private ShuffleboardTab m_targetingTab;
+    private ShuffleboardTab m_gtargetingTab;
     /**Network table entry for reading desired P constant off of the shuffleboard */
-    private NetworkTableEntry m_pEntry;
+    private NetworkTableEntry m_pEntry2;
     /**Network table entry for reading desired I constant off of the shuffleboard */
-    private NetworkTableEntry m_iEntry;
+    private NetworkTableEntry m_iEntry2;
     /**Network table entry for reading desired D constant off of the shuffleboard */
-    private NetworkTableEntry m_dEntry;
-
-    private NetworkTableEntry m_controllerEntry;
+    private NetworkTableEntry m_dEntry2;
+    private NetworkTableEntry m_angle;
 
     /**Network table entry to publish whether we are currently on target */
-    private NetworkTableEntry m_onTargetEntry;
+    private NetworkTableEntry m_onTargetEntry2;
+    double angle = 0;
 
     /**
      * Contructor for LauncherTargeting objects
@@ -45,9 +48,9 @@ public class LauncherTargeting {
      * @param limelight The limelight reader that gives us our target
      * @param robot The main Robot that this constructed in
      */
-    public LauncherTargeting(ShiftDrive drivetrain, LimelightReader limelight, Robot robot) {
+    public GenericTargeting(ShiftDrive drivetrain, AHRS navX, Robot robot) {
         m_drivetrain = drivetrain;
-        m_limelight = limelight;
+        this.navX = navX;
         m_robot = robot;
 
         //Instatiate a new PID controller with PID values passed in from the robot map
@@ -65,34 +68,39 @@ public class LauncherTargeting {
         m_targetController.enableContinuousInput(-180, 180);
 
         //creates a tab on the shuffleboard for all our launcher needs
-        m_targetingTab = Shuffleboard.getTab("Targeting");
+        m_gtargetingTab = Shuffleboard.getTab("Targeting");
+
+        m_gtargetingTab.add(m_targetController)
+        .withWidget(BuiltInWidgets.kPIDController);
 
         //creates a persistent widget as text for setting P constant
-        m_pEntry = m_targetingTab.addPersistent("P", RobotMap.TARGETING_P)                        //creates widget with the robotmap constant as a default
+        m_pEntry2 = m_gtargetingTab.addPersistent("gP", RobotMap.TARGETING_P)                        //creates widget with the robotmap constant as a default
                             .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
                             .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
                             .getEntry();   
         
         //creates a persistent widget as text for setting I constant
-        m_iEntry = m_targetingTab.addPersistent("I", RobotMap.TARGETING_I)                        //creates widget with the robotmap constant as a default
+        m_iEntry2 = m_gtargetingTab.addPersistent("gI", RobotMap.TARGETING_I)                        //creates widget with the robotmap constant as a default
                             .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
                             .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
                             .getEntry();   
 
         //creates a persistent widget as text for setting D constant
-        m_dEntry = m_targetingTab.addPersistent("D", RobotMap.TARGETING_D)                        //creates widget with the robotmap constant as a default
+        m_dEntry2 = m_gtargetingTab.addPersistent("gD", RobotMap.TARGETING_D)                        //creates widget with the robotmap constant as a default
                             .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
                             .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
                             .getEntry();  
 
         //create a widget to display whether we are currently on target
-        m_onTargetEntry = m_targetingTab.add("On Target?", false)               //creates the widget that is false by default as by default we are not on target
+        m_onTargetEntry2 = m_gtargetingTab.add("gOn Target?", false)               //creates the widget that is false by default as by default we are not on target
                                         .withWidget(BuiltInWidgets.kBooleanBox) //set widget to a boolean box to easily display the value
                                         .getEntry();
 
-        m_targetingTab.add(m_targetController)
-                                          .withWidget(BuiltInWidgets.kPIDController);
-                            
+        //creates a persistent widget as text for setting D constant
+        m_angle = m_gtargetingTab.addPersistent("angle", 0)                        //creates widget with the robotmap constant as a default
+                            .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
+                            .withProperties(Map.of("min", -45, "max", 45))   //sets min and max values
+                            .getEntry();  
     }
 
     /**
@@ -103,13 +111,13 @@ public class LauncherTargeting {
      */
     public boolean target() {
         //Only allows the drivetrain to rotate if it currently has any targets
-        if (m_limelight.hasTargets()) {
             //Passes in a speed of zero to keep us from moving, and sets the turn speed to the calculated output of the PID
             //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
             //This way the PID controller should target dead center
-            m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0));
-        }
-
+        double calcedvalue = m_targetController.calculate(navX.getAngle(), angle);
+        System.out.println("Calculated value: " + calcedvalue);
+            m_drivetrain.arcadeDrive(0, calcedvalue);
+        System.out.println("Angle: " + navX.getAngle() + " | Target: " + angle);
         //returns whether the PID believes that we are on target
         return onTarget();
     }
@@ -123,10 +131,14 @@ public class LauncherTargeting {
         boolean onTarget = m_targetController.atSetpoint();
 
         //sets the entry to whether we are on target
-        m_onTargetEntry.setBoolean(onTarget);
+        m_onTargetEntry2.setBoolean(onTarget);
 
         //return whether we are currently on target
         return onTarget;
+    }
+
+    public void setAngleTarget() {
+        angle = m_angle.getDouble(0);
     }
 
     /**
@@ -137,7 +149,11 @@ public class LauncherTargeting {
         //only allows the user to set PID values when in test
         if (m_robot.isTest()) {
             //passes in the values off of the shuffleboard Network Table Entries
-            m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_I), m_dEntry.getDouble(RobotMap.TARGETING_D));
+            m_targetController.setPID(m_pEntry2.getDouble(RobotMap.TARGETING_P), m_iEntry2.getDouble(RobotMap.TARGETING_I), m_dEntry2.getDouble(RobotMap.TARGETING_D));
+            System.out.println("p, i, d" + m_targetController.getP() + " | " + m_targetController.getI() + " | " + m_targetController.getD());
+        }
+        else {
+            System.out.println("Not in test");
         }
     }
 }
