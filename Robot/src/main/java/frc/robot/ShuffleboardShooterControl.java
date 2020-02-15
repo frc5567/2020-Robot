@@ -18,7 +18,8 @@ public class ShuffleboardShooterControl {
     //declare private variables for creating a tab, instantiating a launcher and retrieving data
     private ShuffleboardTab m_launcherTab;
     private Launcher m_launcher;
-    private NetworkTableEntry m_setpoint;
+    private NetworkTableEntry m_percentTarget;
+    private NetworkTableEntry m_angularVelocityTarget;
     
     /**
      * Constructor for ShuffleboardShooterControl objects
@@ -34,22 +35,40 @@ public class ShuffleboardShooterControl {
         m_launcher = launcher;
 
         //creates a persistent widget as text for controlling speed
-        m_setpoint = m_launcherTab.addPersistent("LaunchSpeed", 0.0)                //creates widget with 0.0 as a default
+        m_percentTarget = m_launcherTab.addPersistent("PercentLaunchSpeed", 0.0)                //creates widget with 0.0 as a default
                               .withWidget(BuiltInWidgets.kTextView)             //sets widget to a text view
                               .withProperties(Map.of("min", -1.0, "max", 1.0))  //sets min and max values
+                              .getEntry();                                      //retrieves the entry to assign our setpoint
+
+        //creates a persistent widget as text for controlling speed
+        m_angularVelocityTarget = m_launcherTab.addPersistent("VeloctiyLaunchSpeed (rev/100ms)", 0.0)                //creates widget with 0.0 as a default
+                              .withWidget(BuiltInWidgets.kTextView)             //sets widget to a text view
+                              .withProperties(Map.of("min", -10.0, "max", 10.0))  //sets min and max values
                               .getEntry();                                      //retrieves the entry to assign our setpoint
     }
 
     /**
-     * Sets the setpoint based on what is currently assigned on the shuffleboard
-     * Should be toggled on and off
+     * Sets the percent speed based on what is currently assigned on the shuffleboard
+     * Should be on while button held and off while button released
      */
-    public void setSpeed() {
+    public void setPercentSpeed() {
         //assigns the speed based on the shuffleboard with a default value of zero
-        double tempSpeed = m_setpoint.getDouble(0.0);
+        double tempSpeed = m_percentTarget.getDouble(0.0);
 
         //runs the proportional control system based on the aquired speed
         m_launcher.proportionalSpeedSetter(tempSpeed);
+    }
+
+    /**
+     * Sets the velocity based on what is currently assigned on the shuffleboard
+     * Should be on while button held and off while button released
+     */
+    public void setVelocity() {
+        //assigns the speed based on the shuffleboard with a default value of zero
+        double tempVelocity = m_angularVelocityTarget.getDouble(0.0);
+
+        //runs the proportional control system based on the aquired speed
+        m_launcher.setVelocity(tempVelocity);
     }
 
     /**
