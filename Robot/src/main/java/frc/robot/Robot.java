@@ -187,6 +187,7 @@ public class Robot extends TimedRobot {
     public void testInit() {
         //zeros the shooter
         m_shooterControl.zeroSpeed();
+        m_shooter.configVelocityControl();
     }
 
     @Override
@@ -195,10 +196,16 @@ public class Robot extends TimedRobot {
         if(m_testController.getBButton()) {
             m_shooterControl.setVelocity();
         }
+        //if a button, use percent speed
+        else if (m_testController.getAButton()) {
+            m_shooterControl.setPercentSpeed();
+        }
         //kills the velocity while not holding
         else {
             m_shooterControl.zeroSpeed();
+            m_shooterControl.setPIDF();
         }
+        m_shooterControl.updateVelocity();
     }
 
 }

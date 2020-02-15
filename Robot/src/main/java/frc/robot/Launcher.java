@@ -59,8 +59,10 @@ public class Launcher {
         m_farSlaveMotor1 = farSlaveMotor1;
         m_farSlaveMotor2 = farSlaveMotor2;
 
+        m_closeSlaveMotor.setInverted(false);
+
         //Sets the far motors to be inverted so that they don't work against the close ones
-        m_farSlaveMotor1.setInverted(true);
+        m_farSlaveMotor1.setInverted(false);
         m_farSlaveMotor2.setInverted(true);
 
         //Instantiates the encoder as the encoder plugged into the master
@@ -187,6 +189,13 @@ public class Launcher {
 
         //sets our closed loop control to use our primary PID slot
         m_masterMotor.selectProfileSlot(0, 0);
+    }
+
+    public void setPIDF(double p, double i, double d, double f) {
+        m_masterMotor.config_kP(0, p);
+        m_masterMotor.config_kI(0, i);
+        m_masterMotor.config_kD(0, d);
+        m_masterMotor.config_kF(0, f);   
     }
 
     /**

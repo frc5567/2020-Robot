@@ -20,6 +20,12 @@ public class ShuffleboardShooterControl {
     private Launcher m_launcher;
     private NetworkTableEntry m_percentTarget;
     private NetworkTableEntry m_angularVelocityTarget;
+    private NetworkTableEntry m_PEntry;
+    private NetworkTableEntry m_IEntry;
+    private NetworkTableEntry m_DEntry;
+    private NetworkTableEntry m_FEntry;
+    private NetworkTableEntry m_currentVelocity;
+    private NetworkTableEntry m_currentVelocityText;
     
     /**
      * Constructor for ShuffleboardShooterControl objects
@@ -45,6 +51,30 @@ public class ShuffleboardShooterControl {
                               .withWidget(BuiltInWidgets.kTextView)             //sets widget to a text view
                               .withProperties(Map.of("min", -10000.0, "max", 10000.0))  //sets min and max values
                               .getEntry();                                      //retrieves the entry to assign our setpoint
+        
+        m_PEntry = m_launcherTab.addPersistent("P", 0.0)                //creates widget with 0.0 as a default
+                              .withWidget(BuiltInWidgets.kTextView) 
+                              .getEntry();
+
+        m_IEntry = m_launcherTab.addPersistent("I", 0.0)                //creates widget with 0.0 as a default
+                              .withWidget(BuiltInWidgets.kTextView) 
+                              .getEntry();
+
+        m_DEntry = m_launcherTab.addPersistent("D", 0.0)                //creates widget with 0.0 as a default
+                              .withWidget(BuiltInWidgets.kTextView) 
+                              .getEntry();
+
+        m_FEntry = m_launcherTab.addPersistent("F", 0.0)                //creates widget with 0.0 as a default
+                              .withWidget(BuiltInWidgets.kTextView) 
+                              .getEntry();
+
+        m_currentVelocity = m_launcherTab.add("Current Velocity Graph", 0.0)
+                                        .withWidget(BuiltInWidgets.kGraph)
+                                        .getEntry();
+
+        m_currentVelocityText = m_launcherTab.add("Current Velocity", 0.0)
+                                            .withWidget(BuiltInWidgets.kTextView)
+                                            .getEntry();
     }
 
     /**
@@ -73,6 +103,20 @@ public class ShuffleboardShooterControl {
 
         //runs the proportional control system based on the aquired speed
         m_launcher.setVelocity(tempVelocity);
+    }
+
+    public void setPIDF() {
+        m_launcher.setPIDF(m_PEntry.getDouble(0), m_IEntry.getDouble(0), m_DEntry.getDouble(0), m_FEntry.getDouble(0));
+        System.out.print("P: " + m_PEntry.getDouble(0) + " | ");
+        System.out.print("I: " + m_IEntry.getDouble(0) + " | ");
+        System.out.print("D: " + m_DEntry.getDouble(0) + " | ");
+        System.out.print("F: " + m_FEntry.getDouble(0) + " |\n");
+    }
+
+    public void updateVelocity() {
+        double tempVelocity = (m_launcher.getEncoderVelocity() / 600 );
+        m_currentVelocity.setDouble(tempVelocity);
+        m_currentVelocityText.setDouble(tempVelocity);
     }
 
     /**
