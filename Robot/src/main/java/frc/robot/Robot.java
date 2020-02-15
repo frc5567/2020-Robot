@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.PilotController.DriveType;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import java.util.Map;
 
@@ -47,7 +49,10 @@ public class Robot extends TimedRobot {
     TalonFX m_slaveLeftDriveFalcon;
     TalonFX m_slaveRightDriveFalcon;
 
-    // VictorSPX m_intakeMotor;
+    TalonSRX m_masterLauncher;
+    VictorSPX m_closeLauncherSlave;
+    VictorSPX m_farLauncherSlave1;
+    VictorSPX m_farLauncherSlave2;
 
     //declares our launcher system and our controls for that system over the launcher tab
     Launcher m_shooter;
@@ -101,6 +106,15 @@ public class Robot extends TimedRobot {
         m_leftPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
         m_rightPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
         m_drivetrain = new ShiftDrive(m_masterLeftDriveFalcon, m_masterRightDriveFalcon, m_slaveLeftDriveFalcon, m_slaveRightDriveFalcon, m_leftPiston, m_rightPiston, true);
+
+        //instantiate launcher and shuffleboard control
+        m_masterLauncher = new TalonSRX(RobotMap.MASTER_LAUNCHER_ID);
+        m_closeLauncherSlave = new VictorSPX(RobotMap.CLOSE_LAUNCHER_SLAVE_ID);
+        m_farLauncherSlave1 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE1_ID);
+        m_farLauncherSlave2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
+
+        m_shooter = new Launcher(RobotMap.LAUNCHER_ADJUSTMENT_VALUE, m_masterLauncher, m_closeLauncherSlave, m_farLauncherSlave1, m_farLauncherSlave2);
+        m_shooterControl = new ShuffleboardShooterControl(m_shooter);
 
         //gives us access to the network table for the limelight
         m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
@@ -177,29 +191,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-        //controls for toggling the camera mode between driver mode and vision mode
-        if(m_testController.getBButtonReleased()) {
-            //if it's in driver mode, set the camera to vision mode
-            if(m_isDriverCamera) {
-                m_limelightTable.getEntry("camMode").setNumber(0);
-                m_limelightTable.getEntry("ledMode").setNumber(0);
-            }
-            //if it's in vision mode, set the camera to driver mode
-            else {
-                m_limelightTable.getEntry("camMode").setNumber(1);
-                m_limelightTable.getEntry("ledMode").setNumber(1);
-            }
-            //toggle the variable
-            m_isDriverCamera = !m_isDriverCamera;
-           
+        //sets the velocity of the launcher while holding the b button
+        if(m_testController.getBButton()) {
+            m_shooterControl.setVelocity();
         }
-        //calls GetModifiedDegrees in order to test and receive the print outs of either left or right
-        m_limelightReader.getModifiedDegreesToTarget();
-        //calculates and reports the distance from the robot to the base of the target
-        double netHeight = (m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0));
-        double lengthToHeightRatio = Math.tan((Math.PI / 180) * (m_cameraAngle.getDouble(0) + m_limelightTable.getEntry("ty").getDouble(0)));
-        //reports the distance to the smart dashboard
-        m_distance.setDouble(netHeight /  lengthToHeightRatio);
+        //kills the velocity while not holding
+        else {
+            m_shooterControl.zeroSpeed();
+        }
     }
 
 }
