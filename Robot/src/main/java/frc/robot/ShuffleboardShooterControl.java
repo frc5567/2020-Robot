@@ -41,9 +41,9 @@ public class ShuffleboardShooterControl {
                               .getEntry();                                      //retrieves the entry to assign our setpoint
 
         //creates a persistent widget as text for controlling speed
-        m_angularVelocityTarget = m_launcherTab.addPersistent("VeloctiyLaunchSpeed (rev/100ms)", 0.0)                //creates widget with 0.0 as a default
+        m_angularVelocityTarget = m_launcherTab.addPersistent("VeloctiyLaunchSpeed (rpm)", 0.0)                //creates widget with 0.0 as a default
                               .withWidget(BuiltInWidgets.kTextView)             //sets widget to a text view
-                              .withProperties(Map.of("min", -10.0, "max", 10.0))  //sets min and max values
+                              .withProperties(Map.of("min", -10000.0, "max", 10000.0))  //sets min and max values
                               .getEntry();                                      //retrieves the entry to assign our setpoint
     }
 
@@ -62,10 +62,14 @@ public class ShuffleboardShooterControl {
     /**
      * Sets the velocity based on what is currently assigned on the shuffleboard
      * Should be on while button held and off while button released
+     * <p>The value on the shuffleboard is in rpm, we convert it to rev per 100ms
      */
     public void setVelocity() {
         //assigns the speed based on the shuffleboard with a default value of zero
         double tempVelocity = m_angularVelocityTarget.getDouble(0.0);
+
+        //divide imput by 600 to convert from rpm to rev per 100ms
+        tempVelocity /= 600;
 
         //runs the proportional control system based on the aquired speed
         m_launcher.setVelocity(tempVelocity);
