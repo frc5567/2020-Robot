@@ -191,20 +191,20 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-        // controls for toggling the camera mode between driver mode and vision mode
-        // if(m_driveController.getBButtonReleased()) {
-        //     //if it's in driver mode, set the camera to vision mode
-        //     if(m_isDriverCamera) {
-        //         m_limelightTable.getEntry("pipeline").setNumber(0);
-        //     }
-        //     //if it's in vision mode, set the camera to driver mode
-        //     else {
-        //         m_limelightTable.getEntry("pipeline").setNumber(3);
-        //     }
-        //     //toggle the variable
-        //     m_isDriverCamera = !m_isDriverCamera;
+        //controls for toggling the camera mode between driver mode and vision mode
+        if(m_driveController.getBButtonReleased()) {
+            //if it's in driver mode, set the camera to vision mode
+            if(m_isDriverCamera) {
+                m_limelightTable.getEntry("pipeline").setNumber(0);
+            }
+            //if it's in vision mode, set the camera to driver mode
+            else {
+                m_limelightTable.getEntry("pipeline").setNumber(3);
+            }
+            //toggle the variable
+            m_isDriverCamera = !m_isDriverCamera;
            
-        // }
+        }
         m_gTargeting.setAngleTarget();
         if (m_testController.getBumper(Hand.kRight)) {
             m_gTargeting.target();

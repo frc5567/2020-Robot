@@ -139,7 +139,7 @@ public class RobotMap {
     //This is the height of the
     public static final double TARGET_HEIGHT_INCHES = 98.25;
     //This is temporary and will need to be assigned on our final bot
-    public static final double CAMERA_HEIGHT_INCHES = 45d;
+    public static final double CAMERA_HEIGHT_INCHES = 31.5d;
     //This is the offset we make for inner target TODO:Needs to be tested and tuned
     public static final double OFFSET_TARGET_DEGREES = 0.8;
     //This is the range on either side in degrees where we can still hit the inner target
@@ -147,9 +147,9 @@ public class RobotMap {
 
     //PID values for targeting the vision target
     //TODO: These values are temporary and need to be updated in testing
-    public static final double TARGETING_P = 0;
-    public static final double TARGETING_I = 0;
-    public static final double TARGETING_D = 0;
+    public static final double TARGETING_P = 2.6;
+    public static final double TARGETING_I = 10;
+    public static final double TARGETING_D = 250;
 
     //the period between controller updates in seconds
     public static final double TARGETING_PERIOD_S = 20;

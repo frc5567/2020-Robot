@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import frc.robot.LimelightReader.Pipeline;
 import frc.robot.ShiftDrive.Gear;
 
 /**
@@ -124,10 +125,12 @@ public class PilotController {
     public void controlDriveTrain() {
         //if the b button is pressed, lock onto the high target
         if (m_controller.getAButton()) {
+            m_launcherTargeting.setPipeline(Pipeline.kStandard);
             m_launcherTargeting.target();
         }
         //when the b button isn't pressed, run the drive train as normal
         else {
+            m_launcherTargeting.setPipeline(Pipeline.kDriver);
             //runs our drivetrain based on control scheme passed in
             if (m_driveType == DriveType.kArcade) {
                 arcadeDrive();

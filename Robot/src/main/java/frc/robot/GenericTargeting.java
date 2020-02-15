@@ -115,8 +115,10 @@ public class GenericTargeting {
             //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
             //This way the PID controller should target dead center
         double calcedvalue = m_targetController.calculate(navX.getAngle(), angle);
+        //divide the calculated value by 180 to convert to percent output
+        calcedvalue /= 180;
         System.out.println("Calculated value: " + calcedvalue);
-            m_drivetrain.arcadeDrive(0, calcedvalue);
+        m_drivetrain.arcadeDrive(0, calcedvalue);
         System.out.println("Angle: " + navX.getAngle() + " | Target: " + angle);
         //returns whether the PID believes that we are on target
         return onTarget();

@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.LimelightReader.Pipeline;
 
 /**
  * This class should be used to center our robot on the high target.
@@ -107,7 +108,10 @@ public class LauncherTargeting {
             //Passes in a speed of zero to keep us from moving, and sets the turn speed to the calculated output of the PID
             //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
             //This way the PID controller should target dead center
-            m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0));
+            m_drivetrain.arcadeDrive(0, -(m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0) /180));
+        }
+        else {
+            m_drivetrain.arcadeDrive(0, 0);
         }
 
         //returns whether the PID believes that we are on target
@@ -139,5 +143,9 @@ public class LauncherTargeting {
             //passes in the values off of the shuffleboard Network Table Entries
             m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_I), m_dEntry.getDouble(RobotMap.TARGETING_D));
         }
+    }
+
+    public void setPipeline(Pipeline pipeline){
+        m_limelight.setPipeline(pipeline);
     }
 }
