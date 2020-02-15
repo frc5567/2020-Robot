@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Intake {
     //Declares and Instantiates the double Soleniod. The 0 and 1 are the forward and reverse channels.
-    private DoubleSolenoid m_dSolDropBar;
+    private DoubleSolenoid m_doubleSolenoidDropBar;
     
     // declare intake motors controllers
     private SpeedController m_leftIntakeMotor;
@@ -47,10 +47,10 @@ public class Intake {
     double i;
 
     //Constructor for the Intake objects
-    public Intake(DoubleSolenoid m_dSolDropBar, SpeedControllerGroup m_intakeMotors, SpeedController m_leftIntakeMotor, SpeedController m_rightIntakeMotor, SensorCollection m_encoder, XboxController m_testController){
+    public Intake(DoubleSolenoid m_doubleSolenoidDropBar, SpeedControllerGroup m_intakeMotors, SpeedController m_leftIntakeMotor, SpeedController m_rightIntakeMotor, SensorCollection m_encoder, XboxController m_testController){
         
         
-        this.m_dSolDropBar = m_dSolDropBar;
+        this.m_doubleSolenoidDropBar = m_doubleSolenoidDropBar;
         this.m_intakeMotors = m_intakeMotors;
         this.m_leftIntakeMotor = m_leftIntakeMotor;
         this.m_rightIntakeMotor = m_rightIntakeMotor;
@@ -58,7 +58,7 @@ public class Intake {
         this.m_testController = m_testController;
 
         m_testController = new XboxController(0);
-        m_dSolDropBar = new DoubleSolenoid(0, 1);
+        m_doubleSolenoidDropBar = new DoubleSolenoid(0, 1);
 
         
         m_dropBarMotorSpeedDown = RobotMap.DROP_BAR_SPEED_DOWN;
@@ -67,11 +67,11 @@ public class Intake {
     }
 
     public void kUp(){
-        m_dSolDropBar.set(DoubleSolenoid.Value.kForward);
+        m_doubleSolenoidDropBar.set(DoubleSolenoid.Value.kForward);
     }
 
     public void kDown(){
-        m_dSolDropBar.set(DoubleSolenoid.Value.kReverse);
+        m_doubleSolenoidDropBar.set(DoubleSolenoid.Value.kReverse);
     }
 
 

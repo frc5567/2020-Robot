@@ -37,14 +37,22 @@ public class RobotMap {
     public static final int RIGHT_PERIOD_MS = 20;
     public static final int LEFT_PERIOD_MS = 5;
 
-
     public static final double DRIVE_MAX_DELTA_SPEED = 0.1;
     public static final double DRIVE_MAX_QUICK_TURN_SPEED = 0.1;
     public static final double AUTO_SPEED = 0.2;
 
+  public static final double PERCENT_DEADBAND = 0.001;
+
     public static final double SCALE_FEEDBACK_COEFFICIENT_VALUE = 0.5;
 
     public static final double UNSCALED_FEEDBACK_COEFFICIENT_VALUE = 1;
+
+    public static final double PEAK_OUTPUT = 1.0;
+    
+    public static final int SENSOR_UNIT_PER_100MS_PER_SEC = 2000;
+    public static final int ALLOWABLE_CLOSED_LOOP_ERROR = 0;
+    public static final int LOOP_TIME_MS = 10;
+    public static final int PERIOD_MS = 10;
 
     //the time it takes the drive train to ramp to full speed in open loop control in seconds
     public static final double DRIVE_RAMP_TIME = 0.5;
