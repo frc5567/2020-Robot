@@ -14,7 +14,7 @@ public class RobotMap {
     public static final int DRIVE_CONTROLLER_PORT = 1;
 
     //the deadband on our controller sticks to prevent drift
-    public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.05;
+    public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.08;
 
     //****************************************
     //*                                      *
@@ -77,7 +77,7 @@ public class RobotMap {
     public static final int MASTER_LEFT_FALCON_ID = 3;
     public static final int MASTER_RIGHT_FALCON_ID = 4;
     public static final int SLAVE_LEFT_FALCON_ID = 13;
-    public static final int SLAVE_RIGHT_FALCON_ID = 4;
+    public static final int SLAVE_RIGHT_FALCON_ID = 14;
 
     //solenoid ports
     public static final int LEFT_SOLENOID_FORWARD_PORT = 0;
@@ -106,19 +106,100 @@ public class RobotMap {
     //this number is currently arbitrary (25 feet)
     public static final double MAX_LAUNCHER_DISTANCE_IN = 300;
 
+    //the ports for the launcher motors
+    public static final int MASTER_LAUNCHER_ID = 21;
+    public static final int CLOSE_LAUNCHER_SLAVE_ID = 22;
+    public static final int FAR_LAUNCHER_SLAVE1_ID = 23;
+    public static final int FAR_LAUNCHER_SLAVE2_ID = 24;
+
+    //adjustment value for the launcher percent control
+    //0.5 is pretty arbitrary, it is the value that was used for initial launcher testing
+    public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
+
+    //the launcher timeout for running confing methods
+    public static final int LAUNCHER_CONFIG_TIMEOUT_MS = 30;
+
+    //the period for reading data from the encoders attached to the motor controllers
+    public static final int LAUNCHER_FEEDBACK_PERIOD_MS = 10;
+
+    //the neutral deadband for our launcher PID
+    public static final double LAUNCHER_NEUTRAL_DEADBAND = 0.04;
+
+    //the peak output on our launcher PID
+    public static final double LAUNCHER_PID_PEAK_OUTPUT = 1.0;
+
+    //the number of samples use in rolling average. Valid values are 1,2,4,8,16,32. If another value is specified, it will truncate to nearest support value.
+    //this number is currently arbitrary
+    public static final int LAUNCHER_VELOCITY_MEASUREMENT_WINDOW = 8;
+
+    //the acceptable integral zone for the launch master motor
+    //100 is the value used last year, this should be adjusted in testing if need be
+    public static final int LAUNCHER_I_ZONE = 100;
+
+    //the acceptable error for the launcher PID. Any error less than this will be treated as zero
+    public static final int LAUNCHER_ACCEPTABLE_ERROR = 0;
+
+    //the closed loop period for the launcher PID
+    public static final int LAUNCHER_CLOSED_LOOP_PERIOD_MS = 10; 
+
     //****************************************
     //*                                      *
     //*           CLIMBER CONSTANTS          *
     //*                                      *
     //****************************************
+    //the cruise speed for the climber
     public static final double CLIMBER_SPEED = 0.5;
+
+    //the encoder targets for our lift and extension motor
+    public static final int CLIMBER_EXTENSION_ENCODER_TARGET = 0;
+    public static final int CLIMBER_LIFT_ENCODER_TARGET = 0;
+
+    //the climber timeout for running confing methods
+    public static final int CLIMBER_CONFIG_TIMEOUT_MS = 30;
+
+    //the period for reading data from the encoders attached to the motor controllers
+    public static final int CLIMBER_FEEDBACK_PERIOD_MS = 10;
+
+    //the neutral deadband for our climber PIDs
+    public static final double CLIMBER_NEUTRAL_DEADBAND = 0.04;
+
+    //the peak output on our climber PIDs
+    public static final double CLIMBER_PID_PEAK_OUTPUT = 1.0;
+
+    //the acceleration for the climber in units per 100ms per second
+    //1000 is half the value for the elevator last year, this needs to be tuned via testing
+    public static final int CLIMBER_MOTION_MAGIC_ACCEL = 1000;
+
+    //the cruise velocity for the climber in units per second
+    //1000 is half the value for the elevator last year, this needs to be tuned via testing
+    public static final int CLIMBER_MOTION_MAGIC_CRUISE_VELOCITY = 1000;
+
+    //the PIDF values for the extension motor on the climber
+    //these values are temporary and should be tuned through testing
+    public static final double CLIMBER_EXTENSION_P = 0;
+    public static final double CLIMBER_EXTENSION_I = 0;
+    public static final double CLIMBER_EXTENSION_D = 0;
+    public static final double CLIMBER_EXTENSION_F = 0;
+
+    //the acceptable integral zone for the extension motor
+    //100 is the value used last year, this should be adjusted in testing if need be
+    public static final int CLIMBER_EXTENSION_I_ZONE = 100;
+
+    //the acceptable error for the extension PID. Any error less than this will be treated as zero
+    public static final int CLIMBER_EXTENSION_ACCEPTABLE_ERROR = 0;
+
+    //the closed loop period for the extension PID
+    public static final int CLIMBER_EXTENSION_CLOSED_LOOP_PERIOD_MS = 10;
 
     //****************************************
     //*                                      *
     //*           INTAKE CONSTANTS           *
     //*                                      *
     //****************************************
-    public static final int INTAKE_VICTOR_ID = 15;
+    public static final int INTAKE_SPARK_ID = 15;
+
+    //the ramp time in seconds from zero to full speed for the intake motor
+    public static final double INTAKE_OPEN_LOOP_RAMP_TIME_S = 0.75;
 
     //The maximum number of ticks that the encoder has------The number of ticks might not be correct:double check
     public static final double MAX_ENCODER_TICKS = 22;
@@ -172,6 +253,7 @@ public class RobotMap {
     //*                                      *
     //****************************************
     public static final int PCM_CAN_ID = 20;
+	public static final int CYCLES_TO_MOVE_BALL_ONE_POSITION = 30;
 
 
 }
