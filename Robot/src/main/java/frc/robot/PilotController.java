@@ -1,7 +1,11 @@
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.ShiftDrive.Gear;
 
 /**
@@ -23,6 +27,10 @@ public class PilotController {
 
     private DriveType m_driveType;
 
+    private double m_inputScalar = 0.6;
+    private NetworkTableEntry m_inputScalarEntry;
+    private ShuffleboardTab m_driverTab;
+
     /**
      * Creates an object to allow the pilot to control the drivetrain
      * 
@@ -35,6 +43,16 @@ public class PilotController {
         m_controller = controller;
         m_drivetrain = drivetrain;
         m_driveType = driveType;
+
+        m_driverTab = Shuffleboard.getTab("Driver Tab");
+
+        m_inputScalarEntry = m_driverTab.add("Input Scalar", 0.6)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+    }
+
+    public void setInputScalar() {
+        m_inputScalar = m_inputScalarEntry.getDouble(0.6);
     }
 
     /**
@@ -59,8 +77,10 @@ public class PilotController {
             turnInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
         }
 
+        turnInput *= m_inputScalar;
+
         //run our drivetrain with the adjusted input
-        m_drivetrain.arcadeDrive(m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft), turnInput);
+        m_drivetrain.arcadeDrive(m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft) * m_inputScalar, turnInput);
     }
 
     /**
@@ -121,6 +141,8 @@ public class PilotController {
      */
     public void controlDriveTrain() {
         //runs our drivetrain based on control scheme passed in
+        setInputScalar();
+
         if (m_driveType == DriveType.kArcade) {
             arcadeDrive();
         }
