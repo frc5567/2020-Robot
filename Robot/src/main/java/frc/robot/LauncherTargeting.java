@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  */
 public class LauncherTargeting {
     //Declare our drivetrain, limelight, and PID controller
-    private ShiftDrive m_drivetrain;
+    private Drivetrain m_drivetrain;
     private LimelightReader m_limelight;
     private PIDController m_targetController;
 
@@ -43,7 +43,7 @@ public class LauncherTargeting {
      * @param limelight The limelight reader that gives us our target
      * @param robot The main Robot that this constructed in
      */
-    public LauncherTargeting(ShiftDrive drivetrain, LimelightReader limelight, Robot robot) {
+    public LauncherTargeting(Drivetrain drivetrain, LimelightReader limelight, Robot robot) {
         m_drivetrain = drivetrain;
         m_limelight = limelight;
         m_robot = robot;

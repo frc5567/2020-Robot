@@ -95,6 +95,16 @@ public class Launcher {
         setMotor(m_currentSpeed);
     }
 
+    public void setVelocity(double velocity) {
+        //set the velocity of the motors
+        m_masterMotor.set(ControlMode.Velocity, velocity);
+
+        //set our slave motors to follow master
+        m_closeSlaveMotor.follow(m_masterMotor);
+        m_farSlaveMotor1.follow(m_masterMotor);
+        m_farSlaveMotor2.follow(m_masterMotor);
+    }
+
     /**
      * This revs our launcher to a target velocity as a function of distance
      * <p>Note that this velocity will not be a robot map constant, it will be a result of distance reported by the limelight

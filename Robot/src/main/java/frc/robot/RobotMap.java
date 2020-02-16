@@ -21,8 +21,48 @@ public class RobotMap {
     //*        DRIVETRAIN CONSTANTS          *
     //*                                      *
     //****************************************
+    //Drivetrain, turning, and velocity gains
+    public static final Gains  DRIVETRAIN_GAINS = new Gains(0.3, 0.0, 0.0, 0.0, 100, 1.0);
+    public static final Gains GAINS_TURNING = new Gains(0.1, 0.0, 0.0, 0.0, 200, 1.0);
+    public static final Gains GAINS_VELOCIT = new Gains(0.1, 0.0, 0.0, 0.0, 300, 1.0);
+    
+    //PIDF constants----Could change
+    public static final double PID_INPUT_RANGE = 180.00;
+    public static final double PID_OUTPUT_RANGE = 180.00;
+    public static final double TOLERANCE_ROTATE_CONROLLER = 2.00;
+    public static final double FINISHED_PID_THRESHOLD = 0.15;
+    public static final int PID_PRIMARY = 0;
+
+    public static final int TIMEOUT_MS = 30;
+    public static final int RIGHT_PERIOD_MS = 20;
+    public static final int LEFT_PERIOD_MS = 5;
+
+    public static final double DRIVE_MAX_DELTA_SPEED = 0.1;
+    public static final double DRIVE_MAX_QUICK_TURN_SPEED = 0.1;
+    public static final double AUTO_SPEED = 0.2;
+
+  public static final double PERCENT_DEADBAND = 0.001;
+
+    public static final double SCALE_FEEDBACK_COEFFICIENT_VALUE = 0.5;
+
+    public static final double UNSCALED_FEEDBACK_COEFFICIENT_VALUE = 1;
+
+    public static final double PEAK_OUTPUT = 1.0;
+    
+    public static final int SENSOR_UNIT_PER_100MS_PER_SEC = 2000;
+    public static final int ALLOWABLE_CLOSED_LOOP_ERROR = 0;
+    public static final int LOOP_TIME_MS = 10;
+    public static final int PERIOD_MS = 10;
+
     //the time it takes the drive train to ramp to full speed in open loop control in seconds
     public static final double DRIVE_RAMP_TIME = 0.5;
+
+    public static final double PI = 3.14159265359;
+    // the 6 has to be changed to the diameter of our wheels
+    public static final double DRIVE_TICS_PER_INCH = (4096 / (6*RobotMap.PI));
+
+    //the total number of encoder ticks in a rotate----Check to see if this is the correct number
+    public static final double STARTING_TICK_VALUE = 1440;
 
     //can IDs for drive motors
     //This is for the original can setup
@@ -45,6 +85,7 @@ public class RobotMap {
     public static final int RIGHT_SOLENOID_FORWARD_PORT = 2;
     public static final int RIGHT_SOLENOID_REVERSE_PORT = 3;
 
+
     //****************************************
     //*                                      *
     //*          LAUNCHER CONSTANTS          *
@@ -64,6 +105,16 @@ public class RobotMap {
     //The maximum distance that the launcher can be shot from and still make the target (given max power)
     //this number is currently arbitrary (25 feet)
     public static final double MAX_LAUNCHER_DISTANCE_IN = 300;
+
+    //the ports for the launcher motors
+    public static final int MASTER_LAUNCHER_ID = 21;
+    public static final int CLOSE_LAUNCHER_SLAVE_ID = 22;
+    public static final int FAR_LAUNCHER_SLAVE1_ID = 23;
+    public static final int FAR_LAUNCHER_SLAVE2_ID = 24;
+
+    //adjustment value for the launcher percent control
+    //0.5 is pretty arbitrary, it is the value that was used for initial launcher testing
+    public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
 
     //the launcher timeout for running confing methods
     public static final int LAUNCHER_CONFIG_TIMEOUT_MS = 30;
@@ -149,6 +200,16 @@ public class RobotMap {
 
     //the ramp time in seconds from zero to full speed for the intake motor
     public static final double INTAKE_OPEN_LOOP_RAMP_TIME_S = 0.75;
+
+    //The maximum number of ticks that the encoder has------The number of ticks might not be correct:double check
+    public static final double MAX_ENCODER_TICKS = 22;
+
+    //Speed of the motor on the drop bar when going down
+    public static final double DROP_BAR_SPEED_DOWN = 0.5;
+    //Speed of the motor on the drop bar when going up
+    public static final double DROP_BAR_SPEED_UP = -0.5;
+
+    
 
     //****************************************
     //*                                      *
