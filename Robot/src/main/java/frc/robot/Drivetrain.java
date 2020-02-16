@@ -347,7 +347,7 @@ public class Drivetrain {
         double returnedRotate = m_rotController.calculate(m_gyro.getOffsetYaw());
 
         //Runs he drivetrain with 0 speed and the rotate speed set by the PID
-        arcadeDrive(0, returnedRotate, false);
+        arcadeDrive(0, returnedRotate);
 
         // Checks to see if the PID is finished or close enough
         //Needs to be tested and tuned
@@ -391,16 +391,16 @@ public class Drivetrain {
         System.out.println("Returned Rotate: \t" + returnedRotate);
 
         //Runs the drivetrain with an auto speed of 0.2, and a rotate speed set by the PID
-        arcadeDrive(RobotMap.AUTO_SPEED, returnedRotate, false);
+        arcadeDrive(RobotMap.AUTO_SPEED, returnedRotate);
 
         //TODO: Redue this section-Grab encoder value on first entry(target angle is changed)-get whether going forward or backward-drive forward or backward at set speed until if difference is equal to target distance then stop moving and feed in rotate to get setangle
         /////////////////////////////////////////////////////
 
         if((m_leftStartingEncoderValue - m_leftDriveEncoder.getQuadraturePosition() > target) && (m_rightStartingEncoderValue - m_rightDriveEncoder.getQuadraturePosition() > target) ){
-            arcadeDrive(RobotMap.AUTO_SPEED, 0, false);
+            arcadeDrive(RobotMap.AUTO_SPEED, 0);
             isFinished = false;
         } else {
-            arcadeDrive(0, returnedRotate, false);
+            arcadeDrive(0, returnedRotate);
             isFinished = true;
         }
 
@@ -432,13 +432,11 @@ public class Drivetrain {
      * @param turn turn -1.0 to 1.0, the rate of rotation
      * @param setter If this is true, use speed setters to adjust a speed and conserve battery. If false, use raw input
      */
-    public void arcadeDrive (double forward, double turn, boolean setter) {
-
+    public void arcadeDrive (double forward, double turn) {
         m_masterLeftMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
         m_masterRightMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
         m_slaveLeftMotor.follow(m_masterLeftMotor);
         m_slaveRightMotor.follow(m_masterRightMotor);
-
     }
 
     /**
