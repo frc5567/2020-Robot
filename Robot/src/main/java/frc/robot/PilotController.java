@@ -2,7 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import frc.robot.ShiftDrive.Gear;
+import frc.robot.Drivetrain.Gear;
 
 /**
  * A class to control the drivetrain with the pilot controller
@@ -113,10 +113,10 @@ public class PilotController {
      */
     private void controlGear() {
         if (m_controller.getXButtonReleased()) {
-            m_drivetrain.shiftGear(Drivetrain.Gear.kHighGear);
+            m_drivetrain.shiftGear(Gear.kHighGear);
         }
         else if (m_controller.getYButtonReleased()) {
-            m_drivetrain.shiftGear(Drivetrain.Gear.kLowGear);
+            m_drivetrain.shiftGear(Gear.kLowGear);
         }
     }
     
