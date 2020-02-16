@@ -1,7 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Drivetrain.Gear;
 
 /**
@@ -23,6 +25,19 @@ public class PilotController {
 
     private LauncherTargeting m_launcherTargeting;
     private final DriveType m_driveType;
+
+    //scalars and network table entries to scale our input on our drivetrain
+    //this is to reduce our speed for driver testing and potentially for comp
+    private double m_highGearVelocityScalar = 0.6;
+    private double m_highGearTurnScalar = 0.6;
+    private double m_lowGearVelocityScalar = 0.6;
+    private double m_lowGearTurnScalar = 0.6;
+    private NetworkTableEntry m_highGearVelocityScalarEntry;
+    private NetworkTableEntry m_highGearTurnScalarEntry;
+    private NetworkTableEntry m_lowGearVelocityScalarEntry;
+    private NetworkTableEntry m_lowGearTurnScalarEntry;
+    private ShuffleboardTab m_driverTab;
+
 
     /**
      * Creates an object to allow the pilot to control the drivetrain
