@@ -16,7 +16,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.SPI;
 import frc.robot.PilotController.DriveType;
+import frc.robot.Drivetrain;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -25,6 +28,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import java.util.Map;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -40,165 +44,197 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
    */
+  Drivetrain m_driveTrain;
 
+  NavX m_gyro;
 
-    //declares our drivetrain motor controllers and a currently unused shooter motor
-    TalonFX m_masterLeftDriveFalcon;
-    TalonFX m_masterRightDriveFalcon;
+  //declares our drivetrain motor controllers and a currently unused shooter motor
+  TalonFX m_masterLeftDriveFalcon;
+  TalonFX m_masterRightDriveFalcon;
 
-    TalonFX m_slaveLeftDriveFalcon;
-    TalonFX m_slaveRightDriveFalcon;
+  TalonFX m_slaveLeftDriveFalcon;
+  TalonFX m_slaveRightDriveFalcon;
 
-    TalonSRX m_masterLauncher;
-    VictorSPX m_closeLauncherSlave;
-    VictorSPX m_farLauncherSlave1;
-    VictorSPX m_farLauncherSlave2;
+  TalonSRX m_masterLauncher;
+  VictorSPX m_closeLauncherSlave;
+  VictorSPX m_farLauncherSlave1;
+  VictorSPX m_farLauncherSlave2;
 
-    //declares our launcher system and our controls for that system over the launcher tab
-    Launcher m_shooter;
-    ShuffleboardShooterControl m_shooterControl;
+  //VictorSPX m_intakeMotor;
 
-    //declares an xbox controller used for testing prototype code
-    XboxController m_testController;
+  //declares our launcher system and our controls for that system over the launcher tab
+  Launcher m_shooter;
+  ShuffleboardShooterControl m_shooterControl;
 
-    //declares controllers and drivetrain for testing drive code
-    XboxController m_driveController;
-    PilotController m_pilotController;
-    ShiftDrive m_drivetrain;
+  //declares an xbox controller used for testing prototype code
+  XboxController m_testController;
 
-    DoubleSolenoid m_leftPiston;
-    DoubleSolenoid m_rightPiston;
+  //declares controllers and drivetrain for testing drive code
+  XboxController m_driveController;
+  PilotController m_pilotController;
+  Drivetrain m_drivetrain;
 
-    //toggle for the limelight
-    boolean m_isDriverCamera;
+  DoubleSolenoid m_leftPiston;
+  DoubleSolenoid m_rightPiston;
 
-    //declares the network table for limelight info so that we can access it
-    NetworkTable m_limelightTable;
+  //The setter is true when the speed is being adjusted to conserve battery, if it is false it uses the raw input
+  boolean setter;
 
-    //declare our limelight reader object
-    LimelightReader m_limelightReader;
+  //toggle for the limelight
+  boolean m_isDriverCamera;
 
-    //declare our launcher targeting object
-    LauncherTargeting m_launcherTargeting;
+  //declares the network table for limelight info so that we can access it
+  NetworkTable m_limelightTable;
 
-    //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
-    private ShuffleboardTab m_cameraTab;
-    private NetworkTableEntry m_cameraHeight;
-    private NetworkTableEntry m_cameraAngle;
-    private NetworkTableEntry m_targetHeight;
-    private NetworkTableEntry m_distance;
+  //declare our limelight reader object
+  LimelightReader m_limelightReader;
 
-    public Robot() {
-        //instantiates master motors for drive
-        m_masterLeftDriveFalcon = new TalonFX(RobotMap.MASTER_LEFT_FALCON_ID);
-        m_masterRightDriveFalcon = new TalonFX(RobotMap.MASTER_RIGHT_FALCON_ID);
+  //declare our launcher targeting object
+  LauncherTargeting m_launcherTargeting;
 
-        //instantiates slave motors for drive
-        m_slaveLeftDriveFalcon = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
-        m_slaveRightDriveFalcon = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
+  //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
+  private ShuffleboardTab m_cameraTab;
+  private NetworkTableEntry m_cameraHeight;
+  private NetworkTableEntry m_cameraAngle;
+  private NetworkTableEntry m_targetHeight;
+  private NetworkTableEntry m_distance;
 
-        //instantiates our test controller
-        m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
+  public Robot() {
+    //instantiates master motors for drive
+    m_masterLeftDriveFalcon = new TalonFX(RobotMap.MASTER_LEFT_FALCON_ID);
+    m_masterRightDriveFalcon = new TalonFX(RobotMap.MASTER_RIGHT_FALCON_ID);
 
-        //instantiate drivetrain for tested
-        m_driveController = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
+    //instantiates slave motors for drive
+    m_slaveLeftDriveFalcon = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
+    m_slaveRightDriveFalcon = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
 
-        m_leftPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
-        m_rightPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
-        m_drivetrain = new ShiftDrive(m_masterLeftDriveFalcon, m_masterRightDriveFalcon, m_slaveLeftDriveFalcon, m_slaveRightDriveFalcon, m_leftPiston, m_rightPiston, true);
+    //instantiates currently unused shooter motor
+    // m_intakeMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
 
-        //instantiate launcher and shuffleboard control
-        m_masterLauncher = new TalonSRX(RobotMap.MASTER_LAUNCHER_ID);
-        m_closeLauncherSlave = new VictorSPX(RobotMap.CLOSE_LAUNCHER_SLAVE_ID);
-        m_farLauncherSlave1 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE1_ID);
-        m_farLauncherSlave2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
+    //instantiates our test controller
+    m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
 
-        m_shooter = new Launcher(RobotMap.LAUNCHER_ADJUSTMENT_VALUE, m_masterLauncher, m_closeLauncherSlave, m_farLauncherSlave1, m_farLauncherSlave2);
-        m_shooterControl = new ShuffleboardShooterControl(m_shooter);
+    //instantiate drivetrain for tested
+    m_driveController = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
 
-        //gives us access to the network table for the limelight
-        m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+    m_leftPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
+    m_rightPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
 
-        //create an object to read values off of our limelight
-        m_limelightReader = new LimelightReader(m_limelightTable);
+    //instantiate launcher and shuffleboard control
+    m_masterLauncher = new TalonSRX(RobotMap.MASTER_LAUNCHER_ID);
+    m_closeLauncherSlave = new VictorSPX(RobotMap.CLOSE_LAUNCHER_SLAVE_ID);
+    m_farLauncherSlave1 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE1_ID);
+    m_farLauncherSlave2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
 
-        //create our targeting object
-        //"this" is the current robot, we pass it in so that the targeting can see what periodic function we are in
-        m_launcherTargeting = new LauncherTargeting(m_drivetrain, m_limelightReader, this);
+    m_shooter = new Launcher(RobotMap.LAUNCHER_ADJUSTMENT_VALUE, m_masterLauncher, m_closeLauncherSlave, m_farLauncherSlave1, m_farLauncherSlave2);
+    m_shooterControl = new ShuffleboardShooterControl(m_shooter);
 
-        m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade, m_launcherTargeting);
+    //gives us access to the network table for the limelight
+    m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
+    //Do we need? Double check on what is does
+    try {
+      m_gyro = new NavX(SPI.Port.kMXP);
+    } catch (RuntimeException ex) {
+      System.out.println("Error instantiating navX MXP");
+    }
 
-        //sets our default state to the vision pipeline
-        m_isDriverCamera = false;
+    m_driveTrain.configDriveTrain();
+    //creates a field to display calculated distance
+    m_distance = m_cameraTab.addPersistent("Distance", 0.0)
+                          .getEntry();
+    //sets our default state to the vision pipeline
+    m_isDriverCamera = false;
 
-        //creates a tab on the shuffleboard for the camera
-        m_cameraTab = Shuffleboard.getTab("Camera");
+    m_drivetrain = new Drivetrain(m_masterLeftDriveFalcon, m_masterRightDriveFalcon, m_slaveLeftDriveFalcon, m_slaveRightDriveFalcon, m_leftPiston, m_rightPiston, true);
 
-        //Creates editable text fields to set camera height, fixed angle, and target height
-        m_cameraHeight = m_cameraTab.addPersistent("Camera Height (m)", 0.0)                
-                                .withWidget(BuiltInWidgets.kTextView)             
-                                .withProperties(Map.of("min", 0.0, "max", 6.0)) 
-                                .getEntry();
+    //create an object to read values off of our limelight
+    m_limelightReader = new LimelightReader(m_limelightTable);
 
-        m_cameraAngle = m_cameraTab.addPersistent("Camera Angle (deg)", 0.0)                
-                               .withWidget(BuiltInWidgets.kTextView)             
-                               .withProperties(Map.of("min", 0.0, "max", 90.0)) 
-                               .getEntry();
-        
-        m_targetHeight = m_cameraTab.addPersistent("Target Height (m)", 0.0)                
-                                .withWidget(BuiltInWidgets.kTextView)             
-                                .withProperties(Map.of("min", 0.0, "max", 6.0)) 
-                                .getEntry();
+    //create our targeting object
+    //"this" is the current robot, we pass it in so that the targeting can see what periodic function we are in
+    m_launcherTargeting = new LauncherTargeting(m_drivetrain, m_limelightReader, this);
 
-        //creates a field to display calculated distance
-        m_distance = m_cameraTab.addPersistent("Distance", 0.0)
+    m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade, m_launcherTargeting);
+    //sets our default state to the vision pipeline
+    m_isDriverCamera = false;
+
+    //creates a tab on the shuffleboard for the camera
+    m_cameraTab = Shuffleboard.getTab("Camera");
+
+    //Creates editable text fields to set camera height, fixed angle, and target height
+    m_cameraHeight = m_cameraTab.addPersistent("Camera Height (m)", 0.0)                
+                            .withProperties(Map.of("min", 0.0, "max", 6.0)) 
+                            .withWidget(BuiltInWidgets.kTextView)             
                             .getEntry();
 
-    }
+    m_cameraAngle = m_cameraTab.addPersistent("Camera Angle (deg)", 0.0)                
+                            .withWidget(BuiltInWidgets.kTextView)             
+                            .withProperties(Map.of("min", 0.0, "max", 90.0)) 
+                            .getEntry();
 
-    @Override
-    public void robotInit() {
-        //zeros used motor contollers
-        m_masterLeftDriveFalcon.set(ControlMode.PercentOutput, 0);
-        m_masterRightDriveFalcon.set(ControlMode.PercentOutput, 0);
-        m_slaveLeftDriveFalcon.set(ControlMode.PercentOutput, 0);
-        m_slaveRightDriveFalcon.set(ControlMode.PercentOutput, 0);
-    }
+    m_targetHeight = m_cameraTab.addPersistent("Target Height (m)", 0.0)                
+                            .withWidget(BuiltInWidgets.kTextView)             
+                            .withProperties(Map.of("min", 0.0, "max", 6.0)) 
+                            .getEntry();
+    
+    
+    //creates a field to display calculated distance
+    m_distance = m_cameraTab.addPersistent("Distance", 0.0)
+                          .getEntry();
+  }
 
-    @Override
-    public void autonomousInit() {
-    }
+  @Override
+  public void robotInit() {
+    //zeros used motor controllers
+    m_masterLeftDriveFalcon.set(ControlMode.PercentOutput, 0);
+    m_masterRightDriveFalcon.set(ControlMode.PercentOutput, 0);
+    m_masterLeftDriveFalcon.set(ControlMode.PercentOutput, 0);
+    m_masterRightDriveFalcon.set(ControlMode.PercentOutput, 0);
 
-    @Override
-    public void autonomousPeriodic() {
-    }
+    m_drivetrain.configDriveTrain();
+  }
 
-    @Override
+
+
+  @Override
+  public void autonomousInit() {
+  }
+ 
+  @Override
+  public void autonomousPeriodic() {
+  }
+
+  @Override
     public void teleopInit() {
-    }
 
-    @Override
-    public void teleopPeriodic() {
-        m_pilotController.controlDriveTrain();
-    }
+  }
+        
+  @Override
+  public void teleopPeriodic() {
+      m_pilotController.controlDriveTrain(setter);
+  }
 
-    @Override
-    public void testInit() {
-        //zeros the shooter
-        m_shooterControl.zeroSpeed();
-    }
+  @Override
+  public void testInit() {
+    //zeros the shooter
+    m_shooterControl.zeroSpeed();
+  }
 
-    @Override
-    public void testPeriodic() {
-        //sets the velocity of the launcher while holding the b button
-        if(m_testController.getBButton()) {
-            m_shooterControl.setVelocity();
-        }
-        //kills the velocity while not holding
-        else {
-            m_shooterControl.zeroSpeed();
-        }
+  @Override
+  public void testPeriodic() {
+    
+    //check to see where this goes
+    m_driveTrain.arcadeDrive((m_driveController.getTriggerAxis(Hand.kRight) - m_driveController.getTriggerAxis(Hand.kLeft)), m_driveController.getX(Hand.kLeft), true);
+    
+    //sets the velocity of the launcher while holding the b button
+    if(m_testController.getBButton()) {
+      m_shooterControl.setVelocity();
     }
+    //kills the velocity while not holding
+    else {
+      m_shooterControl.zeroSpeed();
+    }
+  }
 
 }
