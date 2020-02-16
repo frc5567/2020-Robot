@@ -27,8 +27,14 @@ public class PilotController {
 
     private DriveType m_driveType;
 
-    private double m_inputScalar = 0.6;
-    private NetworkTableEntry m_inputScalarEntry;
+    private double m_highGearVelocityScalar = 0.6;
+    private double m_highGearTurnScalar = 0.6;
+    private double m_lowGearVelocityScalar = 0.6;
+    private double m_lowGearTurnScalar = 0.6;
+    private NetworkTableEntry m_highGearVelocityScalarEntry;
+    private NetworkTableEntry m_highGearTurnScalarEntry;
+    private NetworkTableEntry m_lowGearVelocityScalarEntry;
+    private NetworkTableEntry m_lowGearTurnScalarEntry;
     private ShuffleboardTab m_driverTab;
 
     /**
@@ -45,14 +51,29 @@ public class PilotController {
         m_driveType = driveType;
 
         m_driverTab = Shuffleboard.getTab("Driver Tab");
-
-        m_inputScalarEntry = m_driverTab.add("Input Scalar", 0.6)
+        m_highGearVelocityScalarEntry = m_driverTab.addPersistent("High Gear Speed Scalar", 0.6)
                                         .withWidget(BuiltInWidgets.kTextView)
                                         .getEntry();
+
+        m_highGearTurnScalarEntry = m_driverTab.addPersistent("High Gear Turn Scalar", 0.6)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_lowGearVelocityScalarEntry = m_driverTab.addPersistent("Low Gear Speed Scalar", 0.6)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_lowGearTurnScalarEntry = m_driverTab.addPersistent("Low Gear Turn Scalar", 0.6)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+                                        
     }
 
     public void setInputScalar() {
-        m_inputScalar = m_inputScalarEntry.getDouble(0.6);
+        m_highGearVelocityScalar = m_highGearVelocityScalarEntry.getDouble(0.6);
+        m_highGearTurnScalar = m_highGearTurnScalarEntry.getDouble(0.6);
+        m_lowGearVelocityScalar = m_lowGearVelocityScalarEntry.getDouble(0.6);
+        m_lowGearTurnScalar = m_lowGearTurnScalarEntry.getDouble(0.6);
     }
 
     /**
@@ -62,6 +83,7 @@ public class PilotController {
     private void arcadeDrive() {
         //read our current turn
         double turnInput =  m_controller.getX(Hand.kLeft);
+        double velocityInput = m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft);
 
         //if our input is less than our deadband, ignore it by setting the input to zero
         if (Math.abs(turnInput) < RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
@@ -77,10 +99,17 @@ public class PilotController {
             turnInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
         }
 
-        turnInput *= m_inputScalar;
+        if(m_drivetrain.getGear() == Gear.kHigh) {
+            velocityInput *= m_highGearVelocityScalar;
+            turnInput *= m_highGearTurnScalar;
+        }
+        else if(m_drivetrain.getGear() == Gear.kLow) {
+            velocityInput *= m_lowGearVelocityScalar;
+            turnInput *= m_lowGearTurnScalar;
+        }
 
         //run our drivetrain with the adjusted input
-        m_drivetrain.arcadeDrive(m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft) * m_inputScalar, turnInput);
+        m_drivetrain.arcadeDrive(velocityInput, turnInput);
     }
 
     /**
