@@ -39,12 +39,12 @@ public class LauncherTargeting {
 
     /**
      * Contructor for LauncherTargeting objects
-     * @param m_drivetrain2 The drivetrain of the robot
+     * @param drivetrain The drivetrain of the robot
      * @param limelight The limelight reader that gives us our target
      * @param robot The main Robot that this constructed in
      */
-    public LauncherTargeting(Drivetrain m_drivetrain2, LimelightReader limelight, Robot robot) {
-        m_drivetrain = m_drivetrain2;
+    public LauncherTargeting(Drivetrain drivetrain, LimelightReader limelight, Robot robot) {
+        m_drivetrain = drivetrain;
         m_limelight = limelight;
         m_robot = robot;
 
