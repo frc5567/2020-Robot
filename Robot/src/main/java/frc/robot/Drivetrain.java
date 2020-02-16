@@ -124,7 +124,7 @@ public class Drivetrain {
 
 
         //Initializes rotate PID controller with the PIDF constants ----------See if there is a way to add the m_gyro
-        //TODO: Come back to this
+        //TODO: Come back to this-We need to run characterization to get feedforward
         m_rotController = new PIDController(RobotMap.DRIVETRAIN_GAINS.kP, RobotMap.DRIVETRAIN_GAINS.kI, RobotMap.DRIVETRAIN_GAINS.kD, RobotMap.DRIVETRAIN_GAINS.kF);
         m_rotController.enableContinuousInput(-RobotMap.PID_INPUT_RANGE, RobotMap.PID_INPUT_RANGE);
 
@@ -372,6 +372,10 @@ public class Drivetrain {
     public boolean rotateDriveAngle(double targetAngle, double target) {
         // flag for checking if the method is finished
         boolean isFinished = false;
+        
+        //The current encoder values
+        double m_leftStartingEncoderValue = m_leftDriveEncoder.getQuadraturePosition();
+        double m_rightStartingEncoderValue = m_rightDriveEncoder.getQuadraturePosition();
 
         if (m_rotController.getSetpoint() != targetAngle) {
             //Resets the error
@@ -381,7 +385,7 @@ public class Drivetrain {
             m_rotController.setSetpoint(targetAngle);
         }
 
-        //Sets our rotate speed to the reurn of the PID
+        //Sets our rotate speed to the return of the PID
         double returnedRotate = m_rotController.calculate(m_gyro.getOffsetYaw());
 
         System.out.println("Returned Rotate: \t" + returnedRotate);
@@ -389,35 +393,33 @@ public class Drivetrain {
         //Runs the drivetrain with an auto speed of 0.2, and a rotate speed set by the PID
         arcadeDrive(RobotMap.AUTO_SPEED, returnedRotate, false);
 
-        //TODO: Redue this section
+        //TODO: Redue this section-Grab encoder value on first entry(target angle is changed)-get whether going forward or backward-drive forward or backward at set speed until if difference is equal to target distance then stop moving and feed in rotate to get setangle
         /////////////////////////////////////////////////////
-        double startingValue = RobotMap.STARTING_TICK_VALUE;
-        double leftDiffValue;
-        double rightDiffValue;
-        if ((m_leftDriveEncoder.getQuadraturePosition() < startingValue) && (m_rightDriveEncoder.getQuadraturePosition() < startingValue)){
-            double leftValue = m_leftDriveEncoder.getQuadraturePosition();
-            double rightValue = m_rightDriveEncoder.getQuadraturePosition();
 
-            leftDiffValue = startingValue - leftValue;
-            rightDiffValue = startingValue - rightValue;
-
-            double leftInches = leftDiffValue / RobotMap.DRIVE_TICS_PER_INCH;
-            double rightInches = rightDiffValue / RobotMap.DRIVE_TICS_PER_INCH;
-
-            if ( leftInches > target && rightInches > target) {
-                arcadeDrive(RobotMap.AUTO_SPEED, returnedRotate, false);
-                isFinished = false;
-            }
-            else {
-                arcadeDrive(RobotMap.AUTO_SPEED, 0, false);
-             isFinished = true;
+        if((m_leftStartingEncoderValue - m_leftDriveEncoder.getQuadraturePosition() > target) && (m_rightStartingEncoderValue - m_rightDriveEncoder.getQuadraturePosition() > target) ){
+            arcadeDrive(RobotMap.AUTO_SPEED, 0, false);
+            isFinished = false;
+        } else {
+            arcadeDrive(0, returnedRotate, false);
+            isFinished = true;
         }
-        
-        
-        }
+
+        /**
+         * If (target angle has changed){
+         * Get forward or backward
+         * If(starting encoder value - current encoder value > target distance){
+         * drive forward/backward 
+         * isFinished = false;
+         * }
+         * else {
+         * stop moving and rotate to getSetAngle
+         * isFinished = true;
+         * }
+         * 
+         * }
+         */
         ///////////////////////////////////////////////////////
         
-
         //isFinished acts as an exit flag once we have fulfilled the condiions desired
         return isFinished;
     }
