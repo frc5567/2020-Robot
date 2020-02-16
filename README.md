@@ -29,3 +29,14 @@
 | VictorSpx     | 12            |
 | VictorSpx     | 15            |
 
+### Current Robot Motor Layout
+| System         | Motor         | Controller  | Count   |
+| -------------- | ------------- | ----------- | ------- |
+| Drive train    | Falcon 500    | Talon FX    |    4    |
+| Shooter        | 775 Pro       | Talon SRX   |    1    |
+|                |               | Victor SPX  |    3    |
+| Intake         | Neo           | Spark Max   |    1    |
+| Magazine       | Neo           | Spark Max   |    1    |
+| Indexer/Loader | 775 Pro       | Talon SRX   |    1    |
+| Climber Deploy | 775 Pro       | Talon SRX   |    1    |
+| Climber        | Neo           | Spark Max   |    1    |
