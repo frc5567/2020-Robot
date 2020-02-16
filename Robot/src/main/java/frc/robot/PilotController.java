@@ -42,10 +42,8 @@ public class PilotController {
     /**
      * Controls our drivetrain with an arcade control system
      * Triggers are forward and back (left trigger is back, right is forward), left x stick is turn
-     * 
-     *  @param setter The setter is true when the speed is being adjusted to conserve battery, if it is false it uses the raw input
      */
-    private void arcadeDrive(boolean setter) {
+    private void arcadeDrive() {
         //read our current turn
         double turnInput =  m_controller.getX(Hand.kLeft);
 
@@ -122,9 +120,8 @@ public class PilotController {
     
     /**
      * Controls all pilot controlled systems
-     * @param setter The setter is true when the speed is being adjusted to conserve battery, if it is false it uses the raw input
      */
-    public void controlDriveTrain(boolean setter) {
+    public void controlDriveTrain() {
         //if the b button is pressed, lock onto the high target
         if (m_controller.getBButton()) {
             m_launcherTargeting.target();
@@ -133,7 +130,7 @@ public class PilotController {
         else {
             //runs our drivetrain based on control scheme passed in
             if (m_driveType == DriveType.kArcade) {
-                arcadeDrive(setter);
+                arcadeDrive();
             }
             else if (m_driveType == DriveType.kTank) {
                 tankDrive();
