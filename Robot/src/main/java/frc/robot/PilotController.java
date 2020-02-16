@@ -3,6 +3,8 @@ package frc.robot;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Drivetrain.Gear;
 
@@ -52,6 +54,24 @@ public class PilotController {
         m_drivetrain = drivetrain;
         m_driveType = driveType;
         m_launcherTargeting = launcherTargeting;
+
+        //Put drive control scalars onto the shuffleboard for editing mid drive
+        m_driverTab = Shuffleboard.getTab("Driver Tab");
+        m_highGearVelocityScalarEntry = m_driverTab.addPersistent("High Gear Speed Scalar", 0.6)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_highGearTurnScalarEntry = m_driverTab.addPersistent("High Gear Turn Scalar", 0.6)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_lowGearVelocityScalarEntry = m_driverTab.addPersistent("Low Gear Speed Scalar", 0.6)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_lowGearTurnScalarEntry = m_driverTab.addPersistent("Low Gear Turn Scalar", 0.6)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
     }
 
     /**
