@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  */
 public class LauncherTargeting {
     //Declare our drivetrain, limelight, and PID controller
-    private ShiftDrive m_drivetrain;
+    private Drivetrain m_drivetrain;
     private LimelightReader m_limelight;
     private PIDController m_targetController;
 
@@ -39,12 +39,12 @@ public class LauncherTargeting {
 
     /**
      * Contructor for LauncherTargeting objects
-     * @param drivetrain The drivetrain of the robot
+     * @param m_drivetrain2 The drivetrain of the robot
      * @param limelight The limelight reader that gives us our target
      * @param robot The main Robot that this constructed in
      */
-    public LauncherTargeting(ShiftDrive drivetrain, LimelightReader limelight, Robot robot) {
-        m_drivetrain = drivetrain;
+    public LauncherTargeting(Drivetrain m_drivetrain2, LimelightReader limelight, Robot robot) {
+        m_drivetrain = m_drivetrain2;
         m_limelight = limelight;
         m_robot = robot;
 
@@ -101,7 +101,7 @@ public class LauncherTargeting {
             //Passes in a speed of zero to keep us from moving, and sets the turn speed to the calculated output of the PID
             //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
             //This way the PID controller should target dead center
-            m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0));
+            m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0), false);
         }
 
         //returns whether the PID believes that we are on target
