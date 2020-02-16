@@ -225,7 +225,7 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     
     //check to see where this goes
-    m_driveTrain.arcadeDrive((m_driveController.getTriggerAxis(Hand.kRight) - m_driveController.getTriggerAxis(Hand.kLeft)), m_driveController.getX(Hand.kLeft), true);
+    m_driveTrain.arcadeDrive((m_driveController.getTriggerAxis(Hand.kRight) - m_driveController.getTriggerAxis(Hand.kLeft)), m_driveController.getX(Hand.kLeft));
     
     //sets the velocity of the launcher while holding the b button
     if(m_testController.getBButton()) {

@@ -432,13 +432,11 @@ public class Drivetrain {
      * @param turn turn -1.0 to 1.0, the rate of rotation
      * @param setter If this is true, use speed setters to adjust a speed and conserve battery. If false, use raw input
      */
-    public void arcadeDrive (double forward, double turn, boolean setter) {
-
+    public void arcadeDrive (double forward, double turn) {
         m_masterLeftMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
         m_masterRightMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
         m_slaveLeftMotor.follow(m_masterLeftMotor);
         m_slaveRightMotor.follow(m_masterRightMotor);
-
     }
 
     /**

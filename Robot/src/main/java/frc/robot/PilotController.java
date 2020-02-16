@@ -64,7 +64,7 @@ public class PilotController {
         }
 
         //run our drivetrain with the adjusted input
-        m_drivetrain.arcadeDrive(m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft), turnInput, setter);
+        m_drivetrain.arcadeDrive(m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft), turnInput);
     }
 
     /**
