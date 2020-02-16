@@ -75,6 +75,16 @@ public class PilotController {
     }
 
     /**
+     * Refreshes input scalars based on input from shuffleboard
+     */
+    public void setInputScalar() {
+        m_highGearVelocityScalar = m_highGearVelocityScalarEntry.getDouble(0.6);
+        m_highGearTurnScalar = m_highGearTurnScalarEntry.getDouble(0.6);
+        m_lowGearVelocityScalar = m_lowGearVelocityScalarEntry.getDouble(0.6);
+        m_lowGearTurnScalar = m_lowGearTurnScalarEntry.getDouble(0.6);
+    }
+
+    /**
      * Controls our drivetrain with an arcade control system
      * Triggers are forward and back (left trigger is back, right is forward), left x stick is turn
      */
@@ -157,6 +167,9 @@ public class PilotController {
      * Controls all pilot controlled systems
      */
     public void controlDriveTrain() {
+        //sets the scalars on the drivetrain
+        setInputScalar();
+        
         //if the b button is pressed, lock onto the high target
         if (m_controller.getBButton()) {
             m_launcherTargeting.target();
@@ -172,7 +185,7 @@ public class PilotController {
             }
         }
 
-        //Controls shifting the gears off of the x button
+        //Controls shifting the gears off of the x and y buttons
         controlGear();
     }
 }
