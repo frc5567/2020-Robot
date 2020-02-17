@@ -30,10 +30,10 @@ public class PilotController {
 
     //scalars and network table entries to scale our input on our drivetrain
     //this is to reduce our speed for driver testing and potentially for comp
-    private double m_highGearVelocityScalar = 0.6;
-    private double m_highGearTurnScalar = 0.6;
-    private double m_lowGearVelocityScalar = 0.6;
-    private double m_lowGearTurnScalar = 0.6;
+    private double m_highGearVelocityScalar = RobotMap.DRIVE_DEFAULT_INPUT_SCALAR;
+    private double m_highGearTurnScalar = RobotMap.DRIVE_DEFAULT_INPUT_SCALAR;
+    private double m_lowGearVelocityScalar = RobotMap.DRIVE_DEFAULT_INPUT_SCALAR;
+    private double m_lowGearTurnScalar = RobotMap.DRIVE_DEFAULT_INPUT_SCALAR;
     private NetworkTableEntry m_highGearVelocityScalarEntry;
     private NetworkTableEntry m_highGearTurnScalarEntry;
     private NetworkTableEntry m_lowGearVelocityScalarEntry;
@@ -89,7 +89,8 @@ public class PilotController {
      * Triggers are forward and back (left trigger is back, right is forward), left x stick is turn
      */
     private void arcadeDrive() {
-        //read our current turn
+        //read our current velocity and turn
+        double velocityInput = (m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft));
         double turnInput =  m_controller.getX(Hand.kLeft);
 
         //if our input is less than our deadband, ignore it by setting the input to zero
@@ -106,8 +107,17 @@ public class PilotController {
             turnInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
         }
 
+        if(m_drivetrain.getGear() == Gear.kHighGear) {
+            velocityInput *= m_highGearVelocityScalar;
+            turnInput *= m_highGearTurnScalar;
+        }
+        else {
+            velocityInput *= m_lowGearVelocityScalar;
+            turnInput *= m_lowGearTurnScalar;
+        }
+
         //run our drivetrain with the adjusted input
-        m_drivetrain.arcadeDrive(m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft), turnInput);
+        m_drivetrain.arcadeDrive(velocityInput, turnInput);
     }
 
     /**
@@ -169,7 +179,7 @@ public class PilotController {
     public void controlDriveTrain() {
         //sets the scalars on the drivetrain
         setInputScalar();
-        
+
         //if the b button is pressed, lock onto the high target
         if (m_controller.getBButton()) {
             m_launcherTargeting.target();

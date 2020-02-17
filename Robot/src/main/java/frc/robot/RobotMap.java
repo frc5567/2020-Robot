@@ -25,6 +25,9 @@ public class RobotMap {
     public static final Gains  DRIVETRAIN_GAINS = new Gains(0.3, 0.0, 0.0, 0.0, 100, 1.0);
     public static final Gains GAINS_TURNING = new Gains(0.1, 0.0, 0.0, 0.0, 200, 1.0);
     public static final Gains GAINS_VELOCIT = new Gains(0.1, 0.0, 0.0, 0.0, 300, 1.0);
+
+    //The default scalar for drive inputs - what we multiply input from drive controller by
+    public static final double DRIVE_DEFAULT_INPUT_SCALAR = 0.6;
     
     //PIDF constants----Could change
     public static final double PID_INPUT_RANGE = 180.00;
