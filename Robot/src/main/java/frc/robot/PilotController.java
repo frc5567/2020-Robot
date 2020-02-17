@@ -57,19 +57,19 @@ public class PilotController {
 
         //Put drive control scalars onto the shuffleboard for editing mid drive
         m_driverTab = Shuffleboard.getTab("Driver Tab");
-        m_highGearVelocityScalarEntry = m_driverTab.addPersistent("High Gear Speed Scalar", 0.6)
+        m_highGearVelocityScalarEntry = m_driverTab.addPersistent("High Gear Speed Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
                                         .withWidget(BuiltInWidgets.kTextView)
                                         .getEntry();
 
-        m_highGearTurnScalarEntry = m_driverTab.addPersistent("High Gear Turn Scalar", 0.6)
+        m_highGearTurnScalarEntry = m_driverTab.addPersistent("High Gear Turn Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
                                         .withWidget(BuiltInWidgets.kTextView)
                                         .getEntry();
 
-        m_lowGearVelocityScalarEntry = m_driverTab.addPersistent("Low Gear Speed Scalar", 0.6)
+        m_lowGearVelocityScalarEntry = m_driverTab.addPersistent("Low Gear Speed Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
                                         .withWidget(BuiltInWidgets.kTextView)
                                         .getEntry();
 
-        m_lowGearTurnScalarEntry = m_driverTab.addPersistent("Low Gear Turn Scalar", 0.6)
+        m_lowGearTurnScalarEntry = m_driverTab.addPersistent("Low Gear Turn Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
                                         .withWidget(BuiltInWidgets.kTextView)
                                         .getEntry();
     }
@@ -78,10 +78,10 @@ public class PilotController {
      * Refreshes input scalars based on input from shuffleboard
      */
     public void setInputScalar() {
-        m_highGearVelocityScalar = m_highGearVelocityScalarEntry.getDouble(0.6);
-        m_highGearTurnScalar = m_highGearTurnScalarEntry.getDouble(0.6);
-        m_lowGearVelocityScalar = m_lowGearVelocityScalarEntry.getDouble(0.6);
-        m_lowGearTurnScalar = m_lowGearTurnScalarEntry.getDouble(0.6);
+        m_highGearVelocityScalar = m_highGearVelocityScalarEntry.getDouble(RobotMap.DRIVE_DEFAULT_INPUT_SCALAR);
+        m_highGearTurnScalar = m_highGearTurnScalarEntry.getDouble(RobotMap.DRIVE_DEFAULT_INPUT_SCALAR);
+        m_lowGearVelocityScalar = m_lowGearVelocityScalarEntry.getDouble(RobotMap.DRIVE_DEFAULT_INPUT_SCALAR);
+        m_lowGearTurnScalar = m_lowGearTurnScalarEntry.getDouble(RobotMap.DRIVE_DEFAULT_INPUT_SCALAR);
     }
 
     /**
