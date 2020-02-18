@@ -115,6 +115,11 @@ public class RobotMap {
     public static final int FAR_LAUNCHER_SLAVE1_ID = 23;
     public static final int FAR_LAUNCHER_SLAVE2_ID = 24;
 
+    //inversion for far slave motors
+    //one of these should be inverted based on testing, currently unsure which one
+    public static final boolean LAUNCHER_FAR_SLAVE1_INVERTED = true;
+    public static final boolean LAUNCHER_FAR_SLAVE2_INVERTED = true;
+
     //adjustment value for the launcher percent control
     //0.5 is pretty arbitrary, it is the value that was used for initial launcher testing
     public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
