@@ -11,9 +11,10 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 /**
  * A launcher that uses one or multiple motors to launch a projectile
- * <p>Utilizes a scrapped together proportionality controller to adjust speed
+ * <p>Utilizes a scrapped together proportionality controller to adjust speed for percent input,
+ * and uses velocity PID control for velocity control
  * 
- * @version 1/25/2020
+ * @version 2/17/2020
  * @author Josh Overbeek
  */
 public class Launcher {
@@ -42,7 +43,7 @@ public class Launcher {
     /**
      * Constructor for Launcher objects
      * 
-     * <p> To be used for any system that launches a projectile
+     * <p> A four motor launcher with one master connected to an encoder and three slaves
      * 
      * @param adjustmentValue The proportionality constant used to control this launcher's speed
      * @param masterMotor The master speed controller used to launch the projectile
@@ -95,6 +96,10 @@ public class Launcher {
         setMotor(m_currentSpeed);
     }
 
+    /**
+     * Sets the velocity of the motors in revs/100ms
+     * @param velocity target velocity in rev/100ms
+     */
     public void setVelocity(double velocity) {
         //set the velocity of the motors
         m_masterMotor.set(ControlMode.Velocity, velocity);
@@ -107,7 +112,7 @@ public class Launcher {
 
     /**
      * This revs our launcher to a target velocity as a function of distance
-     * <p>Note that this velocity will not be a robot map constant, it will be a result of distance reported by the limelight
+     * <p>This equation needs to be tuned based on testing
      * @param distance Horizontal distance to the target in inches, this should be a product of our limelight
      */
     public void revLauncher(double distance) {
@@ -128,6 +133,7 @@ public class Launcher {
 
     /**
      * This should only be run once at the start of the match or in robot init
+     * <p> This must be run before using any velocity control
      */
     public void configVelocityControl() {
         //config remote sensors
