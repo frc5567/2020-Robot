@@ -101,9 +101,7 @@ public class LauncherTargeting {
             //Passes in a speed of zero to keep us from moving, and sets the turn speed to the calculated output of the PID
             //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
             //This way the PID controller should target dead center
-            //the turn input is negative because while we were testing we discovered that the limelight was return values opposite of what we expected
-            //by inverting our input, we turned towards the target rather than away from it
-            m_drivetrain.arcadeDrive(0, -m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0) );
+            m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0) );
         }
 
         //returns whether the PID believes that we are on target
