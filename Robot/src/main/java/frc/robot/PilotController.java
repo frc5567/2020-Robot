@@ -195,4 +195,11 @@ public class PilotController {
         //Controls shifting the gears off of the x and y buttons
         controlGear();
     }
+
+    /**
+     * @return The drivetrain that the pilot controller controls
+     */
+    public Drivetrain getDrivetrain() {
+        return m_drivetrain;
+    }
 }
