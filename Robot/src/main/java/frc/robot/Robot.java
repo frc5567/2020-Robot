@@ -234,4 +234,15 @@ public class Robot extends TimedRobot {
     }
   }
 
+  @Override
+  public void disabledInit() {
+
+  }
+
+  @Override
+  public void disabledPeriodic() {
+      //sets input scalars for drivetrain control
+      m_pilotController.setInputScalar();
+  }
+
 }

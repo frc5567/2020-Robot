@@ -177,9 +177,6 @@ public class PilotController {
      * Controls all pilot controlled systems
      */
     public void controlDriveTrain() {
-        //sets the scalars on the drivetrain
-        setInputScalar();
-
         //if the b button is pressed, lock onto the high target
         if (m_controller.getBButton()) {
             m_launcherTargeting.target();
