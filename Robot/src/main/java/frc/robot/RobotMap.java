@@ -25,6 +25,9 @@ public class RobotMap {
     public static final Gains  DRIVETRAIN_GAINS = new Gains(0.3, 0.0, 0.0, 0.0, 100, 1.0);
     public static final Gains GAINS_TURNING = new Gains(0.1, 0.0, 0.0, 0.0, 200, 1.0);
     public static final Gains GAINS_VELOCIT = new Gains(0.1, 0.0, 0.0, 0.0, 300, 1.0);
+
+    //The default scalar for drive inputs - what we multiply input from drive controller by
+    public static final double DRIVE_DEFAULT_INPUT_SCALAR = 0.6;
     
     //PIDF constants----Could change
     public static final double PID_INPUT_RANGE = 180.00;
@@ -111,6 +114,11 @@ public class RobotMap {
     public static final int CLOSE_LAUNCHER_SLAVE_ID = 22;
     public static final int FAR_LAUNCHER_SLAVE1_ID = 23;
     public static final int FAR_LAUNCHER_SLAVE2_ID = 24;
+
+    //inversion for far slave motors
+    //one of these should be inverted based on testing, currently unsure which one
+    public static final boolean LAUNCHER_FAR_SLAVE1_INVERTED = true;
+    public static final boolean LAUNCHER_FAR_SLAVE2_INVERTED = true;
 
     //adjustment value for the launcher percent control
     //0.5 is pretty arbitrary, it is the value that was used for initial launcher testing

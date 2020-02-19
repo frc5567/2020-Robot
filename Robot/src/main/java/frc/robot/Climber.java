@@ -7,12 +7,14 @@ import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.SpeedController;
+
 /**
  * Climber with two motors
- * <p>Currently is written expecting Talon motor controllers 
+ * <p>Currently is written expecting one talon and one Spark, where the talon is on extension 
  * <p>This climber uses one motor on a winch to extend the climber and one motor on a winch to retract a hook
  * 
- * @version 1/25/2020
+ * @version 2/18/2020
  * @author Owen Morrow
  */
 public class Climber {
@@ -22,11 +24,10 @@ public class Climber {
   
     // speed controllers used to extend climber and lift robot
     private TalonSRX m_extensionMotor;
-    private TalonSRX m_liftMotor;
+    private SpeedController m_liftMotor;
 
     // encoders for the extension and lift motors
     private SensorCollection m_extensionEncoder;
-    private SensorCollection m_liftEncoder;
   
     //difference between current speed and target speed (set point)
     private double m_error;
@@ -45,7 +46,7 @@ public class Climber {
      * @param liftMotor The motor that pulls the robot up by turning the winch
      * @param adjustmentValue The value we use to adjust speed
      */
-    public Climber(TalonSRX extensionMotor, TalonSRX liftMotor, double adjustmentValue) {
+    public Climber(TalonSRX extensionMotor, SpeedController liftMotor, double adjustmentValue) {
         //instantiate instance variables
         m_extensionMotor = extensionMotor;
         m_liftMotor = liftMotor;
@@ -53,7 +54,6 @@ public class Climber {
 
         //sets our encoders to the encoders plugged into the talons
         m_extensionEncoder = new SensorCollection(m_extensionMotor);
-        m_liftEncoder = new SensorCollection(m_liftMotor);
 
         //sets starting position on object contruction
         //object construction should occur in RobotInit or in Robot contructor
@@ -73,7 +73,7 @@ public class Climber {
      * @param motorSpeed A value between -1.0 and 1.0 where 1.0 is full speed forward
      */
     public void setLiftSpeed(double motorSpeed) {
-        m_liftMotor.set(ControlMode.PercentOutput, motorSpeed);
+        m_liftMotor.set(motorSpeed);
     }
 
     /**
@@ -206,27 +206,10 @@ public class Climber {
     }
   
     /**
-     * Resets both encoders
+     * Resets the encoder
      * Sets the position of the encoders to zero maunally to zero it
      */
     public void encoderReset() {
-        m_liftEncoder.setQuadraturePosition(0, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
-        m_extensionEncoder.setQuadraturePosition(0, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
-    }
-
-    /**
-     * Resets just the lift encoder
-     * Sets the position of the encoder to zero maunally to zero it
-     */
-    public void liftEncoderReset() {
-        m_liftEncoder.setQuadraturePosition(0, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
-    }
-
-    /**
-     * Resets just the extension encoder
-     * Sets the position of the encoder to zero maunally to zero it
-     */
-    public void extensionEncoderReset() {
         m_extensionEncoder.setQuadraturePosition(0, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
     }
 
@@ -235,13 +218,6 @@ public class Climber {
      */
     public int getExtensionEncoderValue() {
       return m_extensionEncoder.getQuadraturePosition();
-    }
-
-    /**
-     * @return The value returned by the lift encoder
-     */
-    public int getLiftEncoderValue() {
-        return m_liftEncoder.getQuadraturePosition();
     }
 
     /**
@@ -276,7 +252,7 @@ public class Climber {
     /**
      * @return the lift motor for the climber
      */
-    public BaseMotorController getLiftMotor() {
+    public SpeedController getLiftMotor() {
         return m_liftMotor;
     }
 
@@ -288,18 +264,10 @@ public class Climber {
     }
 
     /**
-     * @return the encoder on the lift motor
-     */
-    public SensorCollection getLiftEncoder() {
-        return m_liftEncoder;
-    }
-
-    /**
      * @return a summary of the member variables on the climber
      */
     public String toString() {
         return "Extension motor controller: " + m_extensionMotor.toString() + " | Lift motor controller: "
-                + m_liftMotor.toString() + " | Extension encoder: " + m_extensionEncoder.toString() + " | Lift encoder: "
-                + m_liftEncoder.toString() + " | Adjustment value: " + m_adjustmentValue;
+                + m_liftMotor.toString() + " | Extension encoder: " + m_extensionEncoder.toString() + " | Adjustment value: " + m_adjustmentValue;
     }
 }

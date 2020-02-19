@@ -25,8 +25,24 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 public class Drivetrain {
     //Declares an enum for determining the position of the double solenoid. 
     public enum Gear{
-        kLowGear, 
-        kHighGear;
+        kLowGear("Low Gear"), 
+        kHighGear("High Gear");
+
+        private String gearName;
+
+        /**
+         * @param gearnName The name of the gear
+         */
+        Gear(String gearName) {
+            this.gearName = gearName;
+        }
+
+        /**
+         * Returns the position object represented as a string
+         */
+        public String toString() {
+            return this.gearName;
+        }
     }
 
     //Declares the NavX for rotational control

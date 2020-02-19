@@ -1,7 +1,11 @@
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Drivetrain.Gear;
 
 /**
@@ -24,6 +28,19 @@ public class PilotController {
     private LauncherTargeting m_launcherTargeting;
     private final DriveType m_driveType;
 
+    //scalars and network table entries to scale our input on our drivetrain
+    //this is to reduce our speed for driver testing and potentially for comp
+    private double m_highGearVelocityScalar = RobotMap.DRIVE_DEFAULT_INPUT_SCALAR;
+    private double m_highGearTurnScalar = RobotMap.DRIVE_DEFAULT_INPUT_SCALAR;
+    private double m_lowGearVelocityScalar = RobotMap.DRIVE_DEFAULT_INPUT_SCALAR;
+    private double m_lowGearTurnScalar = RobotMap.DRIVE_DEFAULT_INPUT_SCALAR;
+    private NetworkTableEntry m_highGearVelocityScalarEntry;
+    private NetworkTableEntry m_highGearTurnScalarEntry;
+    private NetworkTableEntry m_lowGearVelocityScalarEntry;
+    private NetworkTableEntry m_lowGearTurnScalarEntry;
+    private ShuffleboardTab m_driverTab;
+
+
     /**
      * Creates an object to allow the pilot to control the drivetrain
      * 
@@ -37,6 +54,34 @@ public class PilotController {
         m_drivetrain = drivetrain;
         m_driveType = driveType;
         m_launcherTargeting = launcherTargeting;
+
+        //Put drive control scalars onto the shuffleboard for editing mid drive
+        m_driverTab = Shuffleboard.getTab("Driver Tab");
+        m_highGearVelocityScalarEntry = m_driverTab.addPersistent("High Gear Speed Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_highGearTurnScalarEntry = m_driverTab.addPersistent("High Gear Turn Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_lowGearVelocityScalarEntry = m_driverTab.addPersistent("Low Gear Speed Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_lowGearTurnScalarEntry = m_driverTab.addPersistent("Low Gear Turn Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+    }
+
+    /**
+     * Refreshes input scalars based on input from shuffleboard
+     */
+    public void setInputScalar() {
+        m_highGearVelocityScalar = m_highGearVelocityScalarEntry.getDouble(RobotMap.DRIVE_DEFAULT_INPUT_SCALAR);
+        m_highGearTurnScalar = m_highGearTurnScalarEntry.getDouble(RobotMap.DRIVE_DEFAULT_INPUT_SCALAR);
+        m_lowGearVelocityScalar = m_lowGearVelocityScalarEntry.getDouble(RobotMap.DRIVE_DEFAULT_INPUT_SCALAR);
+        m_lowGearTurnScalar = m_lowGearTurnScalarEntry.getDouble(RobotMap.DRIVE_DEFAULT_INPUT_SCALAR);
     }
 
     /**
@@ -44,7 +89,8 @@ public class PilotController {
      * Triggers are forward and back (left trigger is back, right is forward), left x stick is turn
      */
     private void arcadeDrive() {
-        //read our current turn
+        //read our current velocity and turn
+        double velocityInput = (m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft));
         double turnInput =  m_controller.getX(Hand.kLeft);
 
         //if our input is less than our deadband, ignore it by setting the input to zero
@@ -61,8 +107,17 @@ public class PilotController {
             turnInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
         }
 
+        if(m_drivetrain.getGear() == Gear.kHighGear) {
+            velocityInput *= m_highGearVelocityScalar;
+            turnInput *= m_highGearTurnScalar;
+        }
+        else {
+            velocityInput *= m_lowGearVelocityScalar;
+            turnInput *= m_lowGearTurnScalar;
+        }
+
         //run our drivetrain with the adjusted input
-        m_drivetrain.arcadeDrive(m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft), turnInput);
+        m_drivetrain.arcadeDrive(velocityInput, turnInput);
     }
 
     /**
@@ -137,7 +192,14 @@ public class PilotController {
             }
         }
 
-        //Controls shifting the gears off of the x button
+        //Controls shifting the gears off of the x and y buttons
         controlGear();
+    }
+
+    /**
+     * @return The drivetrain that the pilot controller controls
+     */
+    public Drivetrain getDrivetrain() {
+        return m_drivetrain;
     }
 }
