@@ -51,15 +51,6 @@ public class Robot extends TimedRobot {
   //declare the gyroscope used to rotate our drivetrain and monitor heading
   NavX m_gyro;
 
-  //declare the launcher motor controllers
-  TalonSRX m_masterLauncher;
-
-  /**the launcher slave motor on the same side of the launcher as the master */
-  VictorSPX m_closeLauncherSlave;
-
-  /**the launcher slave motors on the opposite side of the launcher from the master */
-  VictorSPX m_farLauncherSlave1, m_farLauncherSlave2;
-
   //declares our launcher system and our controls for that system over the launcher tab
   Launcher m_launcher;
   ShuffleboardShooterControl m_shooterControl;
@@ -120,12 +111,7 @@ public class Robot extends TimedRobot {
     m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
 
     //instantiate launcher motor controllers and shuffleboard control for those motors
-    m_masterLauncher = new TalonSRX(RobotMap.MASTER_LAUNCHER_ID);
-    m_closeLauncherSlave = new VictorSPX(RobotMap.CLOSE_LAUNCHER_SLAVE_ID);
-    m_farLauncherSlave1 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE1_ID);
-    m_farLauncherSlave2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
-
-    m_launcher = new Launcher(RobotMap.LAUNCHER_ADJUSTMENT_VALUE, m_masterLauncher, m_closeLauncherSlave, m_farLauncherSlave1, m_farLauncherSlave2);
+    m_launcher = new Launcher();
     m_shooterControl = new ShuffleboardShooterControl(m_launcher);
 
     //catch an error on instantiating the navX if it is not plugged in

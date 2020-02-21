@@ -73,6 +73,29 @@ public class Launcher {
     }
 
     /**
+     * Constructor for robot objects
+     * <p> This instantiates a launcher using the robot map constants rather than parameters
+     */
+    public Launcher() {
+        //instantiate motors and djustment value using robot map constants
+        m_adjustmentValue = RobotMap.LAUNCHER_ADJUSTMENT_VALUE;
+        m_masterMotor = new TalonSRX(RobotMap.MASTER_LAUNCHER_ID);
+        m_closeSlaveMotor = new VictorSPX(RobotMap.CLOSE_LAUNCHER_SLAVE_ID);
+        m_farSlaveMotor1 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE1_ID);
+        m_farSlaveMotor2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
+
+        //Sets the far motors to be inverted so that they don't work against the close ones
+        m_farSlaveMotor1.setInverted(RobotMap.LAUNCHER_FAR_SLAVE1_INVERTED);
+        m_farSlaveMotor2.setInverted(RobotMap.LAUNCHER_FAR_SLAVE2_INVERTED);
+
+        //Instantiates the encoder as the encoder plugged into the master
+        m_encoder = new SensorCollection(m_masterMotor);
+
+        //run the config methods to set up velocity control
+        configVelocityControl();
+    }
+
+    /**
      * Assigns a speed directly to the motor controllers
      * @param speed A value between -1.0 and 1.0 where 1.0 is full speed forward
      */
