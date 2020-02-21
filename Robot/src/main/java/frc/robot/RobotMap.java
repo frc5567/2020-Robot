@@ -205,6 +205,12 @@ public class RobotMap {
     //*                                      *
     //****************************************
     public static final int INTAKE_SPARK_ID = 15;
+    public static final int INTAKE_PWM_SPARK_PORT = 0;
+
+    public static final int INTAKE_POSITION_PISTON_FORWARD_PORT = 4;
+    public static final int INTAKE_POSITION_PISTON_REVERSE_PORT = 5;
+
+    public static final int INTAKE_VICTOR_ID = 16;
 
     //the ramp time in seconds from zero to full speed for the intake motor
     public static final double INTAKE_OPEN_LOOP_RAMP_TIME_S = 0.75;
