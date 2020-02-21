@@ -155,6 +155,9 @@ public class RobotMap {
     //*           CLIMBER CONSTANTS          *
     //*                                      *
     //****************************************
+    public static final int EXTENSION_MOTOR_ID = 27;
+    public static final int LIFT_MOTOR_PORT = 1;
+    public static final double CLIMBER_ADJUSTMENT_VALUE = 0.5;
     //the cruise speed for the climber
     public static final double CLIMBER_SPEED = 0.5;
 
