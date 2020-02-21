@@ -44,18 +44,12 @@ public class Robot extends TimedRobot {
   /** The class that we wrote to read values from the controller and control the drivetrain */
   PilotController m_pilotController;
 
-  //our two speed drivetrain
-  Drivetrain m_drivetrain;
-
   //toggle for the limelight
   //control for toggling the limelight should be moved to either limelight reader or pilot controller
   boolean m_isDriverCamera;
 
   //declare our limelight reader object
   LimelightReader m_limelightReader;
-
-  //declare our launcher targeting object
-  LauncherTargeting m_launcherTargeting;
 
   //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
   //this tab is exclusivly for testing, but could still be moved into limelight targeting test mode
@@ -72,7 +66,7 @@ public class Robot extends TimedRobot {
     //instantiate launcher motor controllers and shuffleboard control for those motors
     m_launcher = new Launcher();
     m_shooterControl = new ShuffleboardShooterControl(m_launcher);
-    
+
     //intantiates our PilotController, which controls all systems on the drivetrain
     m_pilotController = new PilotController(DriveType.kArcade, m_limelightReader, this);
     

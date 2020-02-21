@@ -25,13 +25,23 @@ public class PilotController {
          * A tank drive system where the user inputs drive speed to the left and right halves
          * of the drivetrain individually
          */
-        kTank,
+        kTank("Tank Drive"),
 
         /**
          * An arcade drive system where the user inputs a linear speed and a rotation speed
          * which controls the whole drivetrain as a unit
          */ 
-        kArcade;
+        kArcade("Arcade Drive");
+
+        private final String driveName;
+
+        DriveType(String driveName) {
+            this.driveName = driveName;
+        }
+
+        public String toString() {
+            return this.driveName;
+        }
     }
 
     //declare our drivetrain and our controller
@@ -202,6 +212,28 @@ public class PilotController {
      */
     public Drivetrain getDrivetrain() {
         return m_drivetrain;
+    }
+
+    /**
+     * @return the pilot xbox controller
+     */
+    public XboxController getController() {
+        return m_controller;
+    }
+
+    /**
+     * @return the targeting object that rotates based on limelight
+     */
+    public LauncherTargeting getTargeting() {
+        return m_launcherTargeting;
+    }
+
+    /**
+     * @return the current control system
+     * @see frc.robot.PilotController.DriveType DriveType
+     */
+    public DriveType getDriveType() {
+        return m_driveType;
     }
 
     /**
