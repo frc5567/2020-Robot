@@ -202,7 +202,7 @@ public class PilotController {
         }
 
         //this scales our input back to a 0 to 1.0 scale
-        stickInput *= (1.0 / (1.0 - RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) );
+        stickInput /= (1.0 - RobotMap.PILOT_CONTROLLER_STICK_DEADBAND);
 
         return stickInput;
     }
