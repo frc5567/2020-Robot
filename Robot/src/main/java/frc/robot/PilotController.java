@@ -126,7 +126,7 @@ public class PilotController {
         rightInput *= m_currentVelocityScalar;
 
         //run our drivetrain with the adjusted inputs
-        m_drivetrain.tankDrive(-leftInput, -rightInput);
+        m_drivetrain.tankDrive(leftInput, rightInput);
     }
 
     /**
