@@ -67,10 +67,7 @@ public class Robot extends TimedRobot {
   //declares an xbox controller used for testing prototype code
   XboxController m_testController;
 
-  //declares controllers and drivetrain for testing drive code
-  /** The physical Xbox controller that reads inputs */
-  XboxController m_driveController;
-  
+  //declares controller and drivetrain for testing drive code
   /** The class that we wrote to read values from the controller and control the drivetrain */
   PilotController m_pilotController;
 
@@ -122,9 +119,6 @@ public class Robot extends TimedRobot {
     //instantiates our test controller
     m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
 
-    //instantiate xbox controller for controlling the drivetrain
-    m_driveController = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
-
     //instantiate launcher motor controllers and shuffleboard control for those motors
     m_masterLauncher = new TalonSRX(RobotMap.MASTER_LAUNCHER_ID);
     m_closeLauncherSlave = new VictorSPX(RobotMap.CLOSE_LAUNCHER_SLAVE_ID);
@@ -150,7 +144,7 @@ public class Robot extends TimedRobot {
     m_launcherTargeting = new LauncherTargeting(m_drivetrain, m_limelightReader, this);
 
     //intantiates our PilotController, which controls all systems on the drivetrain
-    m_pilotController = new PilotController(m_driveController, m_drivetrain, DriveType.kArcade, m_launcherTargeting);
+    m_pilotController = new PilotController(m_drivetrain, DriveType.kArcade, m_launcherTargeting);
     
     //sets our default state to the vision pipeline
     m_isDriverCamera = false;

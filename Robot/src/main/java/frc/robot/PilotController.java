@@ -77,6 +77,26 @@ public class PilotController {
     }
 
     /**
+     * Creates an object to allow the pilot to control the drivetrain
+     * <p>this constructor instantiates its own xbox controller based on the RobotMap port value
+     * 
+     * @param drivetrain The robot drivetrain
+     * @param driveType The type of drive control that the pilot wants (tank or arcade)
+     * @param launcherTargting The targeting object used to lock on to our target
+     */
+    public PilotController(Drivetrain drivetrain, DriveType driveType, LauncherTargeting launcherTargeting) {
+        m_drivetrain = drivetrain;
+        m_driveType = driveType;
+        m_launcherTargeting = launcherTargeting;
+
+        //instantiate xbox controller for controlling the drivetrain
+        m_controller = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
+
+        //puts input scalar widgets on the shuffleboard
+        shuffleboardConfig();
+    }
+
+    /**
      * Refreshes input scalars based on input from shuffleboard
      * <p> The driver input is multiplied by input scalars in order to reduce the speed of the system.
      *     This should be called only while disabled to prevent constant changing of settings mid match
