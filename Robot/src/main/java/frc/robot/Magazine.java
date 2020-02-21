@@ -46,6 +46,17 @@ public class Magazine {
     }
 
     /**
+     * Vertical constructor for magazine that uses robot map constants for instantiation
+     */
+    public Magazine() {
+        m_motor = new TalonSRX(RobotMap.MAGAZINE_MOTOR_PORT);
+        m_encoder = new SensorCollection(m_motor);
+
+        m_intakeSensor = new DigitalInput(RobotMap.MAGAZINE_IN_SENSOR_PORT);
+        m_launchSensor = new DigitalInput(RobotMap.MAGAZINE_OUT_SENSOR_PORT);
+    }
+
+    /**
      * Runs the belt at a inputted speed
      * @param speed The percent speed both belts should move at from -1.0 to 1.0
      */

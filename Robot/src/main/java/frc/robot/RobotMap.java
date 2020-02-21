@@ -263,6 +263,15 @@ public class RobotMap {
 
     //****************************************
     //*                                      *
+    //*          MAGAZINE CONSTANTS          *
+    //*                                      *
+    //****************************************
+    public static final int MAGAZINE_MOTOR_PORT = 26;
+    public static final int MAGAZINE_IN_SENSOR_PORT = 0;
+    public static final int MAGAZINE_OUT_SENSOR_PORT = 1;
+
+    //****************************************
+    //*                                      *
     //*           GENERAL CONSTANTS          *
     //*                                      *
     //****************************************
