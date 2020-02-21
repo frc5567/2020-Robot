@@ -71,6 +71,9 @@ public class PilotController {
         m_drivetrain = drivetrain;
         m_driveType = driveType;
         m_launcherTargeting = launcherTargeting;
+
+        //puts input scalar widgets on the shuffleboard
+        shuffleboardConfig();
     }
 
     /**
@@ -211,7 +214,7 @@ public class PilotController {
      * instantiates all of our network table entries and displays them under the Driver tab
      * <p>the point of this method is to move the shuffleboard code out of init/constructor
      */
-    public void configShuffleboard() {
+    public void shuffleboardConfig() {
         //Put drive control scalars onto the shuffleboard for editing mid drive
         m_driverTab = Shuffleboard.getTab("Driver Tab");
         m_highGearVelocityScalarEntry = m_driverTab.addPersistent("High Gear Speed Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
