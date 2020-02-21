@@ -20,9 +20,11 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 
-
-
-
+/**
+ * The four motor, two speed drivetrain for our robot
+ * @author Hannah Strimpel
+ * @version 2/21/2020
+ */
 public class Drivetrain {
     //Declares an enum for determining the position of the double solenoid. 
     public enum Gear{
@@ -32,7 +34,7 @@ public class Drivetrain {
         private String gearName;
 
         /**
-         * @param gearnName The name of the gear
+         * @param gearName The name of the gear
          */
         Gear(String gearName) {
             this.gearName = gearName;
