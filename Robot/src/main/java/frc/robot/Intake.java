@@ -168,6 +168,27 @@ public class Intake {
     }
 
     /**
+     * @return the speed controller controlling the outer motor
+     */
+    public SpeedController getOuterMotor() {
+        return m_outerMotor;
+    }
+
+    /**
+     * @return the speed controller controlling the inner motor
+     */
+    public BaseMotorController getInnerMotor() {
+        return m_innerMotor;
+    }
+
+    /**
+     * @return the double solenoid that sets our position
+     */
+    public DoubleSolenoid getPositionPiston() {
+        return m_positionPiston;
+    }
+
+    /**
      * @return the intake represented as a string
      */
     public String toString() {
