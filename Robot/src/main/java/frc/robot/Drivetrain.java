@@ -29,7 +29,8 @@ public class Drivetrain {
     //Declares an enum for determining the position of the double solenoid. 
     public enum Gear{
         kLowGear("Low Gear"), 
-        kHighGear("High Gear");
+        kHighGear("High Gear"),
+        kUnknown("Unknown");
 
         private String gearName;
 
@@ -60,15 +61,10 @@ public class Drivetrain {
     //Delcare variable to determine if two solenoids are being used
     private final boolean m_hasTwoSolenoids;
 
-    // Declare variable for speed
-    double m_speed = 0.0;
-    // Declare master left talon TODO:Fix commenting
+    // Declare drivetrain motors
     TalonFX m_masterRightMotor;
-    // Declare slave left talon
     TalonFX m_masterLeftMotor;
-    // Declare master right talon
     TalonFX m_slaveLeftMotor;
-    // Declare slave right talon
     TalonFX m_slaveRightMotor;
 
     //Declares the encoder used for the master left motor
@@ -76,10 +72,7 @@ public class Drivetrain {
     //Declares the encoder used for the master right motor
     private SensorCollection m_rightDriveEncoder;
 
-    TalonFXConfiguration m_leftConfig = new TalonFXConfiguration();
-    TalonFXConfiguration m_rightConfig = new TalonFXConfiguration();
-
-    //Counter for buying time for the PID
+    //Counter for buying time for the PID TODO: eliminate this
     int m_counter;
 
     //Declares the solenoids/Pistons as objects which is used to switch between the two gears
@@ -89,14 +82,11 @@ public class Drivetrain {
     //Declares a Gear object to store the gear that we are in
     private Gear m_gear;
 
-   
-
     /**
      * Constructor for the drivetrain that uses double solenoids to shift speeds/gears
      * @param ahrs the NavX used to instantiate the gyro
      */
     public Drivetrain(TalonFX leftDrive, TalonFX rightDrive, TalonFX leftSlave, TalonFX rightSlave, DoubleSolenoid rightPiston, DoubleSolenoid leftPiston, boolean hasTwoSolenoids){
-
         //Instantiates the TalonFX motors
         m_masterLeftMotor = leftDrive;
         m_masterRightMotor = rightDrive;
@@ -124,7 +114,6 @@ public class Drivetrain {
 
         //Instatiates the NavX----make sure this is the right port
         m_gyro = new NavX(SerialPort.Port.kMXP);
-
 
         //Initializes rotate PID controller with the PIDF constants ----------See if there is a way to add the m_gyro
         configRotatePID();
@@ -166,9 +155,11 @@ public class Drivetrain {
         //configures the drivetrain
         configDriveTrain();
 
+        //TODO: remove?
         m_counter = 0;
 
-        m_gear = Gear.kLowGear; 
+        //instantiates our gear tracking to a neutral value
+        m_gear = Gear.kUnknown; 
     }
 
     /**
@@ -315,16 +306,13 @@ public class Drivetrain {
      * Sets the drive gear using our pistons. This is private so that it can never be called by an outside class to prevent confusion
      * @param value The value to give to the pistons where kOff removes pressure, kForward is _ gear, a nd kReverse is _ gear
      */
+    private void setPiston(DoubleSolenoid.Value value) {
+        m_leftSolenoid.set(value);
+    }
+
     private void setPistons(DoubleSolenoid.Value value) {
-        //sets both solenoids if we have two
-        if (m_hasTwoSolenoids) {
-            m_leftSolenoid.set(value);
-            m_rightSolenoid.set(value);
-        }
-        //only sets the left solenoid if we have one
-        else {
-            m_leftSolenoid.set(value);
-        }
+        m_leftSolenoid.set(value);
+        m_rightSolenoid.set(value);
     }
 
     /**
@@ -333,6 +321,11 @@ public class Drivetrain {
      * @param gear
      */
     public void shiftGear(Gear gear) {
+        //exit immediately if we are already at the requested gear
+        if(m_gear == gear) {
+            return;
+        }
+
         //sets our current gear to the inputted gear
         m_gear = gear;
 
@@ -345,15 +338,6 @@ public class Drivetrain {
         }
     }
 
-
-    /**
-     * @return The gear that we are currently in (kHighGear or kLowGear)
-     */
-    public Gear getGear(){
-        return m_gear;
-    }
-
-
     /**
      * Drives the drivetrain as a tank, controlling the sides individually
      * <p>Speeds are double values betweem -1.0 and 1.0, where 1.0 is full speed forwards
@@ -365,14 +349,10 @@ public class Drivetrain {
         m_masterLeftMotor.set(ControlMode.PercentOutput, leftSpeed);
         m_masterRightMotor.set(ControlMode.PercentOutput, rightSpeed);
 
-        //Sets the slave motors to copy te masters
+        //Sets the slave motors to copy the masters
         m_slaveLeftMotor.follow(m_masterLeftMotor);
         m_slaveRightMotor.follow(m_masterRightMotor);
-    
-    
     }
-
-
 
     /**
      * Rotates to a set angle without moving forward utilizing the PID and AHRS
@@ -382,48 +362,27 @@ public class Drivetrain {
      * doesn't move (thus finished)
      */
     public boolean rotateToAngle(double targetAngle) {
-        //Flag to check if the method is finished
-        boolean isFinished = false;
-
-        //resets the PID only on first entry
-        if (m_firstCall) {
+        //reset the PID if we have a new setpoint
+        if (m_rotController.getSetpoint() != targetAngle) {
             //resets the error
             m_rotController.reset();
 
             //sets the target to our target angle
             m_rotController.setSetpoint(targetAngle);
-
-            //prevents us from repeating the reset until we run the method again seperately
-            m_firstCall = false;
-
-            m_counter = 0;
         }
+
         //sets our rotate speed to the return of the PID
         double returnedRotate = m_rotController.calculate(m_gyro.getOffsetYaw());
 
         //Runs he drivetrain with 0 speed and the rotate speed set by the PID
+        //TODO: this value is currently unscaled. Will need to update with targeting code when that is refined
         arcadeDrive(0, returnedRotate);
 
-        // Checks to see if the PID is finished or close enough
-        //Needs to be tested and tuned
-        if ( ((returnedRotate < RobotMap.FINISHED_PID_THRESHOLD) && (returnedRotate > -RobotMap.FINISHED_PID_THRESHOLD)) && (m_counter > 10)){
-            isFinished = true;
-            m_firstCall = true;
-            System.out.println("FINISHED");
-        }
-
-        if (isFinished) {
-            m_counter = 0;
-        }
-        else {
-            m_counter++;
-        }
-
-        return isFinished;
+        //return whether we are currently at our setpoint
+        return m_rotController.atSetpoint();
     }
 
-    
-    
+    /** */
     public boolean rotateDriveAngle(double targetAngle, double target) {
         // flag for checking if the method is finished
         boolean isFinished = false;
@@ -524,6 +483,13 @@ public class Drivetrain {
      */
     public int getRightDriveEncoderVelocity(){
         return m_rightDriveEncoder.getQuadratureVelocity();
+    }
+
+    /**
+     * @return The gear that we are currently in (kHighGear or kLowGear)
+     */
+    public Gear getGear(){
+        return m_gear;
     }
 
 }
