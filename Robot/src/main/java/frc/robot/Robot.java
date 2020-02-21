@@ -186,7 +186,7 @@ public class Robot extends TimedRobot {
         
   @Override
   public void teleopPeriodic() {
-      m_pilotController.controlDriveTrain();
+      m_pilotController.controlDriveTrainPeriodic();
   }
 
   @Override
