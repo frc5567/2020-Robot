@@ -40,8 +40,11 @@ public class LimelightReader {
      * @return The adjusted degrees to the inner target
      */
     public double getModifiedDegreesToTarget() {
-        // Sets targetAngle to tx the degrees off from center in the x direction
-        double targetAngle = m_limelightTable.getEntry("tx").getDouble(0);
+        // Sets targetAngle to tx, the degrees off from center in the x direction
+        //this is inverted to play nice with our PID
+        //Since our PID treats the returned angle as our "current" and zero as our setpoint,
+        //we have to invert the angle to make the PID turn the robot in the right direction
+        double targetAngle = -getRawDegreesToTarget();
         
         // Sets a variable equal to the targets skew
         double targetSkew = getSkew();
