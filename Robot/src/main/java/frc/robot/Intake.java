@@ -17,10 +17,30 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 public class Intake {
 
     /**
-     * An enum for storing our positions
+     * An enum for storing our possible intake positions
+     * <p>Possible values:
+     * <li>{@link #kLowered}</li>
+     * <li>{@link #kRaised}</li>
+     * <li>{@link #kUnknown}</li>
      */
     public enum Position {
-        kLowered("Lowered"), kRaised("Raised");
+        /**
+         * The lowered position of the intake
+         * <p>This is the position we use to actually run our system
+         */
+        kLowered("Lowered"),
+        /**
+         * The raised position of the intake
+         * <p>This is the position we need to be in at the start of the match
+         * and the position we use while driving around
+         */
+        kRaised("Raised"),
+        /**
+         * The starting value of the intake
+         * <p>We intialize our storage variable to this position,
+         * however at no point in the match should this ever be the state of the intake
+         */
+        kUnknown("Unknown");
 
         private String positionName;
 
@@ -39,7 +59,7 @@ public class Intake {
         }
     }
 
-    //declare our intake motor controller
+    //declare our intake motor controllers
     SpeedController m_outerMotor;
     BaseMotorController m_innerMotor;
 
@@ -61,8 +81,11 @@ public class Intake {
         m_innerMotor = innerIntakeMotor;
         m_positionPiston = positionPiston;
 
-        //set our default position to raised
-        m_position = Position.kRaised;
+        //set our starting position to unknown
+        m_position = Position.kUnknown;
+
+        //then set the solenoids to the raised position
+        setPosition(Position.kRaised);
     }
 
     /**
@@ -84,8 +107,11 @@ public class Intake {
         m_innerMotor = innerIntakeMotor;
         m_positionPiston = positionPiston;
 
-        //set our default position to raised
-        m_position = Position.kRaised;
+        //set our starting position to unknown
+        m_position = Position.kUnknown;
+
+        //then set the solenoids to the raised position
+        setPosition(Position.kRaised);
   }
 
     /**
