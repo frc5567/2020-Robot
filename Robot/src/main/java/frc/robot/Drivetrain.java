@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
@@ -59,7 +60,7 @@ public class Drivetrain {
 
     // Declare variable for speed
     double m_speed = 0.0;
-    // Declare master left talon
+    // Declare master left talon TODO:Fix commenting
     TalonFX m_masterRightMotor;
     // Declare slave left talon
     TalonFX m_masterLeftMotor;
@@ -119,26 +120,60 @@ public class Drivetrain {
         m_leftDriveEncoder.setQuadraturePosition(0, 0);
         m_rightDriveEncoder.setQuadraturePosition(0, 0);
 
-        //sets the motors to brake when not given an active command
-        m_masterLeftMotor.setNeutralMode(NeutralMode.Brake);
-        m_masterRightMotor.setNeutralMode(NeutralMode.Brake);
-        m_slaveLeftMotor.setNeutralMode(NeutralMode.Brake);
-        m_slaveRightMotor.setNeutralMode(NeutralMode.Brake);
-
-        //configs the drive train to have an acceleration based on the RobotMap constant
-        m_masterLeftMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
-        m_masterRightMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
-        m_slaveLeftMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
-        m_slaveRightMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
-
-        //Sets VistorSPX to follow TalonSRXs output
-        m_slaveLeftMotor.follow(m_masterLeftMotor);
-        m_slaveRightMotor.follow(m_masterRightMotor);
-
         //Instatiates the NavX----make sure this is the right port
         m_gyro = new NavX(SerialPort.Port.kMXP);
 
 
+        //Initializes rotate PID controller with the PIDF constants ----------See if there is a way to add the m_gyro
+        configRotatePID();
+
+        //configures the drivetrain
+        configDriveTrain();
+
+        m_counter = 0;
+
+        m_gear = Gear.kLowGear; 
+    }
+
+    public Drivetrain(boolean hasTwoSolenoids) {
+        //instantiates master motors for drive
+        m_masterLeftMotor = new TalonFX(RobotMap.MASTER_LEFT_FALCON_ID);
+        m_masterRightMotor = new TalonFX(RobotMap.MASTER_RIGHT_FALCON_ID);
+
+        //instantiates slave motors for drive
+        m_slaveLeftMotor = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
+        m_slaveRightMotor = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
+
+        //Instantiates the left and right pistons
+        m_leftSolenoid = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
+        m_rightSolenoid = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
+
+        // Initializes classes to call encoders connected to TalonFXs
+        m_leftDriveEncoder = new SensorCollection(m_masterLeftMotor);
+        m_rightDriveEncoder = new SensorCollection(m_masterRightMotor);
+
+        //instantiate the gyro for rotation control
+        m_gyro = new NavX(SerialPort.Port.kMXP);
+
+        //Instantiates the boolean to determine if there are two solenoids
+        m_hasTwoSolenoids = hasTwoSolenoids;
+
+        //Initializes rotate PID controller with the PIDF constants ----------See if there is a way to add the m_gyro
+        configRotatePID();
+
+        //configures the drivetrain
+        configDriveTrain();
+
+        m_counter = 0;
+
+        m_gear = Gear.kLowGear; 
+    }
+
+    /**
+     * this method instantiates and configures the rotational PID controller
+     * <p> to be run on construction
+     */
+    public void configRotatePID() {
         //Initializes rotate PID controller with the PIDF constants ----------See if there is a way to add the m_gyro
         //TODO: Come back to this-We need to run characterization to get feedforward
         m_rotController = new PIDController(RobotMap.DRIVETRAIN_GAINS.kP, RobotMap.DRIVETRAIN_GAINS.kI, RobotMap.DRIVETRAIN_GAINS.kD, RobotMap.DRIVETRAIN_GAINS.kF);
@@ -146,14 +181,7 @@ public class Drivetrain {
 
         m_rotController.setIntegratorRange(-RobotMap.PID_OUTPUT_RANGE, RobotMap.PID_OUTPUT_RANGE);
         m_rotController.setTolerance(RobotMap.TOLERANCE_ROTATE_CONROLLER);
-
-        m_counter = 0;
-
-        m_gear = Gear.kLowGear; 
-
-
     }
-
 
     /**
      * This should be run in robo init in order to configure the falcons/talons. This method should be called there.
@@ -164,25 +192,34 @@ public class Drivetrain {
         //Sets all motor conrollers to zero to kill movement
         m_masterLeftMotor.set(ControlMode.PercentOutput, 0);
         m_masterRightMotor.set(ControlMode.PercentOutput, 0);
+        m_slaveLeftMotor.follow(m_masterLeftMotor);
+        m_masterRightMotor.follow(m_masterRightMotor);
+
+        //configs the drive train to have an acceleration based on the RobotMap constant
+        m_masterLeftMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        m_masterRightMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        m_slaveLeftMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
+        m_slaveRightMotor.configOpenloopRamp(RobotMap.DRIVE_RAMP_TIME);
 
         //sets all motors to brake
         m_masterLeftMotor.setNeutralMode(NeutralMode.Brake);
         m_masterRightMotor.setNeutralMode(NeutralMode.Brake);
-
         m_slaveLeftMotor.setNeutralMode(NeutralMode.Brake);
         m_slaveRightMotor.setNeutralMode(NeutralMode.Brake);
-
         
         /** Feedback Sensor Configuration */
 
-        //Configure the left Talon's selected sensor to a Quad encoder
+        //Configure the left Talon's selected sensor to a integrated encoder
         m_masterLeftMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, RobotMap.PID_PRIMARY, RobotMap.TIMEOUT_MS);
 
+        //this is my best guess, in theory the TalonFX selected sensor should be the afore set selected feeback device
+        m_masterRightMotor.configRemoteFeedbackFilter(m_masterLeftMotor.getBaseID(), RemoteSensorSource.TalonSRX_SelectedSensor, 1, RobotMap.TIMEOUT_MS);
+        
         // Setup Sum Signal to be used for Distance
         //Feedback Device of Remote Talon
         m_masterRightMotor.configSensorTerm(SensorTerm.Sum0, FeedbackDevice.RemoteSensor1, RobotMap.TIMEOUT_MS);
 
-        //Quadrature Encodere of current Talon
+        //Quadrature Encoder of current Talon
         m_masterRightMotor.configSensorTerm(SensorTerm.Sum1, FeedbackDevice.QuadEncoder, RobotMap.TIMEOUT_MS);
 
         // Setup Difference signal to be used for turn

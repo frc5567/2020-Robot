@@ -80,14 +80,14 @@ public class PilotController {
      * Creates an object to allow the pilot to control the drivetrain
      * <p>this constructor instantiates its own xbox controller based on the RobotMap port value
      * 
-     * @param drivetrain The robot drivetrain
      * @param driveType The type of drive control that the pilot wants (tank or arcade)
-     * @param launcherTargting The targeting object used to lock on to our target
+     * @param limelight the limelight reader used for targeting
+     * @param Robot the current robot for the instantiating the targeting class
      */
-    public PilotController(Drivetrain drivetrain, DriveType driveType, LauncherTargeting launcherTargeting) {
-        m_drivetrain = drivetrain;
+    public PilotController(DriveType driveType, LimelightReader limelight, Robot robot) {
+        m_drivetrain = new Drivetrain(true);
         m_driveType = driveType;
-        m_launcherTargeting = launcherTargeting;
+        m_launcherTargeting = new LauncherTargeting(m_drivetrain, limelight, robot);
 
         //instantiate xbox controller for controlling the drivetrain
         m_controller = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
