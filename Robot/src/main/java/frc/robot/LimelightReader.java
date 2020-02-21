@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * This class has methods to make reading information from the network table easier and more readable
@@ -13,10 +14,10 @@ public class LimelightReader {
 
     /**
      * Constructor for our limelight reader object
-     * @param limelightTable The network table that stores limelight data
      */
-    public LimelightReader(NetworkTable limelightTable) {
-        m_limelightTable = limelightTable;
+    public LimelightReader() {
+        //pull the network table that the limelight publishes data to to a specific variable
+        m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     }
 
     /**

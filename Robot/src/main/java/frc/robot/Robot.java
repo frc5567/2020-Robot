@@ -85,10 +85,6 @@ public class Robot extends TimedRobot {
   //control for toggling the limelight should be moved to either limelight reader or pilot controller
   boolean m_isDriverCamera;
 
-  //declares the network table for limelight info so that we can access it
-  //this is in this class because we currently pass it into the limelight reader object
-  NetworkTable m_limelightTable;
-
   //declare our limelight reader object
   LimelightReader m_limelightReader;
 
@@ -138,9 +134,6 @@ public class Robot extends TimedRobot {
     m_launcher = new Launcher(RobotMap.LAUNCHER_ADJUSTMENT_VALUE, m_masterLauncher, m_closeLauncherSlave, m_farLauncherSlave1, m_farLauncherSlave2);
     m_shooterControl = new ShuffleboardShooterControl(m_launcher);
 
-    //gives us access to the network table for the limelight
-    m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
-
     //catch an error on instantiating the navX if it is not plugged in
     //Note that we do not actually handle this error, we just prevent the robot from crashing here
     try {
@@ -150,7 +143,7 @@ public class Robot extends TimedRobot {
     }
 
     //create an object to read values off of our limelight
-    m_limelightReader = new LimelightReader(m_limelightTable);
+    m_limelightReader = new LimelightReader();
 
     //create our targeting object
     //"this" is the current robot, we pass it in so that the targeting can see what periodic function we are in
