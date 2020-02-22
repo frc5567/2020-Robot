@@ -45,6 +45,10 @@ public class Magazine {
         m_launchSensor = launchSensor;
     }
 
+    public Magazine(TalonSRX motor) {
+        m_motor = motor;
+    }
+
     /**
      * Runs the belt at a inputted speed
      * @param speed The percent speed both belts should move at from -1.0 to 1.0
