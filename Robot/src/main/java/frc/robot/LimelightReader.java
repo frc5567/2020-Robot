@@ -38,7 +38,7 @@ public class LimelightReader {
         return m_limelightTable.getEntry("tx").getDouble(0);
     }
 
-    /**TODO:Correct the inner target offset and the degrees to hit inner target
+    /**
      * This method should adjust the x degrees to target based on target's yaw
      * <p>This is designed to hit the inner target when shooting at an angle.
      * <p>Note that we should only adjust within a certain window, past that we should just target the center of mass

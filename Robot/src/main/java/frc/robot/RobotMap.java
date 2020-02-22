@@ -227,7 +227,7 @@ public class RobotMap {
     public static final double TARGET_HEIGHT_INCHES = 98.25;
     //This is temporary and will need to be assigned on our final bot
     public static final double CAMERA_HEIGHT_INCHES = 45d;
-    //This is the offset we make for inner target TODO:Needs to be tested and tuned
+    //This is the offset we make for inner target TODO:These values needs to be changed in testing
     public static final double OFFSET_TARGET_DEGREES = 0.8;
     //This is the range on either side in degrees where we can still hit the inner target
     public static final double INNER_TARGET_DEGREES = 4.5;
