@@ -18,7 +18,6 @@ import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 
 /**
  * The four motor, two speed drivetrain for our robot
@@ -202,8 +201,8 @@ public class Drivetrain {
         
         /** Feedback Sensor Configuration */
 
-        //Configure the left Talon's selected sensor to a integrated encoder
-        m_masterLeftMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, RobotMap.PID_PRIMARY, RobotMap.TIMEOUT_MS);
+        //Configure the left Talon's selected sensor to a Quad encoder
+        m_masterLeftMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, RobotMap.PID_PRIMARY_SLOT, RobotMap.TIMEOUT_MS);
 
         //this is my best guess, in theory the TalonFX selected sensor should be the afore set selected feeback device
         m_masterRightMotor.configRemoteFeedbackFilter(m_masterLeftMotor.getBaseID(), RemoteSensorSource.TalonSRX_SelectedSensor, 1, RobotMap.TIMEOUT_MS);

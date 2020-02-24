@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
 
   //declares our launcher system and our controls for that system over the launcher tab
   Launcher m_launcher;
-  ShuffleboardShooterControl m_shooterControl;
+  ShuffleboardLauncherControl m_launcherControl;
 
   //declares an xbox controller used for testing prototype code
   XboxController m_testController;
@@ -65,10 +65,10 @@ public class Robot extends TimedRobot {
 
     //instantiate launcher motor controllers and shuffleboard control for those motors
     m_launcher = new Launcher();
-    m_shooterControl = new ShuffleboardShooterControl(m_launcher);
+    m_launcherControl = new ShuffleboardLauncherControl(m_launcher);
 
     //intantiates our PilotController, which controls all systems on the drivetrain
-    m_pilotController = new PilotController(DriveType.kArcade, m_limelightReader, this);
+    m_pilotController = new PilotController(DriveType.kArcade, m_limelightReader);
     
     //sets our default state to the vision pipeline
     m_isDriverCamera = false;
@@ -106,7 +106,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     //zeros the shooter
-    m_shooterControl.zeroSpeed();
+    m_launcherControl.zeroSpeed();
   }
 
   @Override
@@ -114,11 +114,11 @@ public class Robot extends TimedRobot {
     //this test periodic is designed for launcher velocity testing
     //sets the velocity of the launcher while holding the b button
     if(m_testController.getBButton()) {
-      m_shooterControl.setVelocity();
+      m_launcherControl.setVelocity();
     }
     //kills the velocity while not holding
     else {
-      m_shooterControl.zeroSpeed();
+      m_launcherControl.zeroSpeed();
     }
   }
 
