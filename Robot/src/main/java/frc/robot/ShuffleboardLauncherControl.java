@@ -35,16 +35,16 @@ public class ShuffleboardLauncherControl {
         m_launcher = launcher;
 
         //creates a persistent widget as text for controlling speed
-        m_percentTarget = m_launcherTab.addPersistent("PercentLaunchSpeed", 0.0)                //creates widget with 0.0 as a default
+        m_percentTarget = m_launcherTab.addPersistent("Percent Launch Speed", 0.0)//creates widget with 0.0 as a default
                               .withWidget(BuiltInWidgets.kTextView)             //sets widget to a text view
                               .withProperties(Map.of("min", -1.0, "max", 1.0))  //sets min and max values
                               .getEntry();                                      //retrieves the entry to assign our setpoint
 
         //creates a persistent widget as text for controlling speed
-        m_angularVelocityTarget = m_launcherTab.addPersistent("VeloctiyLaunchSpeed (rpm)", 0.0)                //creates widget with 0.0 as a default
-                              .withWidget(BuiltInWidgets.kTextView)             //sets widget to a text view
-                              .withProperties(Map.of("min", -10000.0, "max", 10000.0))  //sets min and max values
-                              .getEntry();                                      //retrieves the entry to assign our setpoint
+        m_angularVelocityTarget = m_launcherTab.addPersistent("Veloctiy Launch Speed (rpm)", 0.0) //creates widget with 0.0 as a default
+                              .withWidget(BuiltInWidgets.kTextView)                             //sets widget to a text view
+                              .withProperties(Map.of("min", -10000.0, "max", 10000.0))          //sets min and max values
+                              .getEntry();                                                      //retrieves the entry to assign our setpoint
     }
 
     /**
