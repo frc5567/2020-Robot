@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  * @version 1/25/2020
  * @author Josh Overbeek
  */
-public class ShuffleboardShooterControl {
+public class ShuffleboardLauncherControl {
 
     //declare private variables for creating a tab, instantiating a launcher and retrieving data
     private ShuffleboardTab m_launcherTab;
@@ -27,7 +27,7 @@ public class ShuffleboardShooterControl {
      * 
      * @param launcher The launcher to be controlled
      */
-    public ShuffleboardShooterControl(Launcher launcher) {
+    public ShuffleboardLauncherControl(Launcher launcher) {
         //creates a tab on the shuffleboard for all our launcher needs
         m_launcherTab = Shuffleboard.getTab("Launcher");
 

@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
 
   //declares our launcher system and our controls for that system over the launcher tab
   Launcher m_launcher;
-  ShuffleboardShooterControl m_shooterControl;
+  ShuffleboardLauncherControl m_launcherControl;
 
   //declares an xbox controller used for testing prototype code
   XboxController m_testController;
@@ -126,7 +126,7 @@ public class Robot extends TimedRobot {
     m_farLauncherSlave2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
 
     m_launcher = new Launcher(m_masterLauncher, m_closeLauncherSlave, m_farLauncherSlave1, m_farLauncherSlave2);
-    m_shooterControl = new ShuffleboardShooterControl(m_launcher);
+    m_launcherControl = new ShuffleboardLauncherControl(m_launcher);
 
     //catch an error on instantiating the navX if it is not plugged in
     //Note that we do not actually handle this error, we just prevent the robot from crashing here
@@ -186,7 +186,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     //zeros the shooter
-    m_shooterControl.zeroSpeed();
+    m_launcherControl.zeroSpeed();
   }
 
   @Override
@@ -194,11 +194,11 @@ public class Robot extends TimedRobot {
     //this test periodic is designed for launcher velocity testing
     //sets the velocity of the launcher while holding the b button
     if(m_testController.getBButton()) {
-      m_shooterControl.setVelocity();
+      m_launcherControl.setVelocity();
     }
     //kills the velocity while not holding
     else {
-      m_shooterControl.zeroSpeed();
+      m_launcherControl.zeroSpeed();
     }
   }
 
