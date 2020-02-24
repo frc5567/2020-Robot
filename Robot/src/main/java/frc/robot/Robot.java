@@ -125,7 +125,7 @@ public class Robot extends TimedRobot {
     m_farLauncherSlave1 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE1_ID);
     m_farLauncherSlave2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
 
-    m_launcher = new Launcher(RobotMap.LAUNCHER_ADJUSTMENT_VALUE, m_masterLauncher, m_closeLauncherSlave, m_farLauncherSlave1, m_farLauncherSlave2);
+    m_launcher = new Launcher(m_masterLauncher, m_closeLauncherSlave, m_farLauncherSlave1, m_farLauncherSlave2);
     m_shooterControl = new ShuffleboardShooterControl(m_launcher);
 
     //catch an error on instantiating the navX if it is not plugged in
