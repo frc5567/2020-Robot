@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  * @author Josh Overbeek
  * @version 2/1/2020
  */
-public class LauncherTargeting {
+public class LimelightTargeting {
     //Declare our drivetrain, limelight, and PID controller
     private Drivetrain m_drivetrain;
     private LimelightReader m_limelight;
@@ -38,12 +38,12 @@ public class LauncherTargeting {
     private NetworkTableEntry m_onTargetEntry;
 
     /**
-     * Contructor for LauncherTargeting objects
+     * Contructor for LimelightTargeting objects
      * @param drivetrain The drivetrain of the robot
      * @param limelight The limelight reader that gives us our target
      * @param robot The main Robot that this constructed in
      */
-    public LauncherTargeting(Drivetrain drivetrain, LimelightReader limelight, Robot robot) {
+    public LimelightTargeting(Drivetrain drivetrain, LimelightReader limelight, Robot robot) {
         m_drivetrain = drivetrain;
         m_limelight = limelight;
         m_robot = robot;

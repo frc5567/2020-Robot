@@ -85,8 +85,8 @@ public class Robot extends TimedRobot {
   //declare our limelight reader object
   LimelightReader m_limelightReader;
 
-  //declare our launcher targeting object
-  LauncherTargeting m_launcherTargeting;
+  //declare our limelight targeting object
+  LimelightTargeting m_limelightTargeting;
 
   //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
   //this tab is exclusivly for testing, but could still be moved into limelight targeting test mode
@@ -141,10 +141,10 @@ public class Robot extends TimedRobot {
 
     //create our targeting object
     //"this" is the current robot, we pass it in so that the targeting can see what periodic function we are in
-    m_launcherTargeting = new LauncherTargeting(m_drivetrain, m_limelightReader, this);
+    m_limelightTargeting = new LimelightTargeting(m_drivetrain, m_limelightReader, this);
 
     //intantiates our PilotController, which controls all systems on the drivetrain
-    m_pilotController = new PilotController(m_drivetrain, DriveType.kArcade, m_launcherTargeting);
+    m_pilotController = new PilotController(m_drivetrain, DriveType.kArcade, m_limelightTargeting);
     
     //sets our default state to the vision pipeline
     m_isDriverCamera = false;

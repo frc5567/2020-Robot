@@ -38,7 +38,7 @@ public class PilotController {
     private XboxController m_controller;
     private Drivetrain m_drivetrain;
 
-    private LauncherTargeting m_launcherTargeting;
+    private LimelightTargeting m_limelightTargeting;
     private final DriveType m_driveType;
 
     //scalars and network table entries to scale our input on our drivetrain
@@ -64,13 +64,13 @@ public class PilotController {
      * @param controller The pilot controller to control the drive train with
      * @param drivetrain The robot drivetrain
      * @param driveType The type of drive control that the pilot wants (tank or arcade)
-     * @param launcherTargting The targeting object used to lock on to our target
+     * @param limelightTargting The targeting object used to lock on to our target
      */
-    public PilotController(XboxController controller, Drivetrain drivetrain, DriveType driveType, LauncherTargeting launcherTargeting) {
+    public PilotController(XboxController controller, Drivetrain drivetrain, DriveType driveType, LimelightTargeting limelightTargeting) {
         m_controller = controller;
         m_drivetrain = drivetrain;
         m_driveType = driveType;
-        m_launcherTargeting = launcherTargeting;
+        m_limelightTargeting = limelightTargeting;
 
         //puts input scalar widgets on the shuffleboard
         shuffleboardConfig();
@@ -82,12 +82,12 @@ public class PilotController {
      * 
      * @param drivetrain The robot drivetrain
      * @param driveType The type of drive control that the pilot wants (tank or arcade)
-     * @param launcherTargting The targeting object used to lock on to our target
+     * @param limelightTargting The targeting object used to lock on to our target
      */
-    public PilotController(Drivetrain drivetrain, DriveType driveType, LauncherTargeting launcherTargeting) {
+    public PilotController(Drivetrain drivetrain, DriveType driveType, LimelightTargeting limelightTargeting) {
         m_drivetrain = drivetrain;
         m_driveType = driveType;
-        m_launcherTargeting = launcherTargeting;
+        m_limelightTargeting = limelightTargeting;
 
         //instantiate xbox controller for controlling the drivetrain
         m_controller = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
@@ -180,7 +180,7 @@ public class PilotController {
     public void controlDriveTrainPeriodic() {
         //if the b button is pressed, lock onto the high target
         if (m_controller.getBButton()) {
-            m_launcherTargeting.target();
+            m_limelightTargeting.target();
         }
         //when the b button isn't pressed, run the drive train as normal
         else {
