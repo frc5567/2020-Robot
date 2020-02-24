@@ -141,7 +141,7 @@ public class Robot extends TimedRobot {
 
     //create our targeting object
     //"this" is the current robot, we pass it in so that the targeting can see what periodic function we are in
-    m_limelightTargeting = new LimelightTargeting(m_drivetrain, m_limelightReader, this);
+    m_limelightTargeting = new LimelightTargeting(m_drivetrain, m_limelightReader);
 
     //intantiates our PilotController, which controls all systems on the drivetrain
     m_pilotController = new PilotController(m_drivetrain, DriveType.kArcade, m_limelightTargeting);

@@ -1,10 +1,9 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
-
 import java.util.Map;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -22,9 +21,6 @@ public class LimelightTargeting {
     private LimelightReader m_limelight;
     private PIDController m_targetController;
 
-    //declares a robot to let us look at what method (auton, teleop, test) we are currently in
-    private Robot m_robot;
-
     //declare private variables for creating a tab, and setting widgets
     private ShuffleboardTab m_targetingTab;
     /**Network table entry for reading desired P constant off of the shuffleboard */
@@ -41,12 +37,10 @@ public class LimelightTargeting {
      * Contructor for LimelightTargeting objects
      * @param drivetrain The drivetrain of the robot
      * @param limelight The limelight reader that gives us our target
-     * @param robot The main Robot that this constructed in
      */
-    public LimelightTargeting(Drivetrain drivetrain, LimelightReader limelight, Robot robot) {
+    public LimelightTargeting(Drivetrain drivetrain, LimelightReader limelight) {
         m_drivetrain = drivetrain;
         m_limelight = limelight;
-        m_robot = robot;
 
         //Instatiate a new PID controller with PID values passed in from the robot map
         m_targetController = new PIDController(RobotMap.TARGETING_P, RobotMap.TARGETING_I, RobotMap.TARGETING_D, RobotMap.TARGETING_PERIOD_S);
@@ -62,31 +56,8 @@ public class LimelightTargeting {
         //This should not effect this class, however it is called for redundancy
         m_targetController.enableContinuousInput(-180, 180);
 
-        //creates a tab on the shuffleboard for all our launcher needs
-        m_targetingTab = Shuffleboard.getTab("Targeting");
-
-        //creates a persistent widget as text for setting P constant
-        m_pEntry = m_targetingTab.addPersistent("P", RobotMap.TARGETING_P)                        //creates widget with the robotmap constant as a default
-                            .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
-                            .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
-                            .getEntry();   
-        
-        //creates a persistent widget as text for setting I constant
-        m_iEntry = m_targetingTab.addPersistent("I", RobotMap.TARGETING_I)                        //creates widget with the robotmap constant as a default
-                            .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
-                            .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
-                            .getEntry();   
-
-        //creates a persistent widget as text for setting D constant
-        m_dEntry = m_targetingTab.addPersistent("D", RobotMap.TARGETING_D)                        //creates widget with the robotmap constant as a default
-                            .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
-                            .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
-                            .getEntry();  
-
-        //create a widget to display whether we are currently on target
-        m_onTargetEntry = m_targetingTab.add("On Target?", false)               //creates the widget that is false by default as by default we are not on target
-                                        .withWidget(BuiltInWidgets.kBooleanBox) //set widget to a boolean box to easily display the value
-                                        .getEntry();
+        //sets up the shuffleboard input for targeting
+        shuffleboardConfig();
     }
 
     /**
@@ -125,13 +96,49 @@ public class LimelightTargeting {
 
     /**
      * Sets the P, I, and D constants based on shuffleboard input
-     * <p>This can only be called in the test method in the robot
+     * <p>-> THIS SHOULD ONLY BE CALLED IN TEST <-
      */
     public void setPID() {
-        //only allows the user to set PID values when in test
-        if (m_robot.isTest()) {
-            //passes in the values off of the shuffleboard Netwrok Table Entries
-            m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_I), m_dEntry.getDouble(RobotMap.TARGETING_D));
-        }
+        //passes in the values off of the shuffleboard Netwrok Table Entries
+        m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_I), m_dEntry.getDouble(RobotMap.TARGETING_D));
+    }
+
+    /**
+     * Reset the PID to RobotMap constants
+     * <p>This should be called every time we disable
+     */
+    public void resetPID() {
+        m_targetController.setPID(RobotMap.TARGETING_P, RobotMap.TARGETING_I, RobotMap.TARGETING_D);
+    }
+
+    /**
+     * instantiates all of our network table entries and displays them under the targeting tab
+     */
+    private void shuffleboardConfig() {
+        //creates a tab on the shuffleboard for all our targeting needs
+        m_targetingTab = Shuffleboard.getTab("Targeting");
+
+        //creates a persistent widget as text for setting P constant
+        m_pEntry = m_targetingTab.addPersistent("P", RobotMap.TARGETING_P)       //creates widget with the robotmap constant as a default
+                                 .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
+                                 .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                 .getEntry();   
+        
+        //creates a persistent widget as text for setting I constant
+        m_iEntry = m_targetingTab.addPersistent("I", RobotMap.TARGETING_I)       //creates widget with the robotmap constant as a default
+                                 .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
+                                 .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                 .getEntry();   
+
+        //creates a persistent widget as text for setting D constant
+        m_dEntry = m_targetingTab.addPersistent("D", RobotMap.TARGETING_D)       //creates widget with the robotmap constant as a default
+                                 .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
+                                 .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                 .getEntry();  
+
+        //create a widget to display whether we are currently on target
+        m_onTargetEntry = m_targetingTab.add("On Target?", false)               //creates the widget that is false by default as by default we are not on target
+                                        .withWidget(BuiltInWidgets.kBooleanBox) //set widget to a boolean box to easily display the value
+                                        .getEntry();
     }
 }
