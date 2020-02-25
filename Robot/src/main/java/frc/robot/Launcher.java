@@ -224,11 +224,12 @@ public class Launcher {
     }
 
     /**
-     * toString method containing motor, encoder, adjustmentValue, current speed and current error
+     * toString method containing motor ID and inversion and encoder position
      * 
      * @return the state of the Launcher object summarized in a string
      */
     public String toString() {
-        return "Motor: " + m_masterMotor.toString() + " | Encoder: "+ m_encoder.toString();
+        return "Motor ID: " + m_masterMotor.getDeviceID() + ", Motor Inversion: " + m_masterMotor.getInverted()
+                + " | Encoder Position: "+ m_encoder.getQuadraturePosition();
     }
 }
