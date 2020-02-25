@@ -28,11 +28,6 @@ import frc.robot.PilotController.DriveType;
  * @version 1/25/2019
  */
 public class Robot extends TimedRobot {
-    /**
-   * This function is run when the robot is first started up and should be used
-   * for any initialization code.
-   */
-
   //declares our launcher system and our controls for that system over the launcher tab
   Launcher m_launcher;
   ShuffleboardLauncherControl m_launcherControl;
@@ -75,9 +70,12 @@ public class Robot extends TimedRobot {
 
     //sets up our camera testing tab
     shuffleboardConfig();
-    
   }
 
+  /**
+   * This function is run when the robot is first started up and should be used
+   * for any initialization code.
+   */
   @Override
   public void robotInit() {
     //zeros used motor controllers

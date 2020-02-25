@@ -23,6 +23,9 @@ public class RobotMap {
     //*        DRIVETRAIN CONSTANTS          *
     //*                                      *
     //****************************************
+    //Whether the drivetrain has two solenoids
+    public static final boolean DRIVETRAIN_HAS_TWO_SOLENOIDS = true;
+    
     //Drivetrain, turning, and velocity gains
     public static final Gains DRIVETRAIN_GAINS = new Gains(0.3, 0.0, 0.0, 0.0, 100, 1.0);
     public static final Gains GAINS_TURNING = new Gains(0.1, 0.0, 0.0, 0.0, 200, 1.0);

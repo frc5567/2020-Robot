@@ -48,7 +48,10 @@ public class PilotController {
     private XboxController m_controller;
     private Drivetrain m_drivetrain;
 
+    //declare the targeting object used to lock-on to the vision target
     private LimelightTargeting m_limelightTargeting;
+
+    //declare the drive control type
     private final DriveType m_driveType;
 
     //scalars and network table entries to scale our input on our drivetrain
@@ -88,14 +91,13 @@ public class PilotController {
 
     /**
      * Creates an object to allow the pilot to control the drivetrain
-     * <p>this constructor instantiates its own xbox controller based on the RobotMap port value
+     * <p>this constructor instantiates its own xbox controller, drivetrain, and targeting object
      * 
      * @param driveType The type of drive control that the pilot wants (tank or arcade)
      * @param limelight the limelight reader used for targeting
-     * @param Robot the current robot for the instantiating the targeting class
      */
     public PilotController(DriveType driveType, LimelightReader limelight) {
-        m_drivetrain = new Drivetrain(true);
+        m_drivetrain = new Drivetrain(RobotMap.DRIVETRAIN_HAS_TWO_SOLENOIDS);
         m_driveType = driveType;
         m_limelightTargeting = new LimelightTargeting(m_drivetrain, limelight);
 
