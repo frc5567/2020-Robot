@@ -242,24 +242,24 @@ public class PilotController {
      * @return the adjusted value for the deadband
      */
     public double adjustForDeadband(double stickInput) {
-        //if our input is less than our deadband, ignore it by setting the input to zero
-        if (Math.abs(stickInput) < RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            stickInput = 0;
-        }
+        //grab the absolute value of the stick input to reduce comparisons
+        double absoluteStickInput = Math.abs(stickInput);
 
-        //correct input so that just barely over the deadband is just barely over zero
-        //effectively this centers our input on zero rather than on 0+/- deadband
-        if (stickInput > RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            stickInput -= RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
+        //if our absolute stick input is withing our deadband, we set it equal to zero and early exit
+        if (absoluteStickInput < RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
+            return 0;
         }
-        else if (stickInput < -RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            stickInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
+        //otherwise, if we're outside of the deadband
+        else {
+            //reduce the input of the stick by the deadband to center the output on zero to prevent jumps
+            absoluteStickInput -= RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
+
+            //then we assign the original sign to the modified input
+            stickInput = Math.copySign(absoluteStickInput, stickInput);
+
+            //then we output the stick input scaled to cover the whole range of values from 0 to 1
+            return stickInput / (1.0 - RobotMap.PILOT_CONTROLLER_STICK_DEADBAND);
         }
-
-        //this scales our input back to a 0 to 1.0 scale
-        stickInput /= (1.0 - RobotMap.PILOT_CONTROLLER_STICK_DEADBAND);
-
-        return stickInput;
     }
 
     /**
