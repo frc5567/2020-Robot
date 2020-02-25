@@ -25,7 +25,7 @@ public class RobotMap {
     //****************************************
     //Whether the drivetrain has two solenoids
     public static final boolean DRIVETRAIN_HAS_TWO_SOLENOIDS = true;
-    
+
     //Drivetrain, turning, and velocity gains
     public static final Gains DRIVETRAIN_GAINS = new Gains(0.3, 0.0, 0.0, 0.0, 100, 1.0);
     public static final Gains GAINS_TURNING = new Gains(0.1, 0.0, 0.0, 0.0, 200, 1.0);
@@ -36,9 +36,10 @@ public class RobotMap {
     
     //PIDF constants----Could change
     public static final double PID_INPUT_RANGE = 180.00;
-    public static final double PID_OUTPUT_RANGE = 180.00;
+
+    //TODO: Arbitrary
+    public static final double ROTATE_PID_INTEGRATOR_RANGE = 0.10;
     public static final double TOLERANCE_ROTATE_CONROLLER = 2.00;
-    public static final double FINISHED_PID_THRESHOLD = 0.15;
 
     public static final int TIMEOUT_MS = 30;
     public static final int RIGHT_PERIOD_MS = 20;
