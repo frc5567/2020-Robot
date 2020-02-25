@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
+
 /**
  * A collection of constants for our robot
  * @version 1/25/2019
@@ -22,7 +24,7 @@ public class RobotMap {
     //*                                      *
     //****************************************
     //Drivetrain, turning, and velocity gains
-    public static final Gains  DRIVETRAIN_GAINS = new Gains(0.3, 0.0, 0.0, 0.0, 100, 1.0);
+    public static final Gains DRIVETRAIN_GAINS = new Gains(0.3, 0.0, 0.0, 0.0, 100, 1.0);
     public static final Gains GAINS_TURNING = new Gains(0.1, 0.0, 0.0, 0.0, 200, 1.0);
     public static final Gains GAINS_VELOCIT = new Gains(0.1, 0.0, 0.0, 0.0, 300, 1.0);
 
@@ -34,7 +36,6 @@ public class RobotMap {
     public static final double PID_OUTPUT_RANGE = 180.00;
     public static final double TOLERANCE_ROTATE_CONROLLER = 2.00;
     public static final double FINISHED_PID_THRESHOLD = 0.15;
-    public static final int PID_PRIMARY = 0;
 
     public static final int TIMEOUT_MS = 30;
     public static final int RIGHT_PERIOD_MS = 20;
@@ -44,7 +45,7 @@ public class RobotMap {
     public static final double DRIVE_MAX_QUICK_TURN_SPEED = 0.1;
     public static final double AUTO_SPEED = 0.2;
 
-  public static final double PERCENT_DEADBAND = 0.001;
+    public static final double PERCENT_DEADBAND = 0.001;
 
     public static final double SCALE_FEEDBACK_COEFFICIENT_VALUE = 0.5;
 
@@ -113,7 +114,10 @@ public class RobotMap {
     public static final int MASTER_LAUNCHER_ID = 21;
     public static final int CLOSE_LAUNCHER_SLAVE_ID = 22;
     public static final int FAR_LAUNCHER_SLAVE1_ID = 23;
-    public static final int FAR_LAUNCHER_SLAVE2_ID = 24;
+	public static final int FAR_LAUNCHER_SLAVE2_ID = 24;
+	
+	//inversion for master motor
+	public static final boolean LAUNCHER_MASTER_INVERTED = false;
 
     //inversion for far slave motors
     //one of these should be inverted based on testing, currently unsure which one
@@ -122,7 +126,9 @@ public class RobotMap {
 
     //adjustment value for the launcher percent control
     //0.5 is pretty arbitrary, it is the value that was used for initial launcher testing
-    public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
+	public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
+	
+	public static final VelocityMeasPeriod VELOCITY_MEASUREMENT_PERIOD = VelocityMeasPeriod.Period_10Ms;
 
     //the launcher timeout for running confing methods
     public static final int LAUNCHER_CONFIG_TIMEOUT_MS = 30;
@@ -262,6 +268,7 @@ public class RobotMap {
     //****************************************
     public static final int PCM_CAN_ID = 20;
 	public static final int CYCLES_TO_MOVE_BALL_ONE_POSITION = 30;
+	public static final int PID_PRIMARY_SLOT = 0;
 
 
 }

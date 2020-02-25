@@ -176,7 +176,7 @@ public class Drivetrain {
         /** Feedback Sensor Configuration */
 
         //Configure the left Talon's selected sensor to a Quad encoder
-        m_masterLeftMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, RobotMap.PID_PRIMARY, RobotMap.TIMEOUT_MS);
+        m_masterLeftMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, RobotMap.PID_PRIMARY_SLOT, RobotMap.TIMEOUT_MS);
 
         // Setup Sum Signal to be used for Distance
         //Feedback Device of Remote Talon

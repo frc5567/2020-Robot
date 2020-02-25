@@ -58,6 +58,9 @@ public class Climber {
         //sets starting position on object contruction
         //object construction should occur in RobotInit or in Robot contructor
         m_startingPosition = m_extensionEncoder.getQuadraturePosition();
+
+        //config the extension talon to run via motion magic
+        configExtensionMotionMagic();
     }
 
     /**
@@ -204,21 +207,6 @@ public class Climber {
         //sets our closed loop control to use our primary PID slot
         m_extensionMotor.selectProfileSlot(0, 0);
     }
-  
-    /**
-     * Resets the encoder
-     * Sets the position of the encoders to zero maunally to zero it
-     */
-    public void encoderReset() {
-        m_extensionEncoder.setQuadraturePosition(0, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
-    }
-
-    /**
-     * @return The value returned by the extension encoder
-     */
-    public int getExtensionEncoderValue() {
-      return m_extensionEncoder.getQuadraturePosition();
-    }
 
     /**
      * Sets both motors' speeds to zero
@@ -261,6 +249,28 @@ public class Climber {
      */
     public SensorCollection getExtensionEncoder() {
         return m_extensionEncoder;
+    }
+
+    /**
+     * @return The position returned by the extension encoder
+     */
+    public int getExtensionEncoderPosition() {
+        return m_extensionEncoder.getQuadraturePosition();
+      }
+  
+    /**
+     * @return The velocity returned by the extension encoder
+     */
+    public int getExtensionEncoderVelocity() {
+        return m_extensionEncoder.getQuadratureVelocity();
+    }
+      
+    /**
+     * Resets the encoder
+     * Sets the position of the encoders to zero maunally to zero it
+     */
+    public void encoderReset() {
+        m_extensionEncoder.setQuadraturePosition(0, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
     }
 
     /**
