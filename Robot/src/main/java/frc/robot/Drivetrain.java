@@ -25,10 +25,25 @@ import com.ctre.phoenix.motorcontrol.InvertType;
  * @version 2/21/2020
  */
 public class Drivetrain {
-    //Declares an enum for determining the position of the double solenoid. 
+    /**
+     * This enum stores the possible gears for the drivetrain
+     * <p>Possible values:
+     * <li>{@link #kLowGear}</li>
+     * <li>{@link #kHighGear}</li>
+     * <li>{@link #kHighGear}</li>
+     */
     public enum Gear{
+        /**
+         * The low speed, high torque gear achieved with the double solenoids in reverse position
+         */
         kLowGear("Low Gear"), 
+        /**
+         * The high speed, low torque gear achieved with the double solenoids in forward position
+         */
         kHighGear("High Gear"),
+        /**
+         * The gear upon robot initialization, and it should only be in this gear until the first change
+         */
         kUnknown("Unknown");
 
         private String gearName;
@@ -106,6 +121,7 @@ public class Drivetrain {
         //configures the drivetrain
         configDriveTrain();
 
+        //set our initital gear to unkwown, this allows for gear switching to either gear initially
         m_gear = Gear.kUnknown; 
     }
 
@@ -206,6 +222,19 @@ public class Drivetrain {
     }
 
     /**
+     * An arcade drive using the integrated velocity PID on the talons
+     * @param forward -1.0 to 1.0, the speed at which you want the robot to move forward
+     * @param turn turn -1.0 to 1.0, the rate of rotation
+     * @param setter If this is true, use speed setters to adjust a speed and conserve battery. If false, use raw input
+     */
+    public void arcadeDrive (double forward, double turn) {
+        m_masterLeftMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
+        m_masterRightMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
+        m_slaveLeftMotor.follow(m_masterLeftMotor);
+        m_slaveRightMotor.follow(m_masterRightMotor);
+    }
+
+    /**
      * Rotates to a set angle without moving forward utilizing the PID and AHRS
      * 
      * @param targetAngle The angle you want the robot to rotate to
@@ -234,24 +263,11 @@ public class Drivetrain {
     }
 
     /**
-     * An arcade drive using the integrated velocity PID on the talons
-     * @param forward -1.0 to 1.0, the speed at which you want the robot to move forward
-     * @param turn turn -1.0 to 1.0, the rate of rotation
-     * @param setter If this is true, use speed setters to adjust a speed and conserve battery. If false, use raw input
-     */
-    public void arcadeDrive (double forward, double turn) {
-        m_masterLeftMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
-        m_masterRightMotor.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
-        m_slaveLeftMotor.follow(m_masterLeftMotor);
-        m_slaveRightMotor.follow(m_masterRightMotor);
-    }
-
-    /**
      * Returns the encoder position of the drivetrain left side encoder
      * @return The position of the left side encoder
      */
     public int getLeftDriveEncoderPosition(){
-        return m_leftDriveEncoder.getQuadraturePosition();
+        return m_masterLeftMotor.getSelectedSensorPosition();
     }
 
     /**
@@ -259,7 +275,7 @@ public class Drivetrain {
      * @return The position of the right side encoder
      */
     public int getRightDriveEncoderPosition() {
-        return m_rightDriveEncoder.getQuadraturePosition();
+        return m_masterRightMotor.getSelectedSensorPosition();
     }
 
     /**
@@ -267,7 +283,7 @@ public class Drivetrain {
      * @return The velocity of the left side encoder
      */
     public int getLeftDriveEncoderVelocity(){
-        return m_leftDriveEncoder.getQuadratureVelocity();
+        return m_masterLeftMotor.getSelectedSensorVelocity();
     }
 
     /**
@@ -275,7 +291,7 @@ public class Drivetrain {
      * @return The velocity of the right side encoder
      */
     public int getRightDriveEncoderVelocity(){
-        return m_rightDriveEncoder.getQuadratureVelocity();
+        return m_masterRightMotor.getSelectedSensorVelocity();
     }
 
     /**
@@ -283,6 +299,13 @@ public class Drivetrain {
      */
     public Gear getGear(){
         return m_gear;
+    }
+
+    /**
+     * @return the gyro that we use for heading
+     */
+    public NavX getGyro() {
+        return m_gyro;
     }
 
     /**
