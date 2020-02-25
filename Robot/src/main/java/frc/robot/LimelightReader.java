@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * This class has methods to make reading information from the network table easier and more readable
@@ -13,10 +14,10 @@ public class LimelightReader {
 
     /**
      * Constructor for our limelight reader object
-     * @param limelightTable The network table that stores limelight data
      */
-    public LimelightReader(NetworkTable limelightTable) {
-        m_limelightTable = limelightTable;
+    public LimelightReader() {
+        //pull the network table that the limelight publishes data to to a specific variable
+        m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     }
 
     /**
@@ -40,8 +41,11 @@ public class LimelightReader {
      * @return The adjusted degrees to the inner target
      */
     public double getModifiedDegreesToTarget() {
-        // Sets targetAngle to tx the degrees off from center in the x direction
-        double targetAngle = m_limelightTable.getEntry("tx").getDouble(0);
+        // Sets targetAngle to tx, the degrees off from center in the x direction
+        //this is inverted to play nice with our PID
+        //Since our PID treats the returned angle as our "current" and zero as our setpoint,
+        //we have to invert the angle to make the PID turn the robot in the right direction
+        double targetAngle = -getRawDegreesToTarget();
         
         // Sets a variable equal to the targets skew
         double targetSkew = getSkew();

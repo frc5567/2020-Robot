@@ -25,8 +25,24 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 public class Drivetrain {
     //Declares an enum for determining the position of the double solenoid. 
     public enum Gear{
-        kLowGear, 
-        kHighGear;
+        kLowGear("Low Gear"), 
+        kHighGear("High Gear");
+
+        private String gearName;
+
+        /**
+         * @param gearnName The name of the gear
+         */
+        Gear(String gearName) {
+            this.gearName = gearName;
+        }
+
+        /**
+         * Returns the position object represented as a string
+         */
+        public String toString() {
+            return this.gearName;
+        }
     }
 
     //Declares the NavX for rotational control
@@ -160,7 +176,7 @@ public class Drivetrain {
         /** Feedback Sensor Configuration */
 
         //Configure the left Talon's selected sensor to a Quad encoder
-        m_masterLeftMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, RobotMap.PID_PRIMARY, RobotMap.TIMEOUT_MS);
+        m_masterLeftMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, RobotMap.PID_PRIMARY_SLOT, RobotMap.TIMEOUT_MS);
 
         // Setup Sum Signal to be used for Distance
         //Feedback Device of Remote Talon

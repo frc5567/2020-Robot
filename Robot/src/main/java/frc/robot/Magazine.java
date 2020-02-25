@@ -1,7 +1,9 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 
@@ -13,9 +15,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class Magazine {
 
     //declare our motor controllers for our belts and the wheel
-    private BaseMotorController m_bottomBelt;
-    private BaseMotorController m_topBelt;
-    private BaseMotorController m_popUpWheel; //TODO: Think of a better name
+    private TalonSRX m_motor;
+
+    //declare encoder for indexing balls
+    private SensorCollection m_encoder;
 
     //declare digital input for the photoelectric sensors
     private DigitalInput m_intakeSensor;
@@ -28,48 +31,33 @@ public class Magazine {
     private boolean m_lastIntakeInput = false;
     private boolean m_lastLaunchInput = false;
 
-    //this counter is used to adjust balls by one position
-    private int m_moveBallsCounter = 0;
-
     /**
      * Constructor for magazine objects
-     * @param bottomBelt The motor controller that controls the bottom belt
-     * @param topBelt The motor controller that controls the top belt
-     * @param popUpWheel The motor controller that drives the wheel which pops the cells into the launcher
+     * @param motor The motor that drives the magazine
      * @param intakeSensor The sensor mounted near the input to index our balls
      * @param launchSensor The sensor mounted near the launchers to tick our count in the magazine down
      */
-    public Magazine(BaseMotorController bottomBelt, BaseMotorController topBelt, BaseMotorController popUpWheel, DigitalInput intakeSensor, DigitalInput launchSensor) {
-        m_bottomBelt = bottomBelt;
-        m_topBelt = topBelt;
-        m_popUpWheel = popUpWheel;
+    public Magazine(TalonSRX motor, DigitalInput intakeSensor, DigitalInput launchSensor) {
+        m_motor = motor;
+        m_encoder = new SensorCollection(m_motor);
 
         m_intakeSensor = intakeSensor;
         m_launchSensor = launchSensor;
     }
 
     /**
-     * Runs both top and bottom belts at a fixed speed, said speed should be tested then defined in robot map
-     * <p>This method should be called whenever we intake a ball to move all units up and when we are shooting
-     * 
+     * Runs the belt at a inputted speed
      * @param speed The percent speed both belts should move at from -1.0 to 1.0
      */
-    public void runBelts(double speed) {
+    public void runBelt(double speed) {
         //sets percent output on both belts
-        m_bottomBelt.set(ControlMode.PercentOutput, speed);
-        m_topBelt.set(ControlMode.PercentOutput, speed);
-    }
-
-    /**
-     * Spins the top wheel to pop a ball into the shooter
-     */
-    public void spinPopUpWheel(double speed) {
-        m_popUpWheel.set(ControlMode.PercentOutput, speed);
+        m_motor.set(ControlMode.PercentOutput, speed);
     }
 
     /**
      * Ticks the number of stored balls up or down based on our sensors
      * <p>This is meant to be run in a periodic method so it can constantly be checking sensors and updating the count
+     * <p>This is very likely completely wrong but I'll leave it here for now
      */
     public void manageStoredBalls() {
         boolean intakeInput = m_intakeSensor.get();
@@ -107,6 +95,27 @@ public class Magazine {
     }
 
     /**
+     * @return the encoder attached to the belts
+     */
+    public SensorCollection getEncoder() {
+        return m_encoder;
+    }
+
+    /**
+     * @return the position of the encoder in ticks
+     */
+    public int getEncoderPosition() {
+        return m_encoder.getQuadraturePosition();
+    }
+
+    /**
+     * @return the velocity of the encoder in encoder ticks per 100ms
+     */
+    public int getEncoderVelocity() {
+        return m_encoder.getQuadratureVelocity();
+    }
+
+    /**
      * @return the number of balls currently in the magazine
      */
     public int getStoredBalls() {
@@ -122,30 +131,16 @@ public class Magazine {
     }
 
     /**
-     * @return the controller for the top belt
+     * @return the controller for the belt
      */
-    public BaseMotorController getTopBeltController() {
-        return m_topBelt;
-    }
-
-    /**
-     * @return the controller for the bottom belt
-     */
-    public BaseMotorController getBottomBeltController() {
-        return m_bottomBelt;
-    }
-
-    /**
-     * @return the controller for the pop-up wheel
-     */
-    public BaseMotorController getPopUpWheelController() {
-        return m_popUpWheel;
+    public BaseMotorController getMotor() {
+        return m_motor;
     }
 
     /**
      * @return the object summarized as a string
      */
     public String toString() {
-        return "Belts (top | bottom): " + m_topBelt.toString() + " | " + m_bottomBelt.toString() + " | Pop-Up Wheel: " + m_popUpWheel.toString();
+        return "Motor: " + m_motor.toString() + " | Encoder: " + m_encoder.toString();
     }
 }
