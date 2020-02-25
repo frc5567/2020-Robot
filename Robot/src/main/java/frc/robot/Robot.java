@@ -108,9 +108,6 @@ public class Robot extends TimedRobot {
     m_slaveLeftDriveFalcon = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
     m_slaveRightDriveFalcon = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
 
-    //instantiates currently unused shooter motor
-    // m_intakeMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
-
     //instantiates our test controller
     m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
 
@@ -212,7 +209,7 @@ public class Robot extends TimedRobot {
         
   @Override
   public void teleopPeriodic() {
-      m_pilotController.controlDriveTrain(setter);
+      m_pilotController.controlDriveTrain();
   }
 
   @Override
@@ -225,7 +222,7 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     
     //check to see where this goes
-    m_driveTrain.arcadeDrive((m_driveController.getTriggerAxis(Hand.kRight) - m_driveController.getTriggerAxis(Hand.kLeft)), m_driveController.getX(Hand.kLeft), true);
+    m_driveTrain.arcadeDrive((m_driveController.getTriggerAxis(Hand.kRight) - m_driveController.getTriggerAxis(Hand.kLeft)), m_driveController.getX(Hand.kLeft));
     
     //sets the velocity of the launcher while holding the b button
     if(m_testController.getBButton()) {
@@ -235,6 +232,17 @@ public class Robot extends TimedRobot {
     else {
       m_shooterControl.zeroSpeed();
     }
+  }
+
+  @Override
+  public void disabledInit() {
+
+  }
+
+  @Override
+  public void disabledPeriodic() {
+      //sets input scalars for drivetrain control
+      m_pilotController.setInputScalar();
   }
 
 }
