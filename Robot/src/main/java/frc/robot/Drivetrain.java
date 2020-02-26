@@ -416,8 +416,8 @@ public class Drivetrain {
         m_masterRightMotor.configPeakOutputReverse(-RobotMap.PEAK_OUTPUT, RobotMap.TIMEOUT_MS);
 
         //motion magic config
-        m_masterRightMotor.configMotionAcceleration(RobotMap.SENSOR_UNIT_PER_100MS_PER_SEC, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.configMotionCruiseVelocity(RobotMap.SENSOR_UNIT_PER_100MS_PER_SEC, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configMotionAcceleration(RobotMap.DRIVE_ACCEL, RobotMap.TIMEOUT_MS);
+        m_masterRightMotor.configMotionCruiseVelocity(RobotMap.DRIVE_CRUISE_SPEED, RobotMap.TIMEOUT_MS);
 
         //FPID Gains for velocity servo
         m_masterRightMotor.config_kP(0, RobotMap.DRIVETRAIN_GAINS.kP, RobotMap.TIMEOUT_MS);

@@ -87,12 +87,9 @@ public class LimelightReader {
      * @return The horizontal distance from the robot to the target
      */
     public double getDistance(double cameraDegreesFromGround) {
-        //calculates and reports the distance from the robot to the base of the target
-        double netHeight = (RobotMap.TARGET_HEIGHT_INCHES - RobotMap.CAMERA_HEIGHT_INCHES);
-
         //The Pi/180 calc is a conversion from degrees to radians so that the Math.tan() method returns the correct value
-        double lengthToHeightRatio = Math.tan((Math.PI / 180) * (cameraDegreesFromGround + getYDegreesToTarget()));
-        return (netHeight / lengthToHeightRatio);
+        double lengthToHeightRatio = Math.tan(RobotMap.DEG_TO_RAD_CONVERSION * (cameraDegreesFromGround + getYDegreesToTarget()));
+        return (RobotMap.NET_HEIGHT_INCHES / lengthToHeightRatio);
     }
 
 }
