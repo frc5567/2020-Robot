@@ -230,6 +230,6 @@ public class Launcher {
      */
     public String toString() {
         return "Motor ID: " + m_masterMotor.getDeviceID() + ", Motor Inversion: " + m_masterMotor.getInverted()
-                + " | Encoder Position: "+ m_encoder.getQuadraturePosition();
+        + ", Current Output (percent): " + m_masterMotor.getMotorOutputPercent()+ " | Encoder Position: "+ m_encoder.getQuadraturePosition();
     }
 }
