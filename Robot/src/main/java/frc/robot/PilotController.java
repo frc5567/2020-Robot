@@ -16,16 +16,29 @@ import frc.robot.Drivetrain.Gear;
 public class PilotController {
     /**
      * Enum to indicate different control systems
+     * <p>Possible values:
+     * <li>{@link #kTank}</li>
+     * <li>{@link #kArcade}</li>
      */
     public enum DriveType {
-        kTank, kArcade;
+        /** 
+         * A tank drive system where the user inputs drive speed to the left and right halves
+         * of the drivetrain individually
+         */
+        kTank,
+
+        /**
+         * An arcade drive system where the user inputs a linear speed and a rotation speed
+         * which controls the whole drivetrain as a unit
+         */ 
+        kArcade;
     }
 
     //declare our drivetrain and our controller
     private XboxController m_controller;
     private Drivetrain m_drivetrain;
 
-    private LauncherTargeting m_launcherTargeting;
+    private LimelightTargeting m_limelightTargeting;
     private final DriveType m_driveType;
 
     //scalars and network table entries to scale our input on our drivetrain
@@ -40,6 +53,10 @@ public class PilotController {
     private NetworkTableEntry m_lowGearTurnScalarEntry;
     private ShuffleboardTab m_driverTab;
 
+    //these variables allow us to reduce the amount of logic on every cycle
+    //we set this value everytime we switch gears
+    private double m_currentVelocityScalar = RobotMap.DRIVE_DEFAULT_INPUT_SCALAR;
+    private double m_currentTurnScalar = RobotMap.DRIVE_DEFAULT_INPUT_SCALAR;
 
     /**
      * Creates an object to allow the pilot to control the drivetrain
@@ -47,35 +64,42 @@ public class PilotController {
      * @param controller The pilot controller to control the drive train with
      * @param drivetrain The robot drivetrain
      * @param driveType The type of drive control that the pilot wants (tank or arcade)
-     * @param launcherTargting The targeting object used to lock on to our target
+     * @param limelightTargting The targeting object used to lock on to our target
      */
-    public PilotController(XboxController controller, Drivetrain drivetrain, DriveType driveType, LauncherTargeting launcherTargeting) {
+    public PilotController(XboxController controller, Drivetrain drivetrain, DriveType driveType, LimelightTargeting limelightTargeting) {
         m_controller = controller;
         m_drivetrain = drivetrain;
         m_driveType = driveType;
-        m_launcherTargeting = launcherTargeting;
+        m_limelightTargeting = limelightTargeting;
 
-        //Put drive control scalars onto the shuffleboard for editing mid drive
-        m_driverTab = Shuffleboard.getTab("Driver Tab");
-        m_highGearVelocityScalarEntry = m_driverTab.addPersistent("High Gear Speed Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
-                                        .withWidget(BuiltInWidgets.kTextView)
-                                        .getEntry();
+        //puts input scalar widgets on the shuffleboard
+        shuffleboardConfig();
+    }
 
-        m_highGearTurnScalarEntry = m_driverTab.addPersistent("High Gear Turn Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
-                                        .withWidget(BuiltInWidgets.kTextView)
-                                        .getEntry();
+    /**
+     * Creates an object to allow the pilot to control the drivetrain
+     * <p>this constructor instantiates its own xbox controller based on the RobotMap port value
+     * 
+     * @param drivetrain The robot drivetrain
+     * @param driveType The type of drive control that the pilot wants (tank or arcade)
+     * @param limelightTargting The targeting object used to lock on to our target
+     */
+    public PilotController(Drivetrain drivetrain, DriveType driveType, LimelightTargeting limelightTargeting) {
+        m_drivetrain = drivetrain;
+        m_driveType = driveType;
+        m_limelightTargeting = limelightTargeting;
 
-        m_lowGearVelocityScalarEntry = m_driverTab.addPersistent("Low Gear Speed Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
-                                        .withWidget(BuiltInWidgets.kTextView)
-                                        .getEntry();
+        //instantiate xbox controller for controlling the drivetrain
+        m_controller = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
 
-        m_lowGearTurnScalarEntry = m_driverTab.addPersistent("Low Gear Turn Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
-                                        .withWidget(BuiltInWidgets.kTextView)
-                                        .getEntry();
+        //puts input scalar widgets on the shuffleboard
+        shuffleboardConfig();
     }
 
     /**
      * Refreshes input scalars based on input from shuffleboard
+     * <p> The driver input is multiplied by input scalars in order to reduce the speed of the system.
+     *     This should be called only while disabled to prevent constant changing of settings mid match
      */
     public void setInputScalar() {
         m_highGearVelocityScalar = m_highGearVelocityScalarEntry.getDouble(RobotMap.DRIVE_DEFAULT_INPUT_SCALAR);
@@ -93,28 +117,12 @@ public class PilotController {
         double velocityInput = (m_controller.getTriggerAxis(Hand.kRight) - m_controller.getTriggerAxis(Hand.kLeft));
         double turnInput =  m_controller.getX(Hand.kLeft);
 
-        //if our input is less than our deadband, ignore it by setting the input to zero
-        if (Math.abs(turnInput) < RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            turnInput = 0;
-        }
+        //adjust our input based on our deadband
+        turnInput = adjustForDeadband(turnInput);
 
-        //correct input so that just barely over the deadband is just barely over zero
-        //effectively this centers our input on zero rather than on 0+/- deadband
-        if (turnInput > RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            turnInput -= RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
-        }
-        else if (turnInput < -RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            turnInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
-        }
-
-        if(m_drivetrain.getGear() == Gear.kHighGear) {
-            velocityInput *= m_highGearVelocityScalar;
-            turnInput *= m_highGearTurnScalar;
-        }
-        else {
-            velocityInput *= m_lowGearVelocityScalar;
-            turnInput *= m_lowGearTurnScalar;
-        }
+        //multiplies our input by our current scalar
+        velocityInput *= m_currentVelocityScalar;
+        turnInput *= m_currentTurnScalar;
 
         //run our drivetrain with the adjusted input
         m_drivetrain.arcadeDrive(velocityInput, turnInput);
@@ -122,64 +130,57 @@ public class PilotController {
 
     /**
      * Controls our drivetrain with a tank control system
-     * Left stick y is left side speed, right stick x is right side speed
+     * Left stick y is left side speed, right stick y is right side speed
      */
     private void tankDrive() {
         //read our current stick input
-        double leftInput =  m_controller.getY(Hand.kLeft);
-        double rightInput =  m_controller.getY(Hand.kRight);
+        //inputs are negative because forward on the stick is naturally negative
+        //so we invert it to make controls match our worldview
+        //we adjust here to make the rest of the method easier to read / debug
+        double leftInput =  -m_controller.getY(Hand.kLeft);
+        double rightInput =  -m_controller.getY(Hand.kRight);
 
-        //if our input is less than our deadband, ignore it by setting the input to zero
-        if (Math.abs(leftInput) < RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            leftInput = 0;
-        }
+        //adjust our stick input for the deadband to remove drift
+        leftInput = adjustForDeadband(leftInput);
+        rightInput = adjustForDeadband(rightInput);
 
-        //correct input so that just barely over the deadband is just barely over zero
-        //effectively this centers our input on zero rather than on 0+/- deadband
-        if (leftInput > RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            leftInput -= RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
-        }
-        else if (leftInput < -RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            leftInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
-        }
+        //scales our left and right sides based on velocity control
+        leftInput *= m_currentVelocityScalar;
+        rightInput *= m_currentVelocityScalar;
 
-        if (Math.abs(rightInput) < RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            rightInput = 0;
-        }
-
-        //correct input so that just barely over the deadband is just barely over zero
-        //effectively this centers our input on zero rather than on 0+/- deadband
-        if (rightInput > RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            rightInput -= RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
-        }
-        else if (rightInput < -RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
-            rightInput += RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
-        }
-
-        //run our drivetrain with the adjusted input
-        //inputs are negative because forward on the stick is naturally negative, so we invert it to make controls intuitive
-        m_drivetrain.tankDrive(-leftInput, -rightInput);
+        //run our drivetrain with the adjusted inputs
+        m_drivetrain.tankDrive(leftInput, rightInput);
     }
 
     /**
      * Sets us to high gear on x button input and low gear on y button input
      */
     private void controlGear() {
-        if (m_controller.getXButtonReleased()) {
+        if (m_controller.getXButtonPressed()) {
+            //set the actual drive gear on the drivetrain
             m_drivetrain.shiftGear(Gear.kHighGear);
+
+            //sets our current scalar to the one used in high gear
+            m_currentVelocityScalar = m_highGearVelocityScalar;
+            m_currentTurnScalar = m_highGearTurnScalar;
         }
-        else if (m_controller.getYButtonReleased()) {
+        else if (m_controller.getYButtonPressed()) {
+            //set the actual drive gear on the drivetrain
             m_drivetrain.shiftGear(Gear.kLowGear);
+
+            //sets our current scalar to the one used in high gear
+            m_currentVelocityScalar = m_lowGearVelocityScalar;
+            m_currentTurnScalar = m_lowGearTurnScalar;
         }
     }
     
     /**
      * Controls all pilot controlled systems
      */
-    public void controlDriveTrain() {
+    public void controlDriveTrainPeriodic() {
         //if the b button is pressed, lock onto the high target
-        if (m_controller.getAButton()) {
-            m_launcherTargeting.target();
+        if (m_controller.getBButton()) {
+            m_limelightTargeting.target();
         }
         //when the b button isn't pressed, run the drive train as normal
         else {
@@ -201,5 +202,55 @@ public class PilotController {
      */
     public Drivetrain getDrivetrain() {
         return m_drivetrain;
+    }
+
+    /**
+     * Take in input from a stick with drift, remove the drift and then scale the input to remove a jump
+     * @param stickInput The direct input from the joystick
+     * @return the adjusted value for the deadband
+     */
+    public double adjustForDeadband(double stickInput) {
+        //grab the absolute value of the stick input to reduce comparisons
+        double absoluteStickInput = Math.abs(stickInput);
+
+        //if our absolute stick input is withing our deadband, we set it equal to zero and early exit
+        if (absoluteStickInput < RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
+            return 0;
+        }
+        //otherwise, if we're outside of the deadband
+        else {
+            //reduce the input of the stick by the deadband to center the output on zero to prevent jumps
+            absoluteStickInput -= RobotMap.PILOT_CONTROLLER_STICK_DEADBAND;
+
+            //then we assign the original sign to the modified input
+            stickInput = Math.copySign(absoluteStickInput, stickInput);
+
+            //then we output the stick input scaled to cover the whole range of values from 0 to 1
+            return stickInput / (1.0 - RobotMap.PILOT_CONTROLLER_STICK_DEADBAND);
+        }
+    }
+
+    /**
+     * instantiates all of our network table entries and displays them under the Driver tab
+     * <p>the point of this method is to move the shuffleboard code out of init/constructor
+     */
+    public void shuffleboardConfig() {
+        //Put drive control scalars onto the shuffleboard for editing mid drive
+        m_driverTab = Shuffleboard.getTab("Driver Tab");
+        m_highGearVelocityScalarEntry = m_driverTab.addPersistent("High Gear Speed Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_highGearTurnScalarEntry = m_driverTab.addPersistent("High Gear Turn Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_lowGearVelocityScalarEntry = m_driverTab.addPersistent("Low Gear Speed Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
+
+        m_lowGearTurnScalarEntry = m_driverTab.addPersistent("Low Gear Turn Scalar", RobotMap.DRIVE_DEFAULT_INPUT_SCALAR)
+                                        .withWidget(BuiltInWidgets.kTextView)
+                                        .getEntry();
     }
 }
