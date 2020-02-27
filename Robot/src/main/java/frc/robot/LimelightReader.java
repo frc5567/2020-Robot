@@ -61,7 +61,10 @@ public class LimelightReader {
                     
                     // Test print outs
                     System.out.println("Inner Target");
-                }else System.out.println("Outer Target");
+                }
+                else {
+                    System.out.println("Outer Target");
+                }
         }
         return targetAngle;
     }
