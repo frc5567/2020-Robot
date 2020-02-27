@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  */
 public class LauncherTargeting {
     //Declare our drivetrain, limelight, and PID controller
-    private ShiftDrive m_drivetrain;
+    private Drivetrain m_drivetrain;
     private LimelightReader m_limelight;
     private PIDController m_targetController;
 
@@ -43,7 +43,7 @@ public class LauncherTargeting {
      * @param limelight The limelight reader that gives us our target
      * @param robot The main Robot that this constructed in
      */
-    public LauncherTargeting(ShiftDrive drivetrain, LimelightReader limelight, Robot robot) {
+    public LauncherTargeting(Drivetrain drivetrain, LimelightReader limelight, Robot robot) {
         m_drivetrain = drivetrain;
         m_limelight = limelight;
         m_robot = robot;
@@ -96,11 +96,14 @@ public class LauncherTargeting {
      * @return Whether we are currently within our acceptable error (on target)
      */
     public boolean target() {
-        //Passes in a speed of zero to keep us from moving, and sets the turn speed to the calculated output of the PID
-        //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
-        //This way the PID controller should target dead center
-        m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0));
-        
+        //Only allows the drivetrain to rotate if it currently has any targets
+        if (m_limelight.hasTargets()) {
+            //Passes in a speed of zero to keep us from moving, and sets the turn speed to the calculated output of the PID
+            //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
+            //This way the PID controller should target dead center
+            m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0) );
+        }
+
         //returns whether the PID believes that we are on target
         return onTarget();
     }
