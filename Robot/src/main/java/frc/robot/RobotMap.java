@@ -40,6 +40,9 @@ public class RobotMap {
 
     /**The default scalar for drive inputs - what we multiply input from drive controller by*/
     public static final double DRIVE_DEFAULT_INPUT_SCALAR = 0.6;
+
+    /**We divide rotational PID output by this number to scale it to match our percent values */
+    public static final double DRIVE_PID_OUTPUT_SCALAR = 180;
     
     /**
      * The possible input range for our rotational PID based on gyro input. 

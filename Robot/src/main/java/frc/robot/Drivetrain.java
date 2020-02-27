@@ -235,6 +235,62 @@ public class Drivetrain {
     }
 
     /**
+     * This method returns the output of the PID controller scaled back to match our expected
+     * drivetrain input range
+     * <p> This method uses the setpoint assigned in setTargetAngle(), or the last set setpoint
+     * @param currentAngle the angle that you are currently at
+     * @return the turn output for the drivetrain
+     */
+    public double scaledPIDOutput(double currentAngle) {
+        return m_rotController.calculate(currentAngle) / RobotMap.DRIVE_PID_OUTPUT_SCALAR;
+    }
+
+    /**
+     * This method returns the output of the PID controller scaled back to match our expected
+     * drivetrain input range
+     * @param currentAngle the angle that you are currently at
+     * @param targetAngle the angle you want to be at
+     * @return the turn output for the drivetrain
+     */
+    public double scaledPIDOutput(double currentAngle, double targetAngle) {
+        return m_rotController.calculate(currentAngle, targetAngle) / RobotMap.DRIVE_PID_OUTPUT_SCALAR;
+    }
+
+    /**
+     * This method sets the passed in angle as our setpoint for holding or rotating to
+     * @param targetAngle the desired setpoint for our rotation PID controller in degrees
+     */
+    public void setTargetAngle(double targetAngle) {
+        //resets the PID controller and clears any prexisting error
+        m_rotController.reset();
+
+        //sets the target for our rotation PID as the passed in target angle
+        m_rotController.setSetpoint(targetAngle);
+    }
+
+    /**
+     * This method sets the setpoint or target for our rotation PID controller to the current angle
+     * <p> This should not be called periodically, as it would constantly reset our PID
+     */
+    public void setTargetAngle() {
+        //resets the PID controller and clears any prexisting error
+        m_rotController.reset();
+
+        //sets the setpoint for the PID to the current angle from our gyro
+        m_rotController.setSetpoint(m_gyro.getAngle());
+    }
+
+    /**
+     * This method holds the target angle based on the angle
+     * TODO:Determine whether or not this should have a more aggresive PID than our normal rotation
+     */
+    public void holdTargetAngle() {
+        //read the current angle and feed it into the PID controller, 
+        //then run the drivetrain based on the output
+        arcadeDrive(0, scaledPIDOutput(m_gyro.getAngle()));
+    }
+
+    /**
      * Rotates to a set angle without moving forward utilizing the PID and AHRS
      * 
      * @param targetAngle The angle you want the robot to rotate to
@@ -252,10 +308,9 @@ public class Drivetrain {
         }
 
         //sets our rotate speed to the return of the PID
-        double returnedRotate = m_rotController.calculate(m_gyro.getOffsetYaw());
+        double returnedRotate = scaledPIDOutput(m_gyro.getOffsetYaw());
 
         //Runs he drivetrain with 0 speed and the rotate speed set by the PID
-        //TODO: this value is currently unscaled. Will need to update with targeting code when that is refined
         arcadeDrive(0, returnedRotate);
 
         //return whether we are currently at our setpoint
@@ -292,6 +347,13 @@ public class Drivetrain {
      */
     public int getRightDriveEncoderVelocity(){
         return m_masterRightMotor.getSelectedSensorVelocity();
+    }
+
+    /**
+     * @return the current setpoint of the PID controller in degrees
+     */
+    public double getTargetAngle() {
+        return m_rotController.getSetpoint();
     }
 
     /**
@@ -455,7 +517,7 @@ public class Drivetrain {
         m_masterRightMotor.selectProfileSlot(1, 1);
     }
 
-    public void setBrake(NeutralMode neutralMode) {
+    public void setNeutralMode(NeutralMode neutralMode) {
         m_masterLeftMotor.setNeutralMode(neutralMode);
         m_masterRightMotor.setNeutralMode(neutralMode);
         m_slaveLeftMotor.setNeutralMode(neutralMode);
