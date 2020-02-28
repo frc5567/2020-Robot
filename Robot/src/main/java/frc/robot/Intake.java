@@ -63,14 +63,14 @@ public class Intake {
     }
 
     //declare our intake motor controllers
-    SpeedController m_outerMotor;
-    BaseMotorController m_innerMotor;
+    private SpeedController m_outerMotor;
+    private BaseMotorController m_innerMotor;
 
     //delcare our position control solenoid
-    DoubleSolenoid m_positionPiston;
+    private DoubleSolenoid m_positionPiston;
 
     //declare our position tracker
-    Position m_position;
+    private Position m_position;
     
     /**
      * Constructor for intake objects
