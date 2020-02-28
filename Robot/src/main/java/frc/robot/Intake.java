@@ -2,9 +2,12 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
@@ -112,7 +115,26 @@ public class Intake {
 
         //then set the solenoids to the raised position
         setPosition(Position.kRaised);
-  }
+    }
+
+    /**
+     * Vertical constructor for the intake
+     * Uses robot map constants for instantation
+     */
+    public Intake() {
+        //the spark is currently set to operate over PWM to reduce can bus traffic
+        m_outerMotor = new PWMSparkMax(RobotMap.INTAKE_PWM_SPARK_PORT);
+        
+        m_innerMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
+
+        m_positionPiston = new DoubleSolenoid(RobotMap.INTAKE_POSITION_PISTON_FORWARD_PORT, RobotMap.INTAKE_POSITION_PISTON_REVERSE_PORT);
+
+        //set our starting position to unknown
+        m_position = Position.kUnknown;
+
+        //then set the solenoids to the raised position
+        setPosition(Position.kRaised);
+    }
 
     /**
      * Sets the speed of the inner intake motor

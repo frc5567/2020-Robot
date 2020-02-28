@@ -9,16 +9,7 @@ package frc.robot;
 
 import java.util.Map;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -37,29 +28,6 @@ import frc.robot.PilotController.DriveType;
  * @version 1/25/2019
  */
 public class Robot extends TimedRobot {
-    /**
-   * This function is run when the robot is first started up and should be used
-   * for any initialization code.
-   */
-
-  //declares our drivetrain motor controllers
-  TalonFX m_masterLeftDriveFalcon;
-  TalonFX m_masterRightDriveFalcon;
-  TalonFX m_slaveLeftDriveFalcon;
-  TalonFX m_slaveRightDriveFalcon;
-
-  //declare the gyroscope used to rotate our drivetrain and monitor heading
-  NavX m_gyro;
-
-  //declare the launcher motor controllers
-  TalonSRX m_masterLauncher;
-
-  /**the launcher slave motor on the same side of the launcher as the master */
-  VictorSPX m_closeLauncherSlave;
-
-  /**the launcher slave motors on the opposite side of the launcher from the master */
-  VictorSPX m_farLauncherSlave1, m_farLauncherSlave2;
-
   //declares our launcher system and our controls for that system over the launcher tab
   Launcher m_launcher;
   ShuffleboardLauncherControl m_launcherControl;
@@ -71,22 +39,12 @@ public class Robot extends TimedRobot {
   /** The class that we wrote to read values from the controller and control the drivetrain */
   PilotController m_pilotController;
 
-  //our two speed drivetrain
-  Drivetrain m_drivetrain;
-
-  //declare the solenoids for controlling the drive gear
-  DoubleSolenoid m_leftPiston;
-  DoubleSolenoid m_rightPiston;
-
   //toggle for the limelight
   //control for toggling the limelight should be moved to either limelight reader or pilot controller
   boolean m_isDriverCamera;
 
   //declare our limelight reader object
   LimelightReader m_limelightReader;
-
-  //declare our limelight targeting object
-  LimelightTargeting m_limelightTargeting;
 
   //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
   //this tab is exclusivly for testing, but could still be moved into limelight targeting test mode
@@ -97,70 +55,30 @@ public class Robot extends TimedRobot {
   private NetworkTableEntry m_distance;
 
   public Robot() {
-    //instantiates master motors for drive
-    m_masterLeftDriveFalcon = new TalonFX(RobotMap.MASTER_LEFT_FALCON_ID);
-    m_masterRightDriveFalcon = new TalonFX(RobotMap.MASTER_RIGHT_FALCON_ID);
-
-    //instantiates slave motors for drive
-    m_slaveLeftDriveFalcon = new TalonFX(RobotMap.SLAVE_LEFT_FALCON_ID);
-    m_slaveRightDriveFalcon = new TalonFX(RobotMap.SLAVE_RIGHT_FALCON_ID);
-
-    //instantiate double solenoids for gear shifting
-    m_leftPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.LEFT_SOLENOID_FORWARD_PORT, RobotMap.LEFT_SOLENOID_REVERSE_PORT);
-    m_rightPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.RIGHT_SOLENOID_FORWARD_PORT, RobotMap.RIGHT_SOLENOID_REVERSE_PORT);
-
-    //instantiate drivetrain object
-    m_drivetrain = new Drivetrain(m_masterLeftDriveFalcon, m_masterRightDriveFalcon, m_slaveLeftDriveFalcon, m_slaveRightDriveFalcon, m_leftPiston, m_rightPiston, true);
-
-    //runs the configure method on the drivetrain. 
-    //This method should be moved into the drivetrain contstructor, when it is this should be removed
-    m_drivetrain.configDriveTrain();
-
     //instantiates our test controller
     m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
 
     //instantiate launcher motor controllers and shuffleboard control for those motors
-    m_masterLauncher = new TalonSRX(RobotMap.MASTER_LAUNCHER_ID);
-    m_closeLauncherSlave = new VictorSPX(RobotMap.CLOSE_LAUNCHER_SLAVE_ID);
-    m_farLauncherSlave1 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE1_ID);
-    m_farLauncherSlave2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
-
-    m_launcher = new Launcher(m_masterLauncher, m_closeLauncherSlave, m_farLauncherSlave1, m_farLauncherSlave2);
+    m_launcher = new Launcher();
     m_launcherControl = new ShuffleboardLauncherControl(m_launcher);
 
-    //catch an error on instantiating the navX if it is not plugged in
-    //Note that we do not actually handle this error, we just prevent the robot from crashing here
-    try {
-        m_gyro = new NavX(SPI.Port.kMXP);
-    } catch (RuntimeException ex) {
-        System.out.println("Error instantiating navX MXP");
-    }
-
-    //create an object to read values off of our limelight
-    m_limelightReader = new LimelightReader();
-
-    //create our targeting object
-    //"this" is the current robot, we pass it in so that the targeting can see what periodic function we are in
-    m_limelightTargeting = new LimelightTargeting(m_drivetrain, m_limelightReader);
-
     //intantiates our PilotController, which controls all systems on the drivetrain
-    m_pilotController = new PilotController(m_drivetrain, DriveType.kArcade, m_limelightTargeting);
+    m_pilotController = new PilotController(DriveType.kArcade, m_limelightReader);
     
     //sets our default state to the vision pipeline
     m_isDriverCamera = false;
 
     //sets up our camera testing tab
     shuffleboardConfig();
-    
   }
 
+  /**
+   * This function is run when the robot is first started up and should be used
+   * for any initialization code.
+   */
   @Override
   public void robotInit() {
     //zeros used motor controllers
-    m_masterLeftDriveFalcon.set(ControlMode.PercentOutput, 0);
-    m_masterRightDriveFalcon.set(ControlMode.PercentOutput, 0);
-    m_masterLeftDriveFalcon.set(ControlMode.PercentOutput, 0);
-    m_masterRightDriveFalcon.set(ControlMode.PercentOutput, 0);
   }
 
 

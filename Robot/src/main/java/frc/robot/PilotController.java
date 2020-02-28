@@ -25,20 +25,33 @@ public class PilotController {
          * A tank drive system where the user inputs drive speed to the left and right halves
          * of the drivetrain individually
          */
-        kTank,
+        kTank("Tank Drive"),
 
         /**
          * An arcade drive system where the user inputs a linear speed and a rotation speed
          * which controls the whole drivetrain as a unit
          */ 
-        kArcade;
+        kArcade("Arcade Drive");
+
+        private final String driveName;
+
+        DriveType(String driveName) {
+            this.driveName = driveName;
+        }
+
+        public String toString() {
+            return this.driveName;
+        }
     }
 
     //declare our drivetrain and our controller
     private XboxController m_controller;
     private Drivetrain m_drivetrain;
 
+    //declare the targeting object used to lock-on to the vision target
     private LimelightTargeting m_limelightTargeting;
+
+    //declare the drive control type
     private final DriveType m_driveType;
 
     //scalars and network table entries to scale our input on our drivetrain
@@ -78,16 +91,15 @@ public class PilotController {
 
     /**
      * Creates an object to allow the pilot to control the drivetrain
-     * <p>this constructor instantiates its own xbox controller based on the RobotMap port value
+     * <p>this constructor instantiates its own xbox controller, drivetrain, and targeting object
      * 
-     * @param drivetrain The robot drivetrain
      * @param driveType The type of drive control that the pilot wants (tank or arcade)
-     * @param limelightTargting The targeting object used to lock on to our target
+     * @param limelight the limelight reader used for targeting
      */
-    public PilotController(Drivetrain drivetrain, DriveType driveType, LimelightTargeting limelightTargeting) {
-        m_drivetrain = drivetrain;
+    public PilotController(DriveType driveType, LimelightReader limelight) {
+        m_drivetrain = new Drivetrain(RobotMap.DRIVETRAIN_HAS_TWO_SOLENOIDS);
         m_driveType = driveType;
-        m_limelightTargeting = limelightTargeting;
+        m_limelightTargeting = new LimelightTargeting(m_drivetrain, limelight);
 
         //instantiate xbox controller for controlling the drivetrain
         m_controller = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
@@ -202,6 +214,28 @@ public class PilotController {
      */
     public Drivetrain getDrivetrain() {
         return m_drivetrain;
+    }
+
+    /**
+     * @return the pilot xbox controller
+     */
+    public XboxController getController() {
+        return m_controller;
+    }
+
+    /**
+     * @return the targeting object that rotates based on limelight
+     */
+    public LimelightTargeting getTargeting() {
+        return m_limelightTargeting;
+    }
+
+    /**
+     * @return the current control system
+     * @see frc.robot.PilotController.DriveType DriveType
+     */
+    public DriveType getDriveType() {
+        return m_driveType;
     }
 
     /**

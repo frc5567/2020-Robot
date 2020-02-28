@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedController;
 
 /**
@@ -51,6 +52,28 @@ public class Climber {
         m_extensionMotor = extensionMotor;
         m_liftMotor = liftMotor;
         m_adjustmentValue = adjustmentValue;
+
+        //sets our encoders to the encoders plugged into the talons
+        m_extensionEncoder = new SensorCollection(m_extensionMotor);
+
+        //sets starting position on object contruction
+        //object construction should occur in RobotInit or in Robot contructor
+        m_startingPosition = m_extensionEncoder.getQuadraturePosition();
+
+        //config the extension talon to run via motion magic
+        configExtensionMotionMagic();
+    }
+
+    /**
+     * Vertical constructor with robot map constants
+     */
+    public Climber() {
+        //instantiate instance variables
+        m_extensionMotor = new TalonSRX(RobotMap.EXTENSION_MOTOR_ID);
+        m_liftMotor = new PWMSparkMax(RobotMap.LIFT_MOTOR_PORT);
+
+        //using the launcher value temporarily, needs to be fixed
+        m_adjustmentValue = RobotMap.CLIMBER_ADJUSTMENT_VALUE;
 
         //sets our encoders to the encoders plugged into the talons
         m_extensionEncoder = new SensorCollection(m_extensionMotor);

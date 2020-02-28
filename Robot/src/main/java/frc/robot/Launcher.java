@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 /**
  * A launcher that uses one or multiple motors to launch a projectile
@@ -55,6 +56,28 @@ public class Launcher {
 
         //Sets the far motors to be inverted so that they don't work against the close ones
         //TODO: Inversion MUST be checked individually prior to testing
+        m_farSlaveMotor1.setInverted(RobotMap.LAUNCHER_FAR_SLAVE1_INVERTED);
+        m_farSlaveMotor2.setInverted(RobotMap.LAUNCHER_FAR_SLAVE2_INVERTED);
+
+        //Instantiates the encoder as the encoder plugged into the master
+        m_encoder = new SensorCollection(m_masterMotor);
+
+        //run the config methods to set up velocity control
+        configVelocityControl();
+    }
+
+    /**
+     * Constructor for robot objects
+     * <p> This instantiates a launcher using the robot map constants rather than parameters
+     */
+    public Launcher() {
+        //instantiate motors and djustment value using robot map constants
+        m_masterMotor = new TalonSRX(RobotMap.MASTER_LAUNCHER_ID);
+        m_closeSlaveMotor = new VictorSPX(RobotMap.CLOSE_LAUNCHER_SLAVE_ID);
+        m_farSlaveMotor1 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE1_ID);
+        m_farSlaveMotor2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
+
+        //Sets the far motors to be inverted so that they don't work against the close ones
         m_farSlaveMotor1.setInverted(RobotMap.LAUNCHER_FAR_SLAVE1_INVERTED);
         m_farSlaveMotor2.setInverted(RobotMap.LAUNCHER_FAR_SLAVE2_INVERTED);
 
