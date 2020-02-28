@@ -46,25 +46,28 @@ public class LimelightReader {
         //Since our PID treats the returned angle as our "current" and zero as our setpoint,
         //we have to invert the angle to make the PID turn the robot in the right direction
         double targetAngle = -getRawDegreesToTarget();
-        
-        // Sets a variable equal to the targets skew
-        double targetSkew = getSkew();
+        double targetSkew;
+        try{
+            // Sets a variable equal to the targets skew
+            targetSkew = getAdjustedSkew();
+        }
+        catch (Exception e) {
+            //if the skew is invalid, print our that is is invalid
+            System.out.println("Invalid Skew Reading");
+            //return zero to prevent crazy oscillations
+            //TODO: work out a better way to handle this
+            return 0;
+        }
 
         // Checks to make sure we have a target
-        if (hasTargets() == true) {
+        if (hasTargets()) {
 
-                // Checks skew to see if we can hit the inner target
-                if(targetSkew <= -90 + RobotMap.INNER_TARGET_DEGREES && targetSkew >= 0 - RobotMap.INNER_TARGET_DEGREES){
-                    
-                    // Offset for inner target
-                    targetAngle *= RobotMap.OFFSET_TARGET_DEGREES;
-                    
-                    // Test print outs
-                    System.out.println("Inner Target");
-                }
-                else {
-                    System.out.println("Outer Target");
-                }
+            // Checks skew to see if we can hit the inner target
+            if(targetSkew <= RobotMap.INNER_TARGET_DEGREES && targetSkew >= -RobotMap.INNER_TARGET_DEGREES){
+                
+                // Offset for inner target
+                targetAngle *= RobotMap.OFFSET_TARGET_DEGREES;
+            }
         }
         return targetAngle;
     }
@@ -79,6 +82,32 @@ public class LimelightReader {
     }
 
     /**
+     * Adjusts our skew value so that values to the left range from 0 to -44 
+     * and values to the right rangle from 0 to 45
+     * @return skew adjusted to match our comprehension
+     * @throws Exception get Skew should not be able to throw an exception greater than 0 or less
+     * than -90. If it does, we throw this exception
+     */
+    public double getAdjustedSkew() throws Exception {
+        //read our skew as we begin to prevent repeated calls
+        double tempSkew = getSkew();
+
+        //if our value is less than or equal to 0 and greater than or equal to -44
+        //we do not modify the values as it properly measures offset to the left
+        if ((0 >= tempSkew) && (tempSkew >= -44)) {
+            return tempSkew;
+        }
+        //else if skew is greater than or equal to -90,
+        //we add 90 to it to balance it at 0 and make positive values represent offset to the right
+        else if (tempSkew >= -90) {
+            return tempSkew + 90;
+        }
+        else {
+            throw new Exception("Impossible skew value");
+        }
+    }
+
+    /**
      * @return The vertical offset in degrees from the center of the camera to the target
      */
     public double getYDegreesToTarget() {
@@ -86,11 +115,12 @@ public class LimelightReader {
     }
 
     /**
-     * @param cameraDegreesFromGround How far from horizontal the camera is mounted in degrees. This should be passed in from a gyro
+     * @param cameraDegreesFromGround How far from horizontal the camera is mounted in degrees. 
+     * This should be passed in from a gyro
      * @return The horizontal distance from the robot to the target
      */
     public double getDistance(double cameraDegreesFromGround) {
-        //The Pi/180 calc is a conversion from degrees to radians so that the Math.tan() method returns the correct value
+        //Math.tan() requires radians, hence the RobotMap constant
         double lengthToHeightRatio = Math.tan(RobotMap.DEG_TO_RAD_CONVERSION * (cameraDegreesFromGround + getYDegreesToTarget()));
         return (RobotMap.NET_HEIGHT_INCHES / lengthToHeightRatio);
     }
