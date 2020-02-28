@@ -166,6 +166,41 @@ public class Climber {
     }
 
     /**
+     * Sets P,I,D,F and cruise velocity/accel based on input
+     * <p>This method should only be called in testing
+     * 
+     * @param kP Proportionality constant
+     * @param kI Integral constant
+     * @param kD Derivative constant
+     * @param kF Feed-forward constant
+     * @param cruiseVelocity Motion Magic cruise velocity in units per 100ms
+     * @param accel Motion Magic acceleration in units per 100ms per second
+     */
+    public void setPIDFConstants(double kP, double kI, double kD, double kF, int cruiseVelocity, int accel) {
+        m_extensionMotor.config_kP(RobotMap.PID_PRIMARY_SLOT, kP, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+        m_extensionMotor.config_kI(RobotMap.PID_PRIMARY_SLOT, kI, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+        m_extensionMotor.config_kD(RobotMap.PID_PRIMARY_SLOT, kD, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+        m_extensionMotor.config_kF(RobotMap.PID_PRIMARY_SLOT, kF, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+
+        m_extensionMotor.configMotionCruiseVelocity(cruiseVelocity, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+        m_extensionMotor.configMotionAcceleration(accel, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+    }
+
+    /**
+     * Resets our constants back to their RobotMap values
+     * <p> Should be run in disabled
+     */
+    public void resetPIDFConstants() {
+        m_extensionMotor.config_kP(RobotMap.PID_PRIMARY_SLOT, RobotMap.CLIMBER_EXTENSION_P, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+        m_extensionMotor.config_kI(RobotMap.PID_PRIMARY_SLOT, RobotMap.CLIMBER_EXTENSION_I, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+        m_extensionMotor.config_kD(RobotMap.PID_PRIMARY_SLOT, RobotMap.CLIMBER_EXTENSION_D, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+        m_extensionMotor.config_kF(RobotMap.PID_PRIMARY_SLOT, RobotMap.CLIMBER_EXTENSION_F, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+
+        m_extensionMotor.configMotionCruiseVelocity(RobotMap.CLIMBER_MOTION_MAGIC_CRUISE_VELOCITY, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+        m_extensionMotor.configMotionAcceleration(RobotMap.CLIMBER_MOTION_MAGIC_ACCEL, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
+    }
+
+    /**
      * Configures the motion magic PID control for the extension motor
      */
     public void configExtensionMotionMagic() {
