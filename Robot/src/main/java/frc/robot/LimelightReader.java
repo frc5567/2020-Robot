@@ -59,7 +59,7 @@ public class LimelightReader {
         if (hasTargets() == true) {
 
                 // Checks skew to see if we can hit the inner target
-                if(targetSkew <= -90 + RobotMap.INNER_TARGET_DEGREES && targetSkew >= 0 - RobotMap.INNER_TARGET_DEGREES){
+                if(targetSkew <= -90 + RobotMap.INNER_TARGET_DEGREES || targetSkew >= 0 - RobotMap.INNER_TARGET_DEGREES){
                     
                     // Offset for inner target
                     targetAngle *= RobotMap.OFFSET_TARGET_DEGREES;

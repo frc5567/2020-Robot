@@ -6,7 +6,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 /**
  * This class should be used to center our robot on the high target.
@@ -20,15 +19,25 @@ public class LimelightTargeting {
     private Drivetrain m_drivetrain;
     private LimelightReader m_limelight;
     private PIDController m_targetController;
+    private ShuffleboardLauncherControl m_launcherControl;
 
-    //declare private variables for creating a tab, and setting widgets
-    private ShuffleboardTab m_targetingTab;
+    /**Network table entry for reading desired F constant off of the shuffleboard */
+    private NetworkTableEntry m_fTargetEntry;
     /**Network table entry for reading desired P constant off of the shuffleboard */
-    private NetworkTableEntry m_pEntry;
+    private NetworkTableEntry m_pTargetEntry;
     /**Network table entry for reading desired I constant off of the shuffleboard */
-    private NetworkTableEntry m_iEntry;
+    private NetworkTableEntry m_iTargetEntry;
     /**Network table entry for reading desired D constant off of the shuffleboard */
-    private NetworkTableEntry m_dEntry;
+    private NetworkTableEntry m_dTargetEntry;
+    /**Network table entry for reading desired F constant off of the shuffleboard */
+    private NetworkTableEntry m_fLauncherEntry;
+    /**Network table entry for reading desired P constant off of the shuffleboard */
+    private NetworkTableEntry m_pLauncherEntry;
+    /**Network table entry for reading desired I constant off of the shuffleboard */
+    private NetworkTableEntry m_iLauncherEntry;
+    /**Network table entry for reading desired D constant off of the shuffleboard */
+    private NetworkTableEntry m_dLauncherEntry;
+    private NetworkTableEntry drivetrainGains;
 
     /**Network table entry to publish whether we are currently on target */
     private NetworkTableEntry m_onTargetEntry;
@@ -100,7 +109,7 @@ public class LimelightTargeting {
      */
     public void setPID() {
         //passes in the values off of the shuffleboard Netwrok Table Entries
-        m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_I), m_dEntry.getDouble(RobotMap.TARGETING_D));
+        m_targetController.setPID(m_pTargetEntry.getDouble(RobotMap.TARGETING_P), m_iTargetEntry.getDouble(RobotMap.TARGETING_I), m_dTargetEntry.getDouble(RobotMap.TARGETING_D));
     }
 
     /**
@@ -116,29 +125,62 @@ public class LimelightTargeting {
      */
     private void shuffleboardConfig() {
         //creates a tab on the shuffleboard for all our targeting needs
-        m_targetingTab = Shuffleboard.getTab("Targeting");
+        m_launcherControl.testingTab = Shuffleboard.getTab("Testing");
 
         //creates a persistent widget as text for setting P constant
-        m_pEntry = m_targetingTab.addPersistent("P", RobotMap.TARGETING_P)       //creates widget with the robotmap constant as a default
+        m_pTargetEntry = m_launcherControl.testingTab.addPersistent("P - Target", RobotMap.TARGETING_P)       //creates widget with the robotmap constant as a default
                                  .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
                                  .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
                                  .getEntry();   
         
         //creates a persistent widget as text for setting I constant
-        m_iEntry = m_targetingTab.addPersistent("I", RobotMap.TARGETING_I)       //creates widget with the robotmap constant as a default
+        m_iTargetEntry = m_launcherControl.testingTab.addPersistent("I - Target", RobotMap.TARGETING_I)       //creates widget with the robotmap constant as a default
                                  .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
                                  .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
                                  .getEntry();   
 
         //creates a persistent widget as text for setting D constant
-        m_dEntry = m_targetingTab.addPersistent("D", RobotMap.TARGETING_D)       //creates widget with the robotmap constant as a default
-                                 .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
-                                 .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
-                                 .getEntry();  
+        m_dTargetEntry = m_launcherControl.testingTab.addPersistent("D - Target", RobotMap.TARGETING_D)       //creates widget with the robotmap constant as a default
+                                .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
+                                .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                .getEntry();  
 
         //create a widget to display whether we are currently on target
-        m_onTargetEntry = m_targetingTab.add("On Target?", false)               //creates the widget that is false by default as by default we are not on target
-                                        .withWidget(BuiltInWidgets.kBooleanBox) //set widget to a boolean box to easily display the value
-                                        .getEntry();
+        m_onTargetEntry = m_launcherControl.testingTab.add("On Target?", false)               //creates the widget that is false by default as by default we are not on target
+                                .withWidget(BuiltInWidgets.kBooleanBox) //set widget to a boolean box to easily display the value
+                                .getEntry();
+
+
+
+        //creates a persistent widget as text for setting F constant
+        m_fLauncherEntry = m_launcherControl.testingTab.addPersistent("F - Launcher", RobotMap.LAUNCHER_F)       //creates widget with the robotmap constant as a default
+                                .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
+                                .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                .getEntry();   
+
+        //creates a persistent widget as text for setting P constant
+        m_pLauncherEntry = m_launcherControl.testingTab.addPersistent("P - Launcher", RobotMap.LAUNCHER_P)       //creates widget with the robotmap constant as a default
+                                .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
+                                .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                .getEntry();   
+
+        //creates a persistent widget as text for setting I constant
+        m_iLauncherEntry = m_launcherControl.testingTab.addPersistent("I - Launcher", RobotMap.LAUNCHER_I)       //creates widget with the robotmap constant as a default
+                                .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
+                                .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                .getEntry();   
+
+        //creates a persistent widget as text for setting D constant
+        m_dLauncherEntry = m_launcherControl.testingTab.addPersistent("D - Launcher", RobotMap.LAUNCHER_D)       //creates widget with the robotmap constant as a default
+                                .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
+                                .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                .getEntry();  
+
+        //TODO: move out of this class following testing
+
+        drivetrainGains = m_launcherControl.testingTab.addPersistent("Drive Gains", RobotMap.DRIVETRAIN_GAINS)       //creates widget with the robotmap constant as a default
+                                .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
+                                .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                .getEntry();  
     }
 }
