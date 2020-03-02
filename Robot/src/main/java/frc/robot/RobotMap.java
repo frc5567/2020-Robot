@@ -239,7 +239,8 @@ public class RobotMap {
     //*                                      *
     //****************************************
     //the PWM port for the outer motor - this is on PWM to reduce CAN traffic
-    public static final int INTAKE_PWM_SPARK_PORT = 0;
+    public static final int INTAKE_PWM_SPARK_PORT = 2;
+    public static final int INTAKE_INNER_MOTOR_PORT = 1;
 
     //the ports for the intake position piston
     public static final int INTAKE_POSITION_PISTON_FORWARD_PORT = 4;
