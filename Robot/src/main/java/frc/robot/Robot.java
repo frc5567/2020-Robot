@@ -12,6 +12,7 @@ import java.util.Map;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -119,25 +120,37 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     //this test periodic is designed for launcher velocity testing
     //sets the velocity of the launcher while holding the b button
+    System.out.println(m_launcher.getMasterMotor().getSelectedSensorPosition(0));
     if(m_testController.getBButton()) {
-    //   m_launcherControl.setVelocity();
+      m_launcherControl.setVelocity();
     //set 40%, above can cause the polycore to jump
         // m_magazine.runBelt(0.4);
         // m_intake.setInnerIntakeMotor(0.3);
         //Both intake motors must be inverted
     }
     else if (m_testController.getAButton()) {
-        // m_launcherControl.setPercentSpeed();
+        m_launcherControl.setPercentSpeed();
         // m_magazine.runBelt(-0.4);
         // m_intake.setOuterIntakeMotor(0.3);
     }
+    else {
+        m_launcherControl.zeroSpeed();
+    }
+
+    if (m_testController.getBumper(Hand.kRight)) {
+        m_magazine.runBelt(0.65);
+    }
+    else if (m_testController.getBumper(Hand.kLeft)) {
+        // m_magazine.runBelt(-0.65);
+        m_launcher.zeroEncoder();
+    }
     //kills the velocity while not holding
     else {
-      m_launcherControl.zeroSpeed();
       m_magazine.runBelt(0);
-      m_intake.setInnerIntakeMotor(0);
-      m_intake.setOuterIntakeMotor(0);
     }
+
+    m_intake.setInnerIntakeMotor(0);
+    m_intake.setOuterIntakeMotor(0);
   }
 
   @Override

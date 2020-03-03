@@ -71,6 +71,8 @@ public class ShuffleboardLauncherControl {
         //divide imput by 600 to convert from rpm to rev per 100ms
         tempVelocity /= 600;
 
+        tempVelocity *= 3010.56;
+
         //runs the proportional control system based on the aquired speed
         m_launcher.setVelocity(tempVelocity);
     }

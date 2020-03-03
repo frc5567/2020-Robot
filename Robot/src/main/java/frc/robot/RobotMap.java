@@ -120,10 +120,10 @@ public class RobotMap {
     //****************************************
     //launcher PID constants for velocity control
     //to be set later
-    public static final double LAUNCHER_P = 0;
+    public static final double LAUNCHER_P = .0125;
     public static final double LAUNCHER_I = 0;
     public static final double LAUNCHER_D = 0;
-    public static final double LAUNCHER_F = 0;
+    public static final double LAUNCHER_F = 1023/7200.0;
 
     //Calculated free spin angular velocity of our shooter based on specs (-10%) divided by three for gear reduction
     //measured in rev/100ms, specs found at https://www.vexrobotics.com/775pro.html#Other_Info
@@ -172,7 +172,7 @@ public class RobotMap {
 
     //the acceptable integral zone for the launch master motor
     //100 is the value used last year, this should be adjusted in testing if need be
-    public static final int LAUNCHER_I_ZONE = 100;
+    public static final int LAUNCHER_I_ZONE = 1000;
 
     //the acceptable error for the launcher PID. Any error less than this will be treated as zero
     public static final int LAUNCHER_ACCEPTABLE_ERROR = 0;

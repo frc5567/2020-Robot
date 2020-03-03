@@ -123,11 +123,14 @@ public class Launcher {
     public void setVelocity(double velocity) {
         //set the velocity of the motors
         m_masterMotor.set(ControlMode.Velocity, velocity);
-
+        System.out.println("Selected Sensor Velocity: " + m_masterMotor.getSelectedSensorVelocity());
+        System.out.println(" | Target Velocity: ");
+        
+        //danny needs smaller fingers
         //set our slave motors to follow master
-        m_closeSlaveMotor.follow(m_masterMotor);
-        m_farSlaveMotor1.follow(m_masterMotor);
-        m_farSlaveMotor2.follow(m_masterMotor);
+        m_closeSlaveMotor.follow(m_masterMotor, FollowerType.PercentOutput);
+        m_farSlaveMotor1.follow(m_masterMotor, FollowerType.PercentOutput);
+        m_farSlaveMotor2.follow(m_masterMotor, FollowerType.PercentOutput);
     }
 
     /**
@@ -230,6 +233,10 @@ public class Launcher {
      */
     public double getCurrentSpeed() {
         return m_currentSpeed;
+    }
+
+    public void zeroEncoder() {
+        m_masterMotor.setSelectedSensorPosition(0);
     }
 
     /**
