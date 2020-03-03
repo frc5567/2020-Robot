@@ -32,6 +32,10 @@ public class Robot extends TimedRobot {
   Launcher m_launcher;
   ShuffleboardLauncherControl m_launcherControl;
 
+  Magazine m_magazine;
+
+  Intake m_intake;
+
   //declares an xbox controller used for testing prototype code
   XboxController m_testController;
 
@@ -67,6 +71,10 @@ public class Robot extends TimedRobot {
     
     //sets our default state to the vision pipeline
     m_isDriverCamera = false;
+
+    m_magazine = new Magazine();
+
+    m_intake = new Intake();
 
     //sets up our camera testing tab
     shuffleboardConfig();
@@ -112,11 +120,23 @@ public class Robot extends TimedRobot {
     //this test periodic is designed for launcher velocity testing
     //sets the velocity of the launcher while holding the b button
     if(m_testController.getBButton()) {
-      m_launcherControl.setVelocity();
+    //   m_launcherControl.setVelocity();
+    //set 40%, above can cause the polycore to jump
+        // m_magazine.runBelt(0.4);
+        // m_intake.setInnerIntakeMotor(0.3);
+        //Both intake motors must be inverted
+    }
+    else if (m_testController.getAButton()) {
+        // m_launcherControl.setPercentSpeed();
+        // m_magazine.runBelt(-0.4);
+        // m_intake.setOuterIntakeMotor(0.3);
     }
     //kills the velocity while not holding
     else {
       m_launcherControl.zeroSpeed();
+      m_magazine.runBelt(0);
+      m_intake.setInnerIntakeMotor(0);
+      m_intake.setOuterIntakeMotor(0);
     }
   }
 

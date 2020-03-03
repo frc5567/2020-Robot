@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 
@@ -15,10 +16,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class Magazine {
 
     //declare our motor controllers for our belts and the wheel
-    private TalonSRX m_motor;
-
-    //declare encoder for indexing balls
-    private SensorCollection m_encoder;
+    private VictorSPX m_motor;
 
     //declare digital input for the photoelectric sensors
     private DigitalInput m_intakeSensor;
@@ -37,9 +35,8 @@ public class Magazine {
      * @param intakeSensor The sensor mounted near the input to index our balls
      * @param launchSensor The sensor mounted near the launchers to tick our count in the magazine down
      */
-    public Magazine(TalonSRX motor, DigitalInput intakeSensor, DigitalInput launchSensor) {
+    public Magazine(VictorSPX motor, DigitalInput intakeSensor, DigitalInput launchSensor) {
         m_motor = motor;
-        m_encoder = new SensorCollection(m_motor);
 
         m_intakeSensor = intakeSensor;
         m_launchSensor = launchSensor;
@@ -49,8 +46,7 @@ public class Magazine {
      * Vertical constructor for magazine that uses robot map constants for instantiation
      */
     public Magazine() {
-        m_motor = new TalonSRX(RobotMap.MAGAZINE_MOTOR_PORT);
-        m_encoder = new SensorCollection(m_motor);
+        m_motor = new VictorSPX(RobotMap.MAGAZINE_MOTOR_PORT);
 
         m_intakeSensor = new DigitalInput(RobotMap.MAGAZINE_IN_SENSOR_PORT);
         m_launchSensor = new DigitalInput(RobotMap.MAGAZINE_OUT_SENSOR_PORT);
@@ -106,27 +102,6 @@ public class Magazine {
     }
 
     /**
-     * @return the encoder attached to the belts
-     */
-    public SensorCollection getEncoder() {
-        return m_encoder;
-    }
-
-    /**
-     * @return the position of the encoder in ticks
-     */
-    public int getEncoderPosition() {
-        return m_encoder.getQuadraturePosition();
-    }
-
-    /**
-     * @return the velocity of the encoder in encoder ticks per 100ms
-     */
-    public int getEncoderVelocity() {
-        return m_encoder.getQuadratureVelocity();
-    }
-
-    /**
      * @return the number of balls currently in the magazine
      */
     public int getStoredBalls() {
@@ -152,6 +127,6 @@ public class Magazine {
      * @return the object summarized as a string
      */
     public String toString() {
-        return "Motor: " + m_motor.toString() + " | Encoder: " + m_encoder.toString();
+        return "Motor: " + m_motor.toString();
     }
 }

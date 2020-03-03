@@ -143,8 +143,8 @@ public class RobotMap {
 	public static final boolean LAUNCHER_MASTER_INVERTED = false;
 
     //inversion for far slave motors
-    //TODO: one of these should be inverted based on testing, currently unsure which one
-    public static final boolean LAUNCHER_FAR_SLAVE1_INVERTED = true;
+    //The far slave motor 1 was inverted at manufacturing, so it needs to not be inverted
+    public static final boolean LAUNCHER_FAR_SLAVE1_INVERTED = false;
     public static final boolean LAUNCHER_FAR_SLAVE2_INVERTED = true;
 
     //adjustment value for the launcher percent control
@@ -306,7 +306,7 @@ public class RobotMap {
     //*                                      *
     //****************************************
     /**The CAN ID for the motor driving the magazine */
-    public static final int MAGAZINE_MOTOR_PORT = 26;
+    public static final int MAGAZINE_MOTOR_PORT = 30;
 
     /**The DIO port for the photoelectric sensor mounted near the intake */
     public static final int MAGAZINE_IN_SENSOR_PORT = 0;

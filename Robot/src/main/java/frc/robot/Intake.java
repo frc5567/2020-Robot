@@ -127,7 +127,7 @@ public class Intake {
         
         m_innerMotor = new PWMTalonSRX(RobotMap.INTAKE_INNER_MOTOR_PORT);
 
-        m_positionPiston = new DoubleSolenoid(RobotMap.INTAKE_POSITION_PISTON_FORWARD_PORT, RobotMap.INTAKE_POSITION_PISTON_REVERSE_PORT);
+        m_positionPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.INTAKE_POSITION_PISTON_FORWARD_PORT, RobotMap.INTAKE_POSITION_PISTON_REVERSE_PORT);
 
         //set our starting position to unknown
         m_position = Position.kUnknown;
