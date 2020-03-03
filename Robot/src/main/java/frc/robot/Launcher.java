@@ -123,10 +123,11 @@ public class Launcher {
     public void setVelocity(double velocity) {
         //set the velocity of the motors
         m_masterMotor.set(ControlMode.Velocity, velocity);
+
+        //debugging print outs
         System.out.println("Selected Sensor Velocity: " + m_masterMotor.getSelectedSensorVelocity());
         System.out.println(" | Target Velocity: ");
         
-        //danny needs smaller fingers
         //set our slave motors to follow master
         m_closeSlaveMotor.follow(m_masterMotor, FollowerType.PercentOutput);
         m_farSlaveMotor1.follow(m_masterMotor, FollowerType.PercentOutput);
@@ -166,6 +167,9 @@ public class Launcher {
         //config remote sensors
         //sets the sensor to be a quad encoder, sets our feedback device to be that sensor
         m_masterMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
+
+        //zero the encoders on every init
+        zeroEncoder();
 
         //sets whether our motor is inverted
         //this is currently false but can be switched based on testing
@@ -235,6 +239,9 @@ public class Launcher {
         return m_currentSpeed;
     }
 
+    /**
+     * Zeros the selected encoder
+     */
     public void zeroEncoder() {
         m_masterMotor.setSelectedSensorPosition(0);
     }

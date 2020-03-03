@@ -119,11 +119,14 @@ public class RobotMap {
     //*                                      *
     //****************************************
     //launcher PID constants for velocity control
-    //to be set later
     public static final double LAUNCHER_P = .0125;
     public static final double LAUNCHER_I = 0;
     public static final double LAUNCHER_D = 0;
     public static final double LAUNCHER_F = 1023/7200.0;
+
+    //600 is minutes to 100ms, 
+    //3010.56 is our calculated raw sensor units per revolution on the output shaft
+    public static final double RPM_TO_UNITS_PER_100MS = 3010.56 / 600;
 
     //Calculated free spin angular velocity of our shooter based on specs (-10%) divided by three for gear reduction
     //measured in rev/100ms, specs found at https://www.vexrobotics.com/775pro.html#Other_Info
@@ -242,18 +245,16 @@ public class RobotMap {
     public static final int INTAKE_PWM_SPARK_PORT = 2;
     public static final int INTAKE_INNER_MOTOR_PORT = 1;
 
+    //inversion for our intake motors
+    public static final boolean OUTER_INTAKE_INVERTED = true;
+    public static final boolean INNER_INTAKE_INVERTED = true;
+
     //the ports for the intake position piston
     public static final int INTAKE_POSITION_PISTON_FORWARD_PORT = 4;
     public static final int INTAKE_POSITION_PISTON_REVERSE_PORT = 5;
 
-    /**The CAN ID for the inner intake motor */
-    public static final int INTAKE_VICTOR_ID = 16;
-
     //the ramp time in seconds from zero to full speed for the intake motor
     public static final double INTAKE_OPEN_LOOP_RAMP_TIME_S = 0.75;
-
-    //The maximum number of ticks that the encoder has------The number of ticks might not be correct:double check
-    public static final double MAX_ENCODER_TICKS = 22;
 
     //****************************************
     //*                                      *

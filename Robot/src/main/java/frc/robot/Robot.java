@@ -33,8 +33,8 @@ public class Robot extends TimedRobot {
   Launcher m_launcher;
   ShuffleboardLauncherControl m_launcherControl;
 
+  //declare our other copilot systems
   Magazine m_magazine;
-
   Intake m_intake;
 
   //declares an xbox controller used for testing prototype code
@@ -73,8 +73,10 @@ public class Robot extends TimedRobot {
     //sets our default state to the vision pipeline
     m_isDriverCamera = false;
 
+    //instantiate magazine, this needs to be moved to copilot controller post testing
     m_magazine = new Magazine();
 
+    //instantiate intake, this needs to be moved to copilot controller post testing
     m_intake = new Intake();
 
     //sets up our camera testing tab
@@ -120,35 +122,43 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     //this test periodic is designed for launcher velocity testing
     //sets the velocity of the launcher while holding the b button
+    //Both intake motors must be inverted
+
+    //this is prints out the position for debugging and calculating units per rev
     System.out.println(m_launcher.getMasterMotor().getSelectedSensorPosition(0));
+
+    //runs velocity control while b button is pressed
     if(m_testController.getBButton()) {
       m_launcherControl.setVelocity();
-    //set 40%, above can cause the polycore to jump
-        // m_magazine.runBelt(0.4);
-        // m_intake.setInnerIntakeMotor(0.3);
-        //Both intake motors must be inverted
     }
+    //runs percent control while a button is pressed
     else if (m_testController.getAButton()) {
         m_launcherControl.setPercentSpeed();
-        // m_magazine.runBelt(-0.4);
-        // m_intake.setOuterIntakeMotor(0.3);
     }
+    //zeros speed while not actively controlled
     else {
         m_launcherControl.zeroSpeed();
     }
 
+    //note that the magazine cannot run over 0.4 without load, or else the polycore will fly off
+    //runs the magazine forward while the right bumper is held, and backward while the left one is
     if (m_testController.getBumper(Hand.kRight)) {
         m_magazine.runBelt(0.65);
     }
     else if (m_testController.getBumper(Hand.kLeft)) {
-        // m_magazine.runBelt(-0.65);
-        m_launcher.zeroEncoder();
+        m_magazine.runBelt(-0.65);
     }
     //kills the velocity while not holding
     else {
       m_magazine.runBelt(0);
     }
 
+    //resets the encoder when the start button is pressed
+    if (m_testController.getStartButton()) {
+        m_launcher.getMasterMotor().setSelectedSensorPosition(0);
+    }
+
+    //disable the intake motors while its
     m_intake.setInnerIntakeMotor(0);
     m_intake.setOuterIntakeMotor(0);
   }

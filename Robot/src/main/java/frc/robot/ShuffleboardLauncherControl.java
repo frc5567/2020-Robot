@@ -68,10 +68,8 @@ public class ShuffleboardLauncherControl {
         //assigns the speed based on the shuffleboard with a default value of zero
         double tempVelocity = m_angularVelocityTarget.getDouble(0.0);
 
-        //divide imput by 600 to convert from rpm to rev per 100ms
-        tempVelocity /= 600;
-
-        tempVelocity *= 3010.56;
+        //Convert inputted velocity in rpm to raw units per 100 ms
+        tempVelocity *= RobotMap.RPM_TO_UNITS_PER_100MS;
 
         //runs the proportional control system based on the aquired speed
         m_launcher.setVelocity(tempVelocity);

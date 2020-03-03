@@ -122,10 +122,12 @@ public class Intake {
      * Uses robot map constants for instantation
      */
     public Intake() {
-        //the spark is currently set to operate over PWM to reduce can bus traffic
+        //the motors are currently set to operate over PWM to reduce can bus traffic
         m_outerMotor = new PWMSparkMax(RobotMap.INTAKE_PWM_SPARK_PORT);
-        
         m_innerMotor = new PWMTalonSRX(RobotMap.INTAKE_INNER_MOTOR_PORT);
+
+        m_outerMotor.setInverted(RobotMap.OUTER_INTAKE_INVERTED);
+        m_innerMotor.setInverted(RobotMap.INNER_INTAKE_INVERTED);
 
         m_positionPiston = new DoubleSolenoid(RobotMap.PCM_CAN_ID, RobotMap.INTAKE_POSITION_PISTON_FORWARD_PORT, RobotMap.INTAKE_POSITION_PISTON_REVERSE_PORT);
 
