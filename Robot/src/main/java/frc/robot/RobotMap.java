@@ -126,7 +126,7 @@ public class RobotMap {
 
     //600 is minutes to 100ms, 
     //3010.56 is our calculated raw sensor units per revolution on the output shaft
-    public static final double RPM_TO_UNITS_PER_100MS = 3010.56 / 600;
+    public static final double RPM_TO_UNITS_PER_100MS = 4096 / 600;
 
     //Calculated free spin angular velocity of our shooter based on specs (-10%) divided by three for gear reduction
     //measured in rev/100ms, specs found at https://www.vexrobotics.com/775pro.html#Other_Info

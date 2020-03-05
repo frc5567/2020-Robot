@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -126,7 +127,7 @@ public class Launcher {
 
         //debugging print outs
         System.out.println("Selected Sensor Velocity: " + m_masterMotor.getSelectedSensorVelocity());
-        System.out.println(" | Target Velocity: ");
+        System.out.println(" | Target Velocity: " + velocity);
         
         //set our slave motors to follow master
         m_closeSlaveMotor.follow(m_masterMotor, FollowerType.PercentOutput);
@@ -166,7 +167,7 @@ public class Launcher {
     private void configVelocityControl() {
         //config remote sensors
         //sets the sensor to be a quad encoder, sets our feedback device to be that sensor
-        m_masterMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
+        m_masterMotor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative, RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //zero the encoders on every init
         zeroEncoder();
@@ -228,7 +229,7 @@ public class Launcher {
      * 
      * @return the motor used to drive the launcher
      */
-    public BaseMotorController getMasterMotor() {
+    public TalonSRX getMasterMotor() {
         return m_masterMotor;
     }
 

@@ -124,9 +124,6 @@ public class Robot extends TimedRobot {
     //sets the velocity of the launcher while holding the b button
     //Both intake motors must be inverted
 
-    //this is prints out the position for debugging and calculating units per rev
-    System.out.println(m_launcher.getMasterMotor().getSelectedSensorPosition(0));
-
     //runs velocity control while b button is pressed
     if(m_testController.getBButton()) {
       m_launcherControl.setVelocity();
@@ -157,6 +154,7 @@ public class Robot extends TimedRobot {
     if (m_testController.getStartButton()) {
         m_launcher.getMasterMotor().setSelectedSensorPosition(0);
     }
+    System.out.println(m_launcher.getMasterMotor().getSelectedSensorPosition());
 
     //disable the intake motors while its
     m_intake.setInnerIntakeMotor(0);
