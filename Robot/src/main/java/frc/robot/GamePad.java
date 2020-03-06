@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 
-// this enum difines the buttons and what they do when active
 public class GamePad extends GenericHID {
 
 	/**
@@ -17,18 +16,17 @@ public class GamePad extends GenericHID {
 	 * Actions each button performs
 	 * Change numbers to correct port number
 	 */
+	// this enum difines the buttons and what they do when active
 	private enum GamePadControls {
 		// Buttons
 		Gear_Up(1),
 		Gear_Down(2),
 		Enable_Intake(3),
 		Disable_Intake(4),
-		Change_Shooter_RPM_Up(5),
-		Change_Shooter_RPM_Down(6),
-		Shooter(7),
-		Disable_shooter(8),
-        Spin_pannel_to_Color(9), //make sure to leave a variable for the color
-        Spin_pannel_by_Rotation_Number(10); //make sure to change the number of spins
+		Change_Launcher_RPM_Up(5),
+		Change_Launcher_RPM_Down(6),
+		Launcher(7),
+		Disable_Launcher(8);
 
 		@SuppressWarnings("MemberName")
 		public final int value;
@@ -37,7 +35,78 @@ public class GamePad extends GenericHID {
 			this.value = newValue;
 		}
 	}
+	/**
+	 * expectedd to be used in co-pilot conroller 
+	 *<p> switches the gear pneumatics to the high gear position 
+	*/
+		//gear up button
+	public boolean getGearUp() {
+		return super.getRawButtonPressed(GamePadControls.Gear_Up.value);
+	}
+	/**
+	 * expected to be used in co-pilot controller
+	 * <p> switches the gear pneumatics to the low gear position
+	 */
+		//gear down button
+	public boolean getGearDown() {
+		return super.getRawButtonPressed(GamePadControls.Gear_Down.value);
+	}
+		//intake button
+		/**
+		 * expected to be used in co-pilot controller
+		 * <p> enables intake. Doing so drops the drop bar and turns on the intake motors
+		 */
+	public boolean getIntake() {
+		return super.getRawButtonPressed(GamePadControls.Enable_Intake.value);
+	}
+		//intake turn off button
+		/**
+		 *  expected to be used in co-pilot controller
+		 * <p> disables intake. Doing so raises the drop bar and turns off the intake motors
+		 */
+	public boolean getDisableIntake() {
+		return super.getRawButtonPressed(GamePadControls.Disable_Intake.value);
+	}
+		//Launcher RPM up button
+		/**
+		 * expected to be used in co-pilot controller
+		 * <p> adjusts launcher speed up to accommadate better balls so that we can use the highest speed
+		 * possible for the condition of the balls
+		 */
+	public boolean getLauncherRPMUp() {
+		return super.getRawButtonPressed(GamePadControls.Change_Launcher_RPM_Up.value);
+	}
+		//Launcher RPM down button
+		/**
+		 * expected to be used in co-pilot controller
+		 *<p> adjusts launcher speed up to accommadate tearing balls so that we can use the highest speed
+		 * possible for the condition of the balls
+		 */
+	public boolean getLauncherRPMDown() {
+		return super.getRawButtonPressed(GamePadControls.Change_Launcher_RPM_Down.value);
+	}
+	/**
+	 * expected to be used in co-pilot controller
+	 * <p> enables the launcher, shifts into low gear, and begins to index the balls into the launcher
+	 * when the motor has reached desired rpm
+	 */
+		//shoot button
+	public boolean getEnableLauncher() {
+		return super.getRawButtonPressed(GamePadControls.Launcher.value);
+	}
+	/**
+	 * expected to be used in co-pilot controller
+	 * <p> disables the launcher and shifts to high gear
+	 */
+		//stop shooting button
+	public boolean getDisableLauncher() {
+		return super.getRawButtonPressed(GamePadControls.Disable_Launcher.value);
+	}
 
+	/**
+	 * These must be extended because GenericHID is abstract
+	 * We cannot delete these, nor make them private
+	 */
 	@Override
 	public double getX(Hand hand) {
 		// TODO Auto-generated method stub
@@ -48,65 +117,6 @@ public class GamePad extends GenericHID {
 	public double getY(Hand hand) {
 		// TODO Auto-generated method stub
 		return 0;
-	}
-
-	/** if button should be pressed once, use this format
-	 * Returns if button has been released
-	 * @param button Button to view if released
-	 * @return Returns button status (if released)
-	 */
-	public boolean getGamePadButtonReleased(GamePadControls button) {
-		return super.getRawButtonReleased(button.value);
-	}
-		//gear up button
-	public boolean getGearUp() {
-		return super.getRawButtonReleased(GamePadControls.Gear_Up.value);
-	}
-		//gear down button
-	public boolean getGearDown() {
-		return super.getRawButtonReleased(GamePadControls.Gear_Down.value);
-	}
-		//intake button
-	public boolean getIntake() {
-		return super.getRawButtonReleased(GamePadControls.Enable_Intake.value);
-	}
-		//intake turn off button
-	public boolean getDisableIntake() {
-		return super.getRawButtonReleased(GamePadControls.Disable_Intake.value);
-	}
-		//shooter RPM up button
-	public boolean getShooterRPMUp() {
-		return super.getRawButtonReleased(GamePadControls.Change_Shooter_RPM_Up.value);
-	}
-		//shooter RPM down button
-	public boolean getShooterRPMDown() {
-		return super.getRawButtonReleased(GamePadControls.Change_Shooter_RPM_Down.value);
-	}
-		//shoot button
-	public boolean getEnableShooter() {
-		return super.getRawButtonReleased(GamePadControls.Shooter.value);
-	}
-		//stop shooting button
-	public boolean getDisableShooter() {
-		return super.getRawButtonReleased(GamePadControls.Disable_shooter.value);
-	}
-		//spin to color button
-	public boolean getSpinToColor() {
-		return super.getRawButtonPressed(GamePadControls.Spin_pannel_to_Color.value);
-	}
-		//spin by roation number button
-	public boolean getSpinByRotationNumber() {
-		return super.getRawButtonPressed(GamePadControls.Spin_pannel_by_Rotation_Number.value);
-	}
-
-
-	/**   if button should be held, use this format
-	 * Returns the status of the button (true if held)
-	 * @param button Button to view if button is held
-	 * @return Returns button status (if held)
-	 */
-	public boolean getGamePadButton(GamePadControls button) {
-		return super.getRawButton(button.value);
 	}
 
 }
