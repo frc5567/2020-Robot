@@ -20,6 +20,10 @@ public class LimelightReader {
         m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     }
 
+    public void disableLEDS() {
+        m_limelightTable.getEntry("ledMode").setDouble(1);
+    }
+
     /**
      * @return Whether or not the limelight sees any valid targets
      */
@@ -60,10 +64,10 @@ public class LimelightReader {
                     targetAngle *= RobotMap.OFFSET_TARGET_DEGREES;
                     
                     // Test print outs
-                    System.out.println("Inner Target");
+                    // System.out.println("Inner Target");
                 }
                 else {
-                    System.out.println("Outer Target");
+                    // System.out.println("Outer Target");
                 }
         }
         return targetAngle;

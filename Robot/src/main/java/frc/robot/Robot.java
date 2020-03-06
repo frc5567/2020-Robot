@@ -9,7 +9,9 @@ package frc.robot;
 
 import java.util.Map;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -67,6 +69,8 @@ public class Robot extends TimedRobot {
     m_launcher = new Launcher();
     m_launcherControl = new ShuffleboardLauncherControl(m_launcher);
 
+    m_limelightReader = new LimelightReader();
+
     //intantiates our PilotController, which controls all systems on the drivetrain
     m_pilotController = new PilotController(DriveType.kArcade, m_limelightReader);
     
@@ -81,6 +85,7 @@ public class Robot extends TimedRobot {
 
     //sets up our camera testing tab
     shuffleboardConfig();
+    m_limelightReader.disableLEDS();
   }
 
   /**
@@ -90,6 +95,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     //zeros used motor controllers
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
   }
 
 
@@ -140,10 +146,10 @@ public class Robot extends TimedRobot {
     //note that the magazine cannot run over 0.4 without load, or else the polycore will fly off
     //runs the magazine forward while the right bumper is held, and backward while the left one is
     if (m_testController.getBumper(Hand.kRight)) {
-        m_magazine.runBelt(0.65);
+        m_magazine.runBelt(0.37);
     }
     else if (m_testController.getBumper(Hand.kLeft)) {
-        m_magazine.runBelt(-0.65);
+        m_magazine.runBelt(-0.37);
     }
     //kills the velocity while not holding
     else {
@@ -154,7 +160,9 @@ public class Robot extends TimedRobot {
     if (m_testController.getStartButton()) {
         m_launcher.getMasterMotor().setSelectedSensorPosition(0);
     }
-    System.out.println(m_launcher.getMasterMotor().getSelectedSensorPosition());
+
+    m_launcherControl.setPIDF();
+    m_launcherControl.publishData();
 
     //disable the intake motors while its
     m_intake.setInnerIntakeMotor(0);
@@ -163,7 +171,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-
+    m_pilotController.getTargeting().getPID_Values();
   }
 
   @Override
@@ -172,6 +180,8 @@ public class Robot extends TimedRobot {
       //and sets them on our drivetrain class. Our driver input is multiplied by our scalar values
       //in order to scale back drivetrain speed.
       m_pilotController.setInputScalar();
+      m_pilotController.getTargeting().setPID();
+      
   }
 
     /**

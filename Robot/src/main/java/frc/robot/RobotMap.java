@@ -119,14 +119,14 @@ public class RobotMap {
     //*                                      *
     //****************************************
     //launcher PID constants for velocity control
-    public static final double LAUNCHER_P = .0125;
+    public static final double LAUNCHER_P = 1.0;
     public static final double LAUNCHER_I = 0;
-    public static final double LAUNCHER_D = 0;
-    public static final double LAUNCHER_F = 1023/7200.0;
+    public static final double LAUNCHER_D = 0.1;
+    public static final double LAUNCHER_F = .27;
 
     //600 is minutes to 100ms, 
     //3010.56 is our calculated raw sensor units per revolution on the output shaft
-    public static final double RPM_TO_UNITS_PER_100MS = 4096 / 600;
+    public static final double RPM_TO_UNITS_PER_100MS = 2048.0 / 600;
 
     //Calculated free spin angular velocity of our shooter based on specs (-10%) divided by three for gear reduction
     //measured in rev/100ms, specs found at https://www.vexrobotics.com/775pro.html#Other_Info
@@ -296,7 +296,7 @@ public class RobotMap {
     public static final double TARGETING_PERIOD_S = 20;
 
     //the maximum accumulated error for the Integral portion of our targeting PID
-    public static final double TARGETING_MAX_ACCUMULATED_ERROR = 0;
+    public static final double TARGETING_MAX_ACCUMULATED_ERROR = 30;
 
     //the acceptable error for our vision targeting in degrees
     public static final double TARGETING_ERROR_TOLERANCE = 0;

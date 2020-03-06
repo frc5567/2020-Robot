@@ -20,6 +20,12 @@ public class ShuffleboardLauncherControl {
     private Launcher m_launcher;
     private NetworkTableEntry m_percentTarget;
     private NetworkTableEntry m_angularVelocityTarget;
+
+    private NetworkTableEntry m_pLaunch;
+    private NetworkTableEntry m_iLaunch;
+    private NetworkTableEntry m_dLaunch;
+    private NetworkTableEntry m_fLaunch;
+    private NetworkTableEntry m_currentVel;
     
     /**
      * Constructor for ShuffleboardShooterControl objects
@@ -45,6 +51,27 @@ public class ShuffleboardLauncherControl {
                               .withWidget(BuiltInWidgets.kTextView)                             //sets widget to a text view
                               .withProperties(Map.of("min", -10000.0, "max", 10000.0))          //sets min and max values
                               .getEntry();                                                      //retrieves the entry to assign our setpoint
+
+        m_pLaunch = m_launcherTab.addPersistent("P", 0.0)
+                                 .withWidget(BuiltInWidgets.kTextView)
+                                 .getEntry();
+
+        m_iLaunch = m_launcherTab.addPersistent("I", 0.0)
+                                 .withWidget(BuiltInWidgets.kTextView)
+                                 .getEntry();
+
+        m_dLaunch = m_launcherTab.addPersistent("D", 0.0)
+                                 .withWidget(BuiltInWidgets.kTextView)
+                                 .getEntry();
+
+        m_fLaunch = m_launcherTab.addPersistent("F", 0.0)
+                                 .withWidget(BuiltInWidgets.kTextView)
+                                 .getEntry();
+
+        m_currentVel = m_launcherTab.addPersistent("Current Velocity", 0.0)
+                                    .withWidget(BuiltInWidgets.kTextView)
+                                    .getEntry();
+
     }
 
     /**
@@ -73,6 +100,14 @@ public class ShuffleboardLauncherControl {
 
         //runs the proportional control system based on the aquired speed
         m_launcher.setVelocity(tempVelocity);
+    }
+
+    public void setPIDF() {
+        m_launcher.configPIDF(m_pLaunch.getDouble(0), m_iLaunch.getDouble(0), m_dLaunch.getDouble(0), m_fLaunch.getDouble(0));
+    }
+
+    public void publishData() {
+        m_currentVel.setDouble(m_launcher.getMasterMotor().getSelectedSensorVelocity(0) / RobotMap.RPM_TO_UNITS_PER_100MS);
     }
 
     /**

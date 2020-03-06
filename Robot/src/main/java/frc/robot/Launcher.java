@@ -126,8 +126,8 @@ public class Launcher {
         m_masterMotor.set(ControlMode.Velocity, velocity);
 
         //debugging print outs
-        System.out.println("Selected Sensor Velocity: " + m_masterMotor.getSelectedSensorVelocity());
-        System.out.println(" | Target Velocity: " + velocity);
+        System.out.print("Selected Sensor Velocity: " + m_masterMotor.getSelectedSensorVelocity());
+        System.out.println(" | Target Velocity: " + velocity + " | Motor Percent Out: " + m_masterMotor.getMotorOutputPercent());
         
         //set our slave motors to follow master
         m_closeSlaveMotor.follow(m_masterMotor, FollowerType.PercentOutput);
@@ -181,12 +181,12 @@ public class Launcher {
         m_masterMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, RobotMap.LAUNCHER_FEEDBACK_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //this configs the deadband for the PID output. Any output with an absolute value less than this will be treated as zero
-        m_masterMotor.configNeutralDeadband(RobotMap.LAUNCHER_NEUTRAL_DEADBAND, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        m_masterMotor.configNeutralDeadband(0, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //this sets the peak output for our motor controller.
         m_masterMotor.configPeakOutputForward(RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
         //this does the same thing but for the reverse direction
-        m_masterMotor.configPeakOutputReverse(-RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        m_masterMotor.configPeakOutputReverse(0, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
         
         //sets the period of the velocity sample
         //effectively this defines the amount of time used to calculate the velocity
@@ -220,6 +220,7 @@ public class Launcher {
         //should be increased if the can bus is haveing issues
         m_masterMotor.configClosedLoopPeriod(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_CLOSED_LOOP_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
+        m_masterMotor.configClosedloopRamp(0);
         //sets our closed loop control to use our primary PID slot
         m_masterMotor.selectProfileSlot(RobotMap.PID_PRIMARY_SLOT, 0);
     }
@@ -269,5 +270,12 @@ public class Launcher {
     public String toString() {
         return "Motor ID: " + m_masterMotor.getDeviceID() + ", Motor Inversion: " + m_masterMotor.getInverted()
         + ", Current Output (percent): " + m_masterMotor.getMotorOutputPercent()+ " | Encoder Position: "+ m_encoder.getQuadraturePosition();
+    }
+
+    public void configPIDF(double p, double i, double d, double f) {
+        m_masterMotor.config_kP(0, p);
+        m_masterMotor.config_kI(0, i);
+        m_masterMotor.config_kD(0, d);
+        m_masterMotor.config_kF(0, f);
     }
 }
