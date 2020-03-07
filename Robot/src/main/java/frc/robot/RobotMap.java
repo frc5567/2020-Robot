@@ -191,13 +191,13 @@ public class RobotMap {
     /**The CAN ID for the extension motor */
     public static final int EXTENSION_MOTOR_ID = 27;
     /**The PWM port for the winch or lift motor */
-    public static final int LIFT_MOTOR_PORT = 1;
+    public static final int LIFT_MOTOR_PORT = 3;
 
     /**The adjustment value for the proportionality constant for the lift motor */
     public static final double CLIMBER_ADJUSTMENT_VALUE = 0.5;
 
     //the encoder target of for the extension motor. TODO: Input an actual value here
-    public static final int CLIMBER_EXTENSION_ENCODER_TARGET = 0;
+    public static final int CLIMBER_EXTENSION_ENCODER_TARGET = 29600;
 
     //the climber timeout for running confing methods
     public static final int CLIMBER_CONFIG_TIMEOUT_MS = 30;
@@ -206,29 +206,29 @@ public class RobotMap {
     public static final int CLIMBER_FEEDBACK_PERIOD_MS = 10;
 
     //the neutral deadband for our climber PIDs
-    public static final double CLIMBER_NEUTRAL_DEADBAND = 0.04;
+    public static final double CLIMBER_NEUTRAL_DEADBAND = 0.02;
 
     //the peak output on our climber PIDs
     public static final double CLIMBER_PID_PEAK_OUTPUT = 1.0;
 
     //the acceleration for the climber in units per 100ms per second
     //1000 is half the value for the elevator last year, this needs to be tuned via testing
-    public static final int CLIMBER_MOTION_MAGIC_ACCEL = 1000;
+    public static final int CLIMBER_MOTION_MAGIC_ACCEL = 2000;
 
     //the cruise velocity for the climber in units per second
     //1000 is half the value for the elevator last year, this needs to be tuned via testing
-    public static final int CLIMBER_MOTION_MAGIC_CRUISE_VELOCITY = 1000;
+    public static final int CLIMBER_MOTION_MAGIC_CRUISE_VELOCITY = 2000;
 
     //the PIDF values for the extension motor on the climber
     //these values are temporary and should be tuned through testing
-    public static final double CLIMBER_EXTENSION_P = 0.3;
-    public static final double CLIMBER_EXTENSION_I = 0;
+    public static final double CLIMBER_EXTENSION_P = 0.4;
+    public static final double CLIMBER_EXTENSION_I = 0.01;
     public static final double CLIMBER_EXTENSION_D = 0;
-    public static final double CLIMBER_EXTENSION_F = 0;
+    public static final double CLIMBER_EXTENSION_F = 0.05;
 
     //the acceptable integral zone for the extension motor
     //100 is the value used last year, this should be adjusted in testing if need be
-    public static final int CLIMBER_EXTENSION_I_ZONE = 100;
+    public static final int CLIMBER_EXTENSION_I_ZONE = 600;
 
     //the acceptable error for the extension PID. Any error less than this will be treated as zero
     public static final int CLIMBER_EXTENSION_ACCEPTABLE_ERROR = 0;
@@ -272,10 +272,11 @@ public class RobotMap {
     /**Height of the vision target in inches */
     public static final double TARGET_HEIGHT_INCHES = 98.25;
     /**Height of the limelight lense in inches TODO: Finalized when robot is set */
-    public static final double CAMERA_HEIGHT_INCHES = 45d;
+    public static final double CAMERA_HEIGHT_INCHES = 43.4;
     /**The difference between the camera height and the target height */
     public static final double NET_HEIGHT_INCHES = RobotMap.TARGET_HEIGHT_INCHES - RobotMap.CAMERA_HEIGHT_INCHES;
 
+    public static final double CAMERA_DEGREES_FROM_GROUND = 14.4;
     /**
      * This is the offset we make for inner target - 
      * we multiply this by our actual offset to change our targeting 

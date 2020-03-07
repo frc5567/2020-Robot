@@ -70,13 +70,13 @@ public class Climber {
     public Climber() {
         //instantiate instance variables
         m_extensionMotor = new TalonSRX(RobotMap.EXTENSION_MOTOR_ID);
-        m_liftMotor = new PWMSparkMax(RobotMap.LIFT_MOTOR_PORT);
-
-        //using the launcher value temporarily, needs to be fixed
-        m_adjustmentValue = RobotMap.CLIMBER_ADJUSTMENT_VALUE;
+        // m_liftMotor = new PWMSparkMax(RobotMap.LIFT_MOTOR_PORT);
 
         //sets our encoders to the encoders plugged into the talons
         m_extensionEncoder = new SensorCollection(m_extensionMotor);
+
+        //using the launcher value temporarily, needs to be fixed
+        m_adjustmentValue = RobotMap.CLIMBER_ADJUSTMENT_VALUE;
 
         //sets starting position on object contruction
         //object construction should occur in RobotInit or in Robot contructor
@@ -170,7 +170,7 @@ public class Climber {
      */
     public void configExtensionMotionMagic() {
         //zero our motors and reset the encoders
-        zeroMotors();
+        // zeroMotors();
         encoderReset();
 
         //set our feedback sensor to the encoder plugged into the motor controller

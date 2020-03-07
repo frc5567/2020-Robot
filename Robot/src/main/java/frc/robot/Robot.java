@@ -9,6 +9,8 @@ package frc.robot;
 
 import java.util.Map;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -125,7 +127,25 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    periodicClimberTest();
+    periodicLauncherTest(); 
+  }
+
+  /**
+   * This method will print out values of all sensors on the robot for prematch checks
+   */
+  public void preMatchSensorTesting() {
+
+  }
+  
+  /**
+   * Prints out the y degrees to target and 
+   * calculates distance based on shuffleboard and limelight
+   */
+  public void periodicDistanceTuning() {
+    System.out.println("Y Degrees to target : "+  m_limelightReader.getYDegreesToTarget());
+    
+    double lengthToHeightRatio = Math.tan(RobotMap.DEG_TO_RAD_CONVERSION * (m_cameraAngle.getDouble(0) + m_limelightReader.getYDegreesToTarget()));
+    m_distance.setDouble((m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0)) / lengthToHeightRatio);
   }
 
   /**
@@ -133,17 +153,33 @@ public class Robot extends TimedRobot {
    * <p> Controls climber manually (for now)
    */
   public void periodicClimberTest() {
-    if(m_testController.getAButton()) {
-      m_climber.setExtensionSpeed(0.25);
+    int extensionCurrent = m_climber.getExtensionMotor().getSelectedSensorPosition();
+    //TODO: RobotMap 29700 (Hard limit)
+    if((extensionCurrent < 29700) && m_testController.getAButton()) {
+      m_climber.setExtensionSpeed(0.4);
     }
-    else if (m_testController.getBButton()) {
-      m_climber.setExtensionSpeed(-0.25);
+    else if ((extensionCurrent > 0) && m_testController.getBButton()) {
+      m_climber.setExtensionSpeed(-0.4);
+    }
+    else if ((extensionCurrent < 29700) && m_testController.getBumper(Hand.kRight)) {
+      m_climber.extendClimber();
+    }
+    else if ((extensionCurrent > 0) && m_testController.getBumper(Hand.kLeft)) {
+      m_climber.retractClimber();
     }
     else {
       m_climber.zeroExtensionMotor();
     }
 
-    m_climber.zeroLiftMotor();
+    if (m_testController.getStartButton()) {
+      m_climber.encoderReset();
+    }
+
+    m_launcherControl.zeroSpeed();
+    m_magazine.runBelt(0);
+    m_intake.setInnerIntakeMotor(0);
+    m_intake.setOuterIntakeMotor(0);
+   // m_climber.zeroLiftMotor();
     System.out.println("Current Encoder Value: \t" + m_climber.getExtensionMotor().getSelectedSensorPosition());
   }
 
@@ -153,25 +189,35 @@ public class Robot extends TimedRobot {
    */
   public void periodicLauncherTest() {
     //runs velocity control while b button is pressed
-    if(m_testController.getBButton()) {
+    if(m_testController.getYButtonPressed()) {
       m_launcherControl.setVelocity();
     }
+    //zeros speed while not actively controlled
+    else if (m_testController.getBButtonPressed()) {
+      m_launcherControl.setPercentSpeed();
+      m_launcherControl.m_currentVel.setDouble(m_launcher.getMasterMotor().getSelectedSensorVelocity() / RobotMap.RPM_TO_UNITS_PER_100MS);
+    }
+    else if (m_testController.getXButtonPressed()) {
+      m_launcherControl.zeroSpeed();
+    }
+
     //runs percent control while a button is pressed
-    else if (m_testController.getAButton()) {
+    if (m_testController.getAButtonPressed()) {
         m_launcherControl.setPercentSpeed();
     }
     //zeros speed while not actively controlled
-    else {
-        m_launcherControl.zeroSpeed();
+    else if (m_testController.getAButtonReleased()) {
+      m_launcherControl.zeroSpeed();
     }
+    
 
     //note that the magazine cannot run over 0.4 without load, or else the polycore will fly off
     //runs the magazine forward while the right bumper is held, and backward while the left one is
     if (m_testController.getBumper(Hand.kRight)) {
-        m_magazine.runBelt(0.37);
+        m_magazine.runBelt(0.7);
     }
     else if (m_testController.getBumper(Hand.kLeft)) {
-        m_magazine.runBelt(-0.37);
+        m_magazine.runBelt(-0.7);
     }
     //kills the velocity while not holding
     else {
@@ -194,6 +240,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     m_pilotController.getTargeting().getPID_Values();
+    m_pilotController.getDrivetrain().setNeutralMode(NeutralMode.Coast);
   }
 
   @Override
@@ -203,6 +250,7 @@ public class Robot extends TimedRobot {
       //in order to scale back drivetrain speed.
       m_pilotController.setInputScalar();
       m_pilotController.getTargeting().setPID();
+      m_pilotController.getDrivetrain().setNeutralMode(NeutralMode.Coast);
       
   }
 

@@ -25,7 +25,7 @@ public class ShuffleboardLauncherControl {
     private NetworkTableEntry m_iLaunch;
     private NetworkTableEntry m_dLaunch;
     private NetworkTableEntry m_fLaunch;
-    private NetworkTableEntry m_currentVel;
+    NetworkTableEntry m_currentVel;
     
     /**
      * Constructor for ShuffleboardShooterControl objects
@@ -83,7 +83,7 @@ public class ShuffleboardLauncherControl {
         double tempSpeed = m_percentTarget.getDouble(0.0);
 
         //runs the proportional control system based on the aquired speed
-        m_launcher.proportionalSpeedSetter(tempSpeed);
+        m_launcher.setMotor(tempSpeed);
     }
 
     /**
@@ -128,6 +128,6 @@ public class ShuffleboardLauncherControl {
      * Sets the setpoint to zero, should be used as a default state
      */
     public void zeroSpeed() {
-        m_launcher.proportionalSpeedSetter(0.0);
+        m_launcher.setMotor(0.0);
     }
 }

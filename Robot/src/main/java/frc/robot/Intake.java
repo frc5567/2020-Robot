@@ -7,7 +7,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PWMSparkMax;
-import edu.wpi.first.wpilibj.PWMTalonSRX;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
@@ -124,7 +124,7 @@ public class Intake {
     public Intake() {
         //the motors are currently set to operate over PWM to reduce can bus traffic
         m_outerMotor = new PWMSparkMax(RobotMap.INTAKE_PWM_SPARK_PORT);
-        m_innerMotor = new PWMTalonSRX(RobotMap.INTAKE_INNER_MOTOR_PORT);
+        m_innerMotor = new Talon(RobotMap.INTAKE_INNER_MOTOR_PORT);
 
         m_outerMotor.setInverted(RobotMap.OUTER_INTAKE_INVERTED);
         m_innerMotor.setInverted(RobotMap.INNER_INTAKE_INVERTED);

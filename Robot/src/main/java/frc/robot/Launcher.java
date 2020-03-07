@@ -123,10 +123,6 @@ public class Launcher {
     public void setVelocity(double velocity) {
         //set the velocity of the motors
         m_masterMotor.set(ControlMode.Velocity, velocity);
-
-        //debugging print outs TODO: Remove all sysouts for final master
-        System.out.print("Selected Sensor Velocity: " + m_masterMotor.getSelectedSensorVelocity());
-        System.out.println(" | Target Velocity: " + velocity + " | Motor Percent Out: " + m_masterMotor.getMotorOutputPercent());
         
         //set our slave motors to follow master
         m_closeSlaveMotor.follow(m_masterMotor, FollowerType.PercentOutput);
@@ -219,6 +215,7 @@ public class Launcher {
         //should be increased if the can bus is haveing issues
         m_masterMotor.configClosedLoopPeriod(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_CLOSED_LOOP_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
+        m_masterMotor.configOpenloopRamp(3);
         m_masterMotor.configClosedloopRamp(0);
         //sets our closed loop control to use our primary PID slot
         m_masterMotor.selectProfileSlot(RobotMap.PID_PRIMARY_SLOT, 0);
