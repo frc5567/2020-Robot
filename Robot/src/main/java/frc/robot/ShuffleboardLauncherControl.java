@@ -102,10 +102,24 @@ public class ShuffleboardLauncherControl {
         m_launcher.setVelocity(tempVelocity);
     }
 
+    /**
+     * Sets PIDF values based on shuffleboard values
+     */
     public void setPIDF() {
         m_launcher.configPIDF(m_pLaunch.getDouble(0), m_iLaunch.getDouble(0), m_dLaunch.getDouble(0), m_fLaunch.getDouble(0));
     }
 
+    /**
+     * Resets PIDF values to RobotMap constants
+     */
+    public void resetPIDF() {
+        m_launcher.resetPIDF();
+    }
+
+    /**
+     * This method publishes all requested data to shuffleboard widgets
+     * <p> This currently holds velocity in RPM, but we can put anything we want here
+     */
     public void publishData() {
         m_currentVel.setDouble(m_launcher.getMasterMotor().getSelectedSensorVelocity(0) / RobotMap.RPM_TO_UNITS_PER_100MS);
     }
@@ -116,5 +130,4 @@ public class ShuffleboardLauncherControl {
     public void zeroSpeed() {
         m_launcher.proportionalSpeedSetter(0.0);
     }
-
 }

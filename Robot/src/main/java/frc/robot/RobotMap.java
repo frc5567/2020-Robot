@@ -221,7 +221,7 @@ public class RobotMap {
 
     //the PIDF values for the extension motor on the climber
     //these values are temporary and should be tuned through testing
-    public static final double CLIMBER_EXTENSION_P = 0;
+    public static final double CLIMBER_EXTENSION_P = 0.3;
     public static final double CLIMBER_EXTENSION_I = 0;
     public static final double CLIMBER_EXTENSION_D = 0;
     public static final double CLIMBER_EXTENSION_F = 0;

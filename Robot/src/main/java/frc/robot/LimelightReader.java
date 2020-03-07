@@ -20,8 +20,18 @@ public class LimelightReader {
         m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     }
 
-    public void disableLEDS() {
-        m_limelightTable.getEntry("ledMode").setDouble(1);
+    /**
+     * Forces the LEDs to turn off on the limelight
+     */
+    public void disableLEDs() {
+        m_limelightTable.getEntry("ledMode").setDouble(1d);
+    }
+
+    /**
+     * Restores the LED to pipeline control
+     */
+    public void enableLEDs() {
+        m_limelightTable.getEntry("ledMode").setDouble(0d);
     }
 
     /**

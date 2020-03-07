@@ -1,7 +1,6 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
@@ -125,7 +124,7 @@ public class Launcher {
         //set the velocity of the motors
         m_masterMotor.set(ControlMode.Velocity, velocity);
 
-        //debugging print outs
+        //debugging print outs TODO: Remove all sysouts for final master
         System.out.print("Selected Sensor Velocity: " + m_masterMotor.getSelectedSensorVelocity());
         System.out.println(" | Target Velocity: " + velocity + " | Motor Percent Out: " + m_masterMotor.getMotorOutputPercent());
         
@@ -272,10 +271,27 @@ public class Launcher {
         + ", Current Output (percent): " + m_masterMotor.getMotorOutputPercent()+ " | Encoder Position: "+ m_encoder.getQuadraturePosition();
     }
 
+    /**
+     * Sets PIDF values to based on passed in parameters
+     * @param p Proportionality Constant
+     * @param i Integral Constant
+     * @param d Derivative Constant
+     * @param f Feed-Forward Constant
+     */
     public void configPIDF(double p, double i, double d, double f) {
         m_masterMotor.config_kP(0, p);
         m_masterMotor.config_kI(0, i);
         m_masterMotor.config_kD(0, d);
         m_masterMotor.config_kF(0, f);
+    }
+
+    /**
+     * Resets PIDF values to their RobotMap constants
+     */
+    public void resetPIDF() {
+        m_masterMotor.config_kP(0, RobotMap.LAUNCHER_P);
+        m_masterMotor.config_kI(0, RobotMap.LAUNCHER_I);
+        m_masterMotor.config_kD(0, RobotMap.LAUNCHER_D);
+        m_masterMotor.config_kF(0, RobotMap.LAUNCHER_F);
     }
 }

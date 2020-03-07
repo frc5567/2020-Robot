@@ -38,6 +38,7 @@ public class Robot extends TimedRobot {
   //declare our other copilot systems
   Magazine m_magazine;
   Intake m_intake;
+  Climber m_climber;
 
   //declares an xbox controller used for testing prototype code
   XboxController m_testController;
@@ -83,9 +84,12 @@ public class Robot extends TimedRobot {
     //instantiate intake, this needs to be moved to copilot controller post testing
     m_intake = new Intake();
 
+    //instantiate climber, this needs to be moved to copilot controller post testing
+    m_climber = new Climber();
+
     //sets up our camera testing tab
     shuffleboardConfig();
-    m_limelightReader.disableLEDS();
+    m_limelightReader.disableLEDs();
   }
 
   /**
@@ -94,11 +98,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    //zeros used motor controllers
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
   }
-
-
 
   @Override
   public void autonomousInit() {
@@ -109,8 +109,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-    public void teleopInit() {
-
+  public void teleopInit() {
   }
         
   @Override
@@ -126,10 +125,33 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    //this test periodic is designed for launcher velocity testing
-    //sets the velocity of the launcher while holding the b button
-    //Both intake motors must be inverted
+    periodicClimberTest();
+  }
 
+  /**
+   * Call this during test periodic for climber testing
+   * <p> Controls climber manually (for now)
+   */
+  public void periodicClimberTest() {
+    if(m_testController.getAButton()) {
+      m_climber.setExtensionSpeed(0.25);
+    }
+    else if (m_testController.getBButton()) {
+      m_climber.setExtensionSpeed(-0.25);
+    }
+    else {
+      m_climber.zeroExtensionMotor();
+    }
+
+    m_climber.zeroLiftMotor();
+    System.out.println("Current Encoder Value: \t" + m_climber.getExtensionMotor().getSelectedSensorPosition());
+  }
+
+  /**
+   * Call this during test periodic for launcher testing
+   * <p> Controls launcher, magazine, and zeros intake
+   */
+  public void periodicLauncherTest() {
     //runs velocity control while b button is pressed
     if(m_testController.getBButton()) {
       m_launcherControl.setVelocity();
@@ -164,7 +186,7 @@ public class Robot extends TimedRobot {
     m_launcherControl.setPIDF();
     m_launcherControl.publishData();
 
-    //disable the intake motors while its
+    //disable the intake motors while its unused
     m_intake.setInnerIntakeMotor(0);
     m_intake.setOuterIntakeMotor(0);
   }
