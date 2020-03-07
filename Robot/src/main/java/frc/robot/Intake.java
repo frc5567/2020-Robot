@@ -2,9 +2,12 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
@@ -17,10 +20,30 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 public class Intake {
 
     /**
-     * An enum for storing our positions
+     * An enum for storing our possible intake positions
+     * <p>Possible values:
+     * <li>{@link #kLowered}</li>
+     * <li>{@link #kRaised}</li>
+     * <li>{@link #kUnknown}</li>
      */
     public enum Position {
-        kLowered("Lowered"), kRaised("Raised");
+        /**
+         * The lowered position of the intake
+         * <p>This is the position we use to actually run our system
+         */
+        kLowered("Lowered"),
+        /**
+         * The raised position of the intake
+         * <p>This is the position we need to be in at the start of the match
+         * and the position we use while driving around
+         */
+        kRaised("Raised"),
+        /**
+         * The starting value of the intake
+         * <p>We intialize our storage variable to this position,
+         * however at no point in the match should this ever be the state of the intake
+         */
+        kUnknown("Unknown");
 
         private String positionName;
 
@@ -39,7 +62,7 @@ public class Intake {
         }
     }
 
-    //declare our intake motor controller
+    //declare our intake motor controllers
     SpeedController m_outerMotor;
     BaseMotorController m_innerMotor;
 
@@ -61,8 +84,11 @@ public class Intake {
         m_innerMotor = innerIntakeMotor;
         m_positionPiston = positionPiston;
 
-        //set our default position to raised
-        m_position = Position.kRaised;
+        //set our starting position to unknown
+        m_position = Position.kUnknown;
+
+        //then set the solenoids to the raised position
+        setPosition(Position.kRaised);
     }
 
     /**
@@ -84,9 +110,31 @@ public class Intake {
         m_innerMotor = innerIntakeMotor;
         m_positionPiston = positionPiston;
 
-        //set our default position to raised
-        m_position = Position.kRaised;
-  }
+        //set our starting position to unknown
+        m_position = Position.kUnknown;
+
+        //then set the solenoids to the raised position
+        setPosition(Position.kRaised);
+    }
+
+    /**
+     * Vertical constructor for the intake
+     * Uses robot map constants for instantation
+     */
+    public Intake() {
+        //the spark is currently set to operate over PWM to reduce can bus traffic
+        m_outerMotor = new PWMSparkMax(RobotMap.INTAKE_PWM_SPARK_PORT);
+        
+        m_innerMotor = new VictorSPX(RobotMap.INTAKE_VICTOR_ID);
+
+        m_positionPiston = new DoubleSolenoid(RobotMap.INTAKE_POSITION_PISTON_FORWARD_PORT, RobotMap.INTAKE_POSITION_PISTON_REVERSE_PORT);
+
+        //set our starting position to unknown
+        m_position = Position.kUnknown;
+
+        //then set the solenoids to the raised position
+        setPosition(Position.kRaised);
+    }
 
     /**
      * Sets the speed of the inner intake motor
@@ -139,6 +187,27 @@ public class Intake {
      */
     public Position getPosition() {
         return m_position;
+    }
+
+    /**
+     * @return the speed controller controlling the outer motor
+     */
+    public SpeedController getOuterMotor() {
+        return m_outerMotor;
+    }
+
+    /**
+     * @return the speed controller controlling the inner motor
+     */
+    public BaseMotorController getInnerMotor() {
+        return m_innerMotor;
+    }
+
+    /**
+     * @return the double solenoid that sets our position
+     */
+    public DoubleSolenoid getPositionPiston() {
+        return m_positionPiston;
     }
 
     /**

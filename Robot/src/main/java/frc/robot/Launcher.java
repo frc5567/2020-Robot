@@ -5,7 +5,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -19,14 +18,8 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
  * @author Josh Overbeek
  */
 public class Launcher {
-    //error times this gives you the increase in speed 
-    private double m_adjustmentValue;
-
     //current set speed of the motor
     private double m_currentSpeed = 0;
-
-    //difference between current speed and target speed (set point)
-    private double m_error;
 
     //speed controllers used to launch 
     //the master controller drives the other motors in closed loop velocity control
@@ -46,20 +39,43 @@ public class Launcher {
      * 
      * <p> A four motor launcher with one master connected to an encoder and three slaves
      * 
-     * @param adjustmentValue The proportionality constant used to control this launcher's speed
      * @param masterMotor The master speed controller used to launch the projectile
      * @param closeSlaveMotor The slave motor controller on the same side of the shooter as the master
      * @param farSlaveMotor1 One of the slave motors on the far side of the launcher (from the master)
      * @param farSlaveMotor2 The other slave motor on the far side of the launcher
      */
-    public Launcher(double adjustmentValue, TalonSRX masterMotor, BaseMotorController closeSlaveMotor, BaseMotorController farSlaveMotor1, BaseMotorController farSlaveMotor2) {
-        m_adjustmentValue = adjustmentValue;
-
+    public Launcher(TalonSRX masterMotor, BaseMotorController closeSlaveMotor, 
+                    BaseMotorController farSlaveMotor1, BaseMotorController farSlaveMotor2) {
+        
+        //instantiate passed-in motors
         m_masterMotor = masterMotor;
         m_closeSlaveMotor = closeSlaveMotor;
 
         m_farSlaveMotor1 = farSlaveMotor1;
         m_farSlaveMotor2 = farSlaveMotor2;
+
+        //Sets the far motors to be inverted so that they don't work against the close ones
+        //TODO: Inversion MUST be checked individually prior to testing
+        m_farSlaveMotor1.setInverted(RobotMap.LAUNCHER_FAR_SLAVE1_INVERTED);
+        m_farSlaveMotor2.setInverted(RobotMap.LAUNCHER_FAR_SLAVE2_INVERTED);
+
+        //Instantiates the encoder as the encoder plugged into the master
+        m_encoder = new SensorCollection(m_masterMotor);
+
+        //run the config methods to set up velocity control
+        configVelocityControl();
+    }
+
+    /**
+     * Constructor for robot objects
+     * <p> This instantiates a launcher using the robot map constants rather than parameters
+     */
+    public Launcher() {
+        //instantiate motors and djustment value using robot map constants
+        m_masterMotor = new TalonSRX(RobotMap.MASTER_LAUNCHER_ID);
+        m_closeSlaveMotor = new VictorSPX(RobotMap.CLOSE_LAUNCHER_SLAVE_ID);
+        m_farSlaveMotor1 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE1_ID);
+        m_farSlaveMotor2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
 
         //Sets the far motors to be inverted so that they don't work against the close ones
         m_farSlaveMotor1.setInverted(RobotMap.LAUNCHER_FAR_SLAVE1_INVERTED);
@@ -92,16 +108,16 @@ public class Launcher {
      */
     public void proportionalSpeedSetter(double setpoint) {
         //calculates error based on the difference between current and target speeds
-        m_error = setpoint - m_currentSpeed;
+        double error = setpoint - m_currentSpeed;
         //adjusts the current speed proportionally to the error
-        m_currentSpeed += (m_error * m_adjustmentValue);
+        m_currentSpeed += (error * RobotMap.LAUNCHER_ADJUSTMENT_VALUE);
 
         //sets the speed of the motors based on the adjusted current speed
         setMotor(m_currentSpeed);
     }
 
     /**
-     * Sets the velocity of the motors in revs/100ms
+     * Sets the velocity of the motors in rev/100ms
      * @param velocity target velocity in rev/100ms
      */
     public void setVelocity(double velocity) {
@@ -116,57 +132,58 @@ public class Launcher {
 
     /**
      * This revs our launcher to a target velocity as a function of distance
-     * <p>This equation needs to be tuned based on testing
+     * <p>TODO: This equation needs to be tuned based on testing
      * @param distance Horizontal distance to the target in inches, this should be a product of our limelight
      */
     public void revLauncher(double distance) {
         //calculate what percent of our max distance we are from our target
         double percentMaxDistance = (distance /  RobotMap.MAX_LAUNCHER_DISTANCE_IN);
 
+        //if our distance is greater than our max distance, this caps the output at one
+        if (percentMaxDistance > 1.0) {
+            percentMaxDistance = 1.0;
+        }
+        //or, if we have negative distance, floor our distance at zero to prevent unexpected results
+        else if (percentMaxDistance < 0.0) {
+            percentMaxDistance = 0.0;
+        }
+
         //set our target velocity to that same percent of our max speed
         double targetVelocity = (percentMaxDistance * RobotMap.LAUNCHER_FREESPIN_ANGULAR_VELOCITY);
 
         //set our motor to the target velocity calculated
-        m_masterMotor.set(ControlMode.Velocity, targetVelocity);
-
-        //set our slave motors to follow master
-        m_closeSlaveMotor.follow(m_masterMotor);
-        m_farSlaveMotor1.follow(m_masterMotor);
-        m_farSlaveMotor2.follow(m_masterMotor);
+        setVelocity(targetVelocity);
     }
 
     /**
-     * This should only be run once at the start of the match or in robot init
+     * This should only be run in the constructor for this object
      * <p> This must be run before using any velocity control
      */
-    public void configVelocityControl() {
+    private void configVelocityControl() {
         //config remote sensors
         //sets the sensor to be a quad encoder, sets our feedback device to be that sensor
         m_masterMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
 
         //sets whether our motor is inverted
         //this is currently false but can be switched based on testing
-        m_masterMotor.setInverted(false);
-        m_masterMotor.setSensorPhase(false);
+        m_masterMotor.setInverted(RobotMap.LAUNCHER_MASTER_INVERTED);
+        m_masterMotor.setSensorPhase(RobotMap.LAUNCHER_MASTER_INVERTED);
 
         //this sets how often we pull data from our sensor
-        //as it is currently set, the motor controller will read from the encoder every 10 miliseconds
         m_masterMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, RobotMap.LAUNCHER_FEEDBACK_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //this configs the deadband for the PID output. Any output with an absolute value less than this will be treated as zero
-        //curently, this is the factory default (0.04), but should be tuned on testing
         m_masterMotor.configNeutralDeadband(RobotMap.LAUNCHER_NEUTRAL_DEADBAND, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
-        //this sets the peak output for our PID. The PID cannot output a value higher than this
-        //this is currently set to 1.0, so the PID can output as much as it wants
+        //this sets the peak output for our motor controller.
         m_masterMotor.configPeakOutputForward(RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
         //this does the same thing but for the reverse direction
         m_masterMotor.configPeakOutputReverse(-RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
         
         //sets the period of the velocity sample
         //effectively this defines the amount of time used to calculate the velocity
-        //this selection is currrently arbitrary
-        m_masterMotor.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        //TODO: this selection is currrently arbitrary
+        m_masterMotor.configVelocityMeasurementPeriod(RobotMap.VELOCITY_MEASUREMENT_PERIOD, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //Sets the number of samples used in the rolling average for calculating velocity
         m_masterMotor.configVelocityMeasurementWindow(RobotMap.LAUNCHER_VELOCITY_MEASUREMENT_WINDOW, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
@@ -174,44 +191,29 @@ public class Launcher {
         //set p, i, d, f values
         //the zero is the PID slot, in this case it is zero for the primary PID
         //the launcher has no auxillary or turning PID control
-        m_masterMotor.config_kP(0, RobotMap.LAUNCHER_P);
-        m_masterMotor.config_kI(0, RobotMap.LAUNCHER_I);
-        m_masterMotor.config_kD(0, RobotMap.LAUNCHER_D);
-        m_masterMotor.config_kF(0, RobotMap.LAUNCHER_F);
+        m_masterMotor.config_kP(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_P);
+        m_masterMotor.config_kI(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_I);
+        m_masterMotor.config_kD(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_D);
+        m_masterMotor.config_kF(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_F);
 
         //this sets the acceptable amount of Integral error, where if the absolute accumulated error exceeds this ammount, it resets to zero
         //this is designed to prevent the PID from going crazy if we move too far from our target
-        m_masterMotor.config_IntegralZone(0, RobotMap.LAUNCHER_I_ZONE, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        m_masterMotor.config_IntegralZone(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_I_ZONE, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //sets the max output of the motor specifically within closed loop control
-        //this is likely redundant, but the values can be set to seperate if needed in testing
-        m_masterMotor.configClosedLoopPeakOutput(0, RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        //TODO: this is likely redundant, but the values can be set to seperate if needed in testing
+        m_masterMotor.configClosedLoopPeakOutput(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //this configures an allowable error in closed loop control
-        //any error less than this is treated as zero. We currently set this to zero, but we can increase it if need be
-        m_masterMotor.configAllowableClosedloopError(0, RobotMap.LAUNCHER_ACCEPTABLE_ERROR, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        //any error less than this is treated as zero.
+        m_masterMotor.configAllowableClosedloopError(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_ACCEPTABLE_ERROR, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //configures the period for closed loop calculations in MS 
-        //Currently set to 10, but should be increased if the can bus is haveing issues
-        m_masterMotor.configClosedLoopPeriod(0, RobotMap.LAUNCHER_CLOSED_LOOP_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        //should be increased if the can bus is haveing issues
+        m_masterMotor.configClosedLoopPeriod(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_CLOSED_LOOP_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //sets our closed loop control to use our primary PID slot
-        m_masterMotor.selectProfileSlot(0, 0);
-    }
-
-    /**
-     * Sets the proportionality constant
-     * @param adjustmentValue The desired value for said constant
-     */
-    public void setAdjustmentValue(double adjustmentValue) {
-        m_adjustmentValue = adjustmentValue;
-    }
-
-    /**
-     * @return The proportionality constant used to adjust speed
-     */
-    public double getAdjustmentValue() {
-        return m_adjustmentValue;
+        m_masterMotor.selectProfileSlot(RobotMap.PID_PRIMARY_SLOT, 0);
     }
     
     /**
@@ -245,18 +247,12 @@ public class Launcher {
     }
 
     /**
-     * @return the current difference between the current speed and the setpoint
-     */
-    public double getError() {
-        return m_error;
-    }
-
-    /**
-     * toString method containing motor, encoder, adjustmentValue, current speed and current error
+     * toString method containing motor ID and inversion and encoder position
      * 
      * @return the state of the Launcher object summarized in a string
      */
     public String toString() {
-        return "Motor: " + m_masterMotor.toString() + " | Encoder: "+ m_encoder + " | Adjustment Value: " + m_adjustmentValue + " | Current Speed: " + m_currentSpeed + " | Current Error: " + m_error;
+        return "Motor ID: " + m_masterMotor.getDeviceID() + ", Motor Inversion: " + m_masterMotor.getInverted()
+        + ", Current Output (percent): " + m_masterMotor.getMotorOutputPercent()+ " | Encoder Position: "+ m_encoder.getQuadraturePosition();
     }
 }
