@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * This class has methods to make reading information from the network table easier and more readable
@@ -11,17 +12,12 @@ public class LimelightReader {
     //declares the network table for limelight info so that we can access it
     private NetworkTable m_limelightTable;
 
-    //flags for running needed pipeline
-    private boolean m_3Times = false;
-    private boolean m_2Times = false;
-    private boolean m_stand = false;
-
     /**
      * Constructor for our limelight reader object
-     * @param limelightTable The network table that stores limelight data
      */
-    public LimelightReader(NetworkTable limelightTable) {
-        m_limelightTable = limelightTable;
+    public LimelightReader() {
+        //pull the network table that the limelight publishes data to to a specific variable
+        m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     }
 
     /**
@@ -65,7 +61,10 @@ public class LimelightReader {
                     
                     // Test print outs
                     System.out.println("Inner Target");
-                }else System.out.println("Outer Target");
+                }
+                else {
+                    System.out.println("Outer Target");
+                }
         }
         return targetAngle;
     }
@@ -91,13 +90,11 @@ public class LimelightReader {
      * @return The horizontal distance from the robot to the target
      */
     public double getDistance(double cameraDegreesFromGround) {
-        //calculates and reports the distance from the robot to the base of the target
-        double netHeight = (RobotMap.TARGET_HEIGHT_INCHES - RobotMap.CAMERA_HEIGHT_INCHES);
-
         //The Pi/180 calc is a conversion from degrees to radians so that the Math.tan() method returns the correct value
-        double lengthToHeightRatio = Math.tan((Math.PI / 180) * (cameraDegreesFromGround + getYDegreesToTarget()));
-        return (netHeight / lengthToHeightRatio);
+        double lengthToHeightRatio = Math.tan(RobotMap.DEG_TO_RAD_CONVERSION * (cameraDegreesFromGround + getYDegreesToTarget()));
+        return (RobotMap.NET_HEIGHT_INCHES / lengthToHeightRatio);
     }
+    // creates a enum for our pipeline modes
     // creates a enum for our pipeline modes
     public enum Pipeline{
         kStandard,
@@ -113,39 +110,17 @@ public class LimelightReader {
 
         // changes pipeline mode depending on what we set it to
         if(m_pipeline == Pipeline.kStandard){
-            m_limelightTable.getEntry("standardVision").setNumber(0);
+            m_limelightTable.getEntry("pipeline").setNumber(0);
         }
         else if(m_pipeline == Pipeline.kZoomX2){
-            m_limelightTable.getEntry("2Zoom").setNumber(1);
+            m_limelightTable.getEntry("pipeline").setNumber(1);
         }
         else if(m_pipeline == Pipeline.kZoomX3){
-            m_limelightTable.getEntry("3Zoom").setNumber(2);
+            m_limelightTable.getEntry("pipeline").setNumber(2);
         }
         else if(m_pipeline == Pipeline.kDriver){
-            m_limelightTable.getEntry("driver").setNumber(3);
+            m_limelightTable.getEntry("pipeline").setNumber(3);
         }
     }
-
-    public void searchTarget(){
-        m_pipeline = Pipeline.kZoomX3;
-        
-        if(hasTargets() && m_pipeline == Pipeline.kZoomX3){
-            m_3Times = true;
-        }
-        else if(!hasTargets() && m_3Times == false){
-            m_pipeline = Pipeline.kZoomX2;
-            m_2Times = true;
-        }
-        else if(!hasTargets() && m_2Times == false){
-            m_pipeline = Pipeline.kStandard;
-            m_stand = true;
-        }
-        
-    }
-
-    public void flagReset(){
-        m_3Times = false;
-        m_2Times = false;
-        m_stand = false;
-    }
+    
 }
