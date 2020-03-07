@@ -16,6 +16,10 @@ public class RobotMap {
     //the deadband on our controller sticks to prevent drift
     public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.08;
 
+    //The intake motor speeds, for the inner and outer motors, used in the PilotController class
+    public static final double COPILOT_CONTROLLER_INNER_INTAKE_SPEED = 0.5;
+    public static final double COPILOT_CONTROLLER_OUTER_INTAKE_SPEED = 0.5;
+
     //****************************************
     //*                                      *
     //*        DRIVETRAIN CONSTANTS          *
