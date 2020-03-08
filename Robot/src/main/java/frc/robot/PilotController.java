@@ -50,6 +50,7 @@ public class PilotController {
 
     //declare the targeting object used to lock-on to the vision target
     private LimelightTargeting m_limelightTargeting;
+    private LimelightReader m_limelight;
 
     //declare the drive control type
     private final DriveType m_driveType;
@@ -99,7 +100,8 @@ public class PilotController {
     public PilotController(DriveType driveType, LimelightReader limelight) {
         m_drivetrain = new Drivetrain(RobotMap.DRIVETRAIN_HAS_TWO_SOLENOIDS);
         m_driveType = driveType;
-        m_limelightTargeting = new LimelightTargeting(m_drivetrain, limelight);
+        m_limelight = limelight;
+        m_limelightTargeting = new LimelightTargeting(m_drivetrain, m_limelight);
 
         //instantiate xbox controller for controlling the drivetrain
         m_controller = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
@@ -133,8 +135,8 @@ public class PilotController {
         turnInput = adjustForDeadband(turnInput);
 
         //multiplies our input by our current scalar
-        velocityInput *= m_currentVelocityScalar;
-        turnInput *= m_currentTurnScalar;
+        velocityInput *= m_currentVelocityScalar * Math.abs(velocityInput);
+        turnInput *= m_currentTurnScalar * Math.abs(turnInput);
 
         //run our drivetrain with the adjusted input
         m_drivetrain.arcadeDrive(velocityInput, turnInput);
@@ -192,10 +194,12 @@ public class PilotController {
     public void controlDriveTrainPeriodic() {
         //if the b button is pressed, lock onto the high target
         if (m_controller.getBButton()) {
+            m_limelight.getTable().getEntry("pipeline").setDouble(0);
             m_limelightTargeting.target();
         }
         //when the b button isn't pressed, run the drive train as normal
         else {
+            m_limelight.getTable().getEntry("pipeline").setDouble(3);
             //runs our drivetrain based on control scheme passed in
             if (m_driveType == DriveType.kArcade) {
                 arcadeDrive();

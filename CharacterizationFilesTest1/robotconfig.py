@@ -18,7 +18,7 @@
     # Inversions for the right side motors
     "rightMotorsInverted": [False, False],
     # Wheel diameter (in units of your choice - will dictate units of analysis)
-    "wheelDiameter": 6.0,
+    "wheelDiameter": 6.25,
     # If your robot has only one encoder, set all right encoder fields to `None`
     # Encoder edges-per-revolution (*NOT* cycles per revolution!)
     # This value should be the edges per revolution *of the wheels*, and so
@@ -41,4 +41,5 @@
     # "" (NavX using default SPI, ADXRS450 using onboard CS0, or no gyro)
     "gyroPort": "SPI.Port.kMXP",
 }
+
 
