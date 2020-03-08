@@ -77,7 +77,7 @@ public class Magazine {
         }
 
         //if we don't see the same value that we had last cycle and our new input is false
-        //then we have a falling edge on our laucnh, so we've seen a ball exit the system
+        //then we have a falling edge on our launch, so we've seen a ball exit the system
         if ( (launchInput != m_lastLaunchInput) && (launchInput == false)) {
             m_storedBalls--;
         }

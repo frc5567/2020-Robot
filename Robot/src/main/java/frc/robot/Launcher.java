@@ -215,8 +215,10 @@ public class Launcher {
         //should be increased if the can bus is haveing issues
         m_masterMotor.configClosedLoopPeriod(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_CLOSED_LOOP_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
-        m_masterMotor.configOpenloopRamp(3);
+        //configures ramp speed
+        m_masterMotor.configOpenloopRamp(RobotMap.LAUNCHER_OPEN_LOOP_RAMP_TIME_S);
         m_masterMotor.configClosedloopRamp(0);
+
         //sets our closed loop control to use our primary PID slot
         m_masterMotor.selectProfileSlot(RobotMap.PID_PRIMARY_SLOT, 0);
     }
@@ -276,19 +278,19 @@ public class Launcher {
      * @param f Feed-Forward Constant
      */
     public void configPIDF(double p, double i, double d, double f) {
-        m_masterMotor.config_kP(0, p);
-        m_masterMotor.config_kI(0, i);
-        m_masterMotor.config_kD(0, d);
-        m_masterMotor.config_kF(0, f);
+        m_masterMotor.config_kP(RobotMap.PID_PRIMARY_SLOT, p);
+        m_masterMotor.config_kI(RobotMap.PID_PRIMARY_SLOT, i);
+        m_masterMotor.config_kD(RobotMap.PID_PRIMARY_SLOT, d);
+        m_masterMotor.config_kF(RobotMap.PID_PRIMARY_SLOT, f);
     }
 
     /**
      * Resets PIDF values to their RobotMap constants
      */
     public void resetPIDF() {
-        m_masterMotor.config_kP(0, RobotMap.LAUNCHER_P);
-        m_masterMotor.config_kI(0, RobotMap.LAUNCHER_I);
-        m_masterMotor.config_kD(0, RobotMap.LAUNCHER_D);
-        m_masterMotor.config_kF(0, RobotMap.LAUNCHER_F);
+        m_masterMotor.config_kP(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_P);
+        m_masterMotor.config_kI(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_I);
+        m_masterMotor.config_kD(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_D);
+        m_masterMotor.config_kF(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_F);
     }
 }

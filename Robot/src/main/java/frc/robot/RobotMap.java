@@ -178,10 +178,11 @@ public class RobotMap {
     public static final int LAUNCHER_I_ZONE = 1000;
 
     //the acceptable error for the launcher PID. Any error less than this will be treated as zero
-    public static final int LAUNCHER_ACCEPTABLE_ERROR = 0;
+    public static final int LAUNCHER_ACCEPTABLE_ERROR = 50;
 
     //the closed loop period for the launcher PID
     public static final int LAUNCHER_CLOSED_LOOP_PERIOD_MS = 10; 
+    public static final int LAUNCHER_OPEN_LOOP_RAMP_TIME_S = 3;
 
     //****************************************
     //*                                      *
@@ -300,7 +301,7 @@ public class RobotMap {
     public static final double TARGETING_MAX_ACCUMULATED_ERROR = 30;
 
     //the acceptable error for our vision targeting in degrees
-    public static final double TARGETING_ERROR_TOLERANCE = 0;
+    public static final double TARGETING_ERROR_TOLERANCE = .7;
 
     //****************************************
     //*                                      *

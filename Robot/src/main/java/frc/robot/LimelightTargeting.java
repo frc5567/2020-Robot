@@ -73,8 +73,7 @@ public class LimelightTargeting {
             //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
             //This way the PID controller should target dead center
             double degToTarget = -m_limelight.getRawDegreesToTarget();
-            double turn =  (m_targetController.calculate(degToTarget, 0)) /45;
-            System.out.println(degToTarget + "\t    |   " + turn + "   |   " + m_targetController.getVelocityError());
+            double turn = (m_targetController.calculate(degToTarget, 0)) /45;
             m_drivetrain.arcadeDrive(0, turn);
         }
 
