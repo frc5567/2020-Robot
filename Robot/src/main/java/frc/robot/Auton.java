@@ -33,11 +33,11 @@ public class Auton {
     private AutonState m_state;
     private double m_tempTime = 0;
 
-    public Auton(LimelightReader limelight) {
-        m_magazine = new Magazine();
-        m_launcher = new Launcher();
-        m_drivetrain = new Drivetrain(true);
-        m_targeting = new LimelightTargeting(m_drivetrain, limelight);
+    public Auton(LimelightTargeting targeting, Magazine magazine, Launcher launcher, Drivetrain drivetrain) {
+        m_magazine = magazine;
+        m_launcher = launcher;
+        m_drivetrain = drivetrain;
+        m_targeting = targeting;
         m_state = AutonState.kInitialReverse;
     }
 
@@ -55,13 +55,15 @@ public class Auton {
         m_targeting.resetPID();
         m_targeting.resetError();
         m_state = AutonState.kInitialReverse;
+        m_drivetrain.zeroEncoders();
 
     }
 
     public void periodic() {
         //back up for brief period
         if (m_state.equals(AutonState.kInitialReverse)) {
-            if (reverse(-0.3, -200)) {
+            System.out.println("Move back");
+            if (reverse(-0.15, -30000)) {
                 m_state = AutonState.kTarget;
             }
             else {
@@ -69,9 +71,9 @@ public class Auton {
             }
         }
         else if (m_state.equals(AutonState.kTarget)) {
+            System.out.println("target");
             m_launcher.setMotor(0.5);
-            m_drivetrain.arcadeDrive(0, 0);
-            if (m_targeting.target()) {
+            if (m_targeting.target() && (m_launcher.getMasterMotor().getMotorOutputPercent() > 0.47)) {
                 m_state = AutonState.kRevToVelocity;
             }
             else {
@@ -79,18 +81,23 @@ public class Auton {
             }
         }
         else if (m_state.equals(AutonState.kRevToVelocity)) {
-            if (revToVelocity(6000)) {
+            m_targeting.target();
+            System.out.println("rev");
+            if (revToVelocity(4800)) {
                 m_state = AutonState.kRunBalls;
                 m_tempTime = Timer.getFPGATimestamp();
             }
         }
         else if (m_state.equals(AutonState.kRunBalls)) {
+            m_drivetrain.arcadeDrive(0, 0);
+            System.out.println("mag");
             runMagazine(0.8);
-            if (m_tempTime + 5 < Timer.getFPGATimestamp()) {
+            if (m_tempTime + 3 < Timer.getFPGATimestamp()) {
                 m_state = AutonState.kEnd;
             }
         }
         else if (m_state.equals(AutonState.kEnd)) {
+            System.out.println("end");
             m_drivetrain.arcadeDrive(0, 0);
             m_launcher.setMotor(0);
             m_magazine.runBelt(0);
@@ -104,7 +111,8 @@ public class Auton {
      * @return Whether we have hit our target
      */
     public boolean reverse(double speed, double target) {
-        if (m_drivetrain.getLeftDriveEncoderPosition() < target && m_drivetrain.getLeftDriveEncoderPosition() < target) {
+        if (m_drivetrain.getLeftDriveEncoderPosition() < target || m_drivetrain.getLeftDriveEncoderPosition() < target) {
+            m_drivetrain.arcadeDrive(0, 0);
             return true;
         }
         else {
@@ -118,8 +126,8 @@ public class Auton {
     }
 
     public boolean revToVelocity(double velocity) {
-        m_launcher.setVelocity(velocity);
-        if (Math.abs(m_launcher.getMasterMotor().getClosedLoopError()) < RobotMap.LAUNCHER_ACCEPTABLE_ERROR) {
+        m_launcher.setVelocity(velocity * RobotMap.RPM_TO_UNITS_PER_100MS);
+        if ((m_launcher.getMasterMotor().getSelectedSensorVelocity() / RobotMap.RPM_TO_UNITS_PER_100MS) > (velocity - 50)) {
             return true;
         }
         else {

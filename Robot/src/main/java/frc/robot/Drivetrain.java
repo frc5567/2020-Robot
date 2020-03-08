@@ -172,6 +172,11 @@ public class Drivetrain {
         m_leftSolenoid.set(value);
     }
 
+    public void zeroEncoders() {
+        m_leftDriveEncoder.setQuadraturePosition(0, 10);
+        m_rightDriveEncoder.setQuadraturePosition(0, 10);
+    }
+
     /**
      * Sets the drive gear using our pistons. 
      * This is private so that it can never be called by an outside class to prevent confusion

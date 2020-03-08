@@ -83,6 +83,25 @@ public class LimelightReader {
         return targetAngle;
     }
 
+    public double offset() {
+        double targetSkew = getSkew();
+        // Checks to make sure we have a target
+        if (hasTargets() == true) {
+
+            // Checks skew to see if we can hit the inner target
+            if(targetSkew <= -90 + RobotMap.INNER_TARGET_DEGREES){
+                
+                // Offset for inner target
+                return RobotMap.OFFSET_TARGET_DEGREES;
+                
+            }
+            else if (targetSkew >= 0 - RobotMap.INNER_TARGET_DEGREES) {
+                return -RobotMap.OFFSET_TARGET_DEGREES;
+            }
+        }
+        return 0;
+    }
+
     /**
      * @return The skew of the target in degrees, only returns negative values
      * 0 to -20 degrees is the range the target is to the left of us

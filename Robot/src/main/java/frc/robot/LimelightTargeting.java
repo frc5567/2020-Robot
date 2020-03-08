@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
  * This class should be used to center our robot on the high target.
@@ -73,8 +74,9 @@ public class LimelightTargeting {
             //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
             //This way the PID controller should target dead center
             double degToTarget = -m_limelight.getRawDegreesToTarget();
-            double turn = (m_targetController.calculate(degToTarget, 0)) /45;
+            double turn = MathUtil.clamp((m_targetController.calculate(degToTarget, 0) /45), -1, 1);
             m_drivetrain.arcadeDrive(0, turn);
+            System.out.println("Postition error: " + m_targetController.getPositionError());
         }
 
         //returns whether the PID believes that we are on target

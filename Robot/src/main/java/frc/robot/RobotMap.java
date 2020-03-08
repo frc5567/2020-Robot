@@ -167,7 +167,7 @@ public class RobotMap {
     public static final double LAUNCHER_NEUTRAL_DEADBAND = 0.04;
 
     //the peak output on our launcher PID
-    public static final double LAUNCHER_PID_PEAK_OUTPUT = 1.0;
+    public static final double LAUNCHER_PID_PEAK_OUTPUT = 0.9;
 
     //the number of samples use in rolling average. Valid values are 1,2,4,8,16,32. If another value is specified, it will truncate to nearest support value.
     //this number is currently arbitrary
@@ -283,16 +283,16 @@ public class RobotMap {
      * we multiply this by our actual offset to change our targeting 
      * <p> TODO:Needs to be tested and tuned
      */
-    public static final double OFFSET_TARGET_DEGREES = 0.8;
+    public static final double OFFSET_TARGET_DEGREES = 5.5;
 
     //This is the range on either side in degrees where we can still hit the inner target
     public static final double INNER_TARGET_DEGREES = 4.5;
 
     //PID values for targeting the vision target
     //TODO: These values are temporary and need to be updated in testing
-    public static final double TARGETING_P = 0;
-    public static final double TARGETING_I = 0;
-    public static final double TARGETING_D = 0;
+    public static final double TARGETING_P = 0.5;
+    public static final double TARGETING_I = 0.00125;
+    public static final double TARGETING_D = 0.8;
 
     //the period between controller updates in seconds
     public static final double TARGETING_PERIOD_S = 20;
@@ -301,7 +301,7 @@ public class RobotMap {
     public static final double TARGETING_MAX_ACCUMULATED_ERROR = 30;
 
     //the acceptable error for our vision targeting in degrees
-    public static final double TARGETING_ERROR_TOLERANCE = .7;
+    public static final double TARGETING_ERROR_TOLERANCE = 0.5;
 
     //****************************************
     //*                                      *
