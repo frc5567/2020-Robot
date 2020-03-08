@@ -23,8 +23,8 @@ public class RobotMap {
     public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.08;
 
     //The intake motor speeds, for the inner and outer motors, used in the PilotController class
-    public static final double COPILOT_CONTROLLER_INNER_INTAKE_SPEED = 0.5;
-    public static final double COPILOT_CONTROLLER_OUTER_INTAKE_SPEED = 0.5;
+    public static final double COPILOT_CONTROLLER_INNER_INTAKE_SPEED = 0.3;
+    public static final double COPILOT_CONTROLLER_OUTER_INTAKE_SPEED = 0.3;
 
     //****************************************
     //*                                      *
@@ -128,6 +128,10 @@ public class RobotMap {
     public static final double LAUNCHER_I = 0;
     public static final double LAUNCHER_D = 0;
     public static final double LAUNCHER_F = 0;
+
+    //600 is minutes to 100ms,
+    //3010.56 is our calculated raw sensor units per revolution on the output shaft
+    public static final double RPM_TO_UNITS_PER_100MS = 2048.0 / 600;
 
     //Calculated free spin angular velocity of our shooter based on specs (-10%) divided by three for gear reduction
     //measured in rev/100ms, specs found at https://www.vexrobotics.com/775pro.html#Other_Info
