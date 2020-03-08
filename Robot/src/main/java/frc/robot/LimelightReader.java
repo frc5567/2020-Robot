@@ -127,5 +127,33 @@ public class LimelightReader {
         double lengthToHeightRatio = Math.tan(RobotMap.DEG_TO_RAD_CONVERSION * (cameraDegreesFromGround + getYDegreesToTarget()));
         return (RobotMap.NET_HEIGHT_INCHES / lengthToHeightRatio);
     }
+    // creates a enum for our pipeline modes
+    // creates a enum for our pipeline modes
+    public enum Pipeline{
+        kStandard,
+        kZoomX2,
+        kZoomX3,
+        kDriver;
+    }
+    // declare object to store pipeline
+    public Pipeline m_pipeline;
+    public void setPipeline(Pipeline pipeline){
 
+        m_pipeline = pipeline;
+
+        // changes pipeline mode depending on what we set it to
+        if(m_pipeline == Pipeline.kStandard){
+            m_limelightTable.getEntry("pipeline").setNumber(0);
+        }
+        else if(m_pipeline == Pipeline.kZoomX2){
+            m_limelightTable.getEntry("pipeline").setNumber(1);
+        }
+        else if(m_pipeline == Pipeline.kZoomX3){
+            m_limelightTable.getEntry("pipeline").setNumber(2);
+        }
+        else if(m_pipeline == Pipeline.kDriver){
+            m_limelightTable.getEntry("pipeline").setNumber(3);
+        }
+    }
+    
 }

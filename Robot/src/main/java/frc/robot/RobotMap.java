@@ -22,6 +22,10 @@ public class RobotMap {
     /**the deadband on our controller sticks, used to prevent drift*/
     public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.08;
 
+    //The intake motor speeds, for the inner and outer motors, used in the PilotController class
+    public static final double COPILOT_CONTROLLER_INNER_INTAKE_SPEED = 0.3;
+    public static final double COPILOT_CONTROLLER_OUTER_INTAKE_SPEED = 0.3;
+
     //****************************************
     //*                                      *
     //*        DRIVETRAIN CONSTANTS          *
@@ -125,6 +129,10 @@ public class RobotMap {
     public static final double LAUNCHER_F = .27;
 
     //600 is minutes to 100ms, 
+    //3010.56 is our calculated raw sensor units per revolution on the output shaft
+    public static final double RPM_TO_UNITS_PER_100MS = 2048.0 / 600;
+
+    //600 is minutes to 100ms,
     //3010.56 is our calculated raw sensor units per revolution on the output shaft
     public static final double RPM_TO_UNITS_PER_100MS = 2048.0 / 600;
 
