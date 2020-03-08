@@ -250,6 +250,9 @@ public class RobotMap {
     public static final boolean OUTER_INTAKE_INVERTED = true;
     public static final boolean INNER_INTAKE_INVERTED = true;
 
+    public static final double OUTER_INTAKE_SPEED = 0.6;
+    public static final double INNER_INTAKE_SPEED = 0.3;
+
     //the ports for the intake position piston
     public static final int INTAKE_POSITION_PISTON_FORWARD_PORT = 0;
     public static final int INTAKE_POSITION_PISTON_REVERSE_PORT = 3;

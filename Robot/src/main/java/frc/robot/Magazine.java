@@ -18,7 +18,7 @@ public class Magazine {
     //declare our motor controllers for our belts and the wheel
     private VictorSPX m_motor;
 
-    //declare digital input for the photoelectric sensors
+    /**The photoelectric sensors for indexing, which are normally false */
     private DigitalInput m_intakeSensor;
     private DigitalInput m_launchSensor;
 
@@ -59,6 +59,23 @@ public class Magazine {
     public void runBelt(double speed) {
         //sets percent output on both belts
         m_motor.set(ControlMode.PercentOutput, speed);
+    }
+
+    /**
+     * Runs the belt based off of sensor input
+     * <p>Every time the intake sensor is tripped, 
+     * the magazine runs until the ball is clear of the intake sensor.
+     */
+    public void sensorBeltControl() {
+        if(!m_launchSensor.get()) {
+            runBelt(0);
+        }
+        else if (m_intakeSensor.get()) {
+            runBelt(0.71);
+        }
+        else {
+            runBelt(0);
+        }
     }
 
     /**

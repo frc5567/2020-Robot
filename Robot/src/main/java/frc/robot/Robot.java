@@ -48,8 +48,6 @@ public class Robot extends TimedRobot {
   //declares an xbox controller used for testing prototype code
   XboxController m_testController;
   XboxController m_testController2;
-  DigitalInput pe1;// = new DigitalInput(8);
-  DigitalInput pe2;// = new DigitalInput(7);
   //declares controller and drivetrain for testing drive code
   /** The class that we wrote to read values from the controller and control the drivetrain */
   PilotController m_pilotController;
@@ -68,16 +66,13 @@ public class Robot extends TimedRobot {
   private NetworkTableEntry m_cameraAngle;
   private NetworkTableEntry m_targetHeight;
   private NetworkTableEntry m_distance;
-  private boolean m_runningMagazine = false;
-
-  private boolean m_runMagazine = false;
 
   private Auton m_auton;
 
   public Robot() {
     //instantiates our test controller
     m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
-    m_testController2 = new XboxController(3);
+    m_testController2 = new XboxController(4);
 
     //instantiate launcher motor controllers and shuffleboard control for those motors
     m_launcher = new Launcher();
@@ -211,19 +206,6 @@ public class Robot extends TimedRobot {
     System.out.println("Current Encoder Value: \t" + m_climber.getExtensionMotor().getSelectedSensorPosition());
   }
 
-  public void magazineControl() {
-    if(!m_magazine.getLaunchSensor().get()) {
-      m_magazine.runBelt(0);
-    }
-    else if (!m_magazine.getIntakeSensor().get()) {
-      m_magazine.runBelt(0.71);
-    }
-    else {
-      m_magazine.runBelt(0);
-    }
-    System.out.println("Launch sensor is " + m_magazine.getLaunchSensor().get());
-  }
-
   /**
    * Call this during test periodic for launcher testing
    * <p> Controls launcher, magazine, and zeros intake
@@ -242,10 +224,9 @@ public class Robot extends TimedRobot {
       m_launcherControl.zeroSpeed();
     }
     
-    //note that the magazine cannot run over 0.4 without load, or else the polycore will fly off
     //runs the magazine forward while the right bumper is held, and backward while the left one is
     if (m_testController2.getXButton()) {
-      magazineControl();
+      m_magazine.sensorBeltControl();
     }
     else if (m_testController2.getBumper(Hand.kRight)) {
         m_magazine.runBelt(0.7);
