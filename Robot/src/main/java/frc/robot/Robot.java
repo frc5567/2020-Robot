@@ -71,6 +71,11 @@ public class Robot extends TimedRobot {
   private boolean m_runningMagazine = false;
   private double m_timeAtStart = 0.0;
 
+  private boolean m_runMagazine = false;
+  private double m_timeAtStart = 0.0;
+
+  private Auton m_auton;
+
   public Robot() {
     //instantiates our test controller
     m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
@@ -97,6 +102,8 @@ public class Robot extends TimedRobot {
     //instantiate climber, this needs to be moved to copilot controller post testing
     m_climber = new Climber();
 
+    m_auton = new Auton(m_limelightReader);
+
     //sets up our camera testing tab
     shuffleboardConfig();
     m_limelightReader.disableLEDs();
@@ -112,10 +119,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    m_auton.init();
   }
  
   @Override
   public void autonomousPeriodic() {
+    m_auton.periodic();
   }
 
   @Override
@@ -161,6 +170,29 @@ public class Robot extends TimedRobot {
     
     double lengthToHeightRatio = Math.tan(RobotMap.DEG_TO_RAD_CONVERSION * (m_cameraAngle.getDouble(0) + m_limelightReader.getYDegreesToTarget()));
     m_distance.setDouble((m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0)) / lengthToHeightRatio);
+  }
+
+  /**
+   * 
+   */
+  public void magazineTesting() {
+    if(m_magazine.getLaunchSensor().get()) {
+      m_magazine.runBelt(0);
+    }
+    else if (m_magazine.getIntakeSensor().get()) {
+      m_magazine.runBelt(0.7);
+      m_runMagazine = true;
+      m_timeAtStart = Timer.getFPGATimestamp();
+    }
+    else if (m_runMagazine) {
+      m_magazine.runBelt(0.7);
+      if (m_timeAtStart + 2 < Timer.getFPGATimestamp()) {
+        m_runMagazine = false;
+      }
+    }
+    else {
+      m_magazine.runBelt(0);
+    }
   }
 
   /**
