@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
@@ -98,13 +99,7 @@ public class Intake {
      * @param innerIntakeMotor The inner intake wheel for pulling balls into the magazine
      * @param positionPiston the double solenoid used to control the piston controlling position
      */
-    public Intake(CANSparkMax outerIntakeMotor, SpeedController innerIntakeMotor, DoubleSolenoid positionPiston) {  
-        //sets the time in seconds from zero to full for the intake motor
-        //acts as a speed setter to control acceleration
-        //this is configured on the passed in variable rather than the member variable because it must be run on a object declared as a CANSparkMax
-        //It should make no difference in the end result
-        outerIntakeMotor.setOpenLoopRampRate(RobotMap.INTAKE_OPEN_LOOP_RAMP_TIME_S);
-
+    public Intake(PWMSparkMax outerIntakeMotor, SpeedController innerIntakeMotor, DoubleSolenoid positionPiston) {  
         //instantiate instance variables
         m_outerMotor = outerIntakeMotor;
         m_innerMotor = innerIntakeMotor;
@@ -123,7 +118,7 @@ public class Intake {
      */
     public Intake() {
         //the motors are currently set to operate over PWM to reduce can bus traffic
-        m_outerMotor = new PWMSparkMax(RobotMap.INTAKE_PWM_SPARK_PORT);
+        m_outerMotor = new VictorSP(RobotMap.INTAKE_PWM_SPARK_PORT);
         m_innerMotor = new Talon(RobotMap.INTAKE_INNER_MOTOR_PORT);
 
         m_outerMotor.setInverted(RobotMap.OUTER_INTAKE_INVERTED);

@@ -107,10 +107,10 @@ public class RobotMap {
     public static final int SLAVE_RIGHT_FALCON_ID = 14;
 
     //solenoid ports
-    public static final int LEFT_SOLENOID_FORWARD_PORT = 0;
-    public static final int LEFT_SOLENOID_REVERSE_PORT = 1;
+    public static final int LEFT_SOLENOID_FORWARD_PORT = 4;
+    public static final int LEFT_SOLENOID_REVERSE_PORT = 5;
     public static final int RIGHT_SOLENOID_FORWARD_PORT = 2;
-    public static final int RIGHT_SOLENOID_REVERSE_PORT = 3;
+    public static final int RIGHT_SOLENOID_REVERSE_PORT = 1;
 
 
     //****************************************
@@ -250,8 +250,8 @@ public class RobotMap {
     public static final boolean INNER_INTAKE_INVERTED = true;
 
     //the ports for the intake position piston
-    public static final int INTAKE_POSITION_PISTON_FORWARD_PORT = 4;
-    public static final int INTAKE_POSITION_PISTON_REVERSE_PORT = 5;
+    public static final int INTAKE_POSITION_PISTON_FORWARD_PORT = 0;
+    public static final int INTAKE_POSITION_PISTON_REVERSE_PORT = 3;
 
     //the ramp time in seconds from zero to full speed for the intake motor
     public static final double INTAKE_OPEN_LOOP_RAMP_TIME_S = 0.75;
@@ -311,10 +311,10 @@ public class RobotMap {
     public static final int MAGAZINE_MOTOR_PORT = 30;
 
     /**The DIO port for the photoelectric sensor mounted near the intake */
-    public static final int MAGAZINE_IN_SENSOR_PORT = 0;
+    public static final int MAGAZINE_IN_SENSOR_PORT = 7;
 
     /**The DIO port for the photoelectric sensor mounted near the launcher */
-    public static final int MAGAZINE_OUT_SENSOR_PORT = 1;
+    public static final int MAGAZINE_OUT_SENSOR_PORT = 8;
 
     //****************************************
     //*                                      *

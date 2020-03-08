@@ -14,12 +14,15 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.Intake.Position;
 import frc.robot.PilotController.DriveType;
 
 
@@ -44,7 +47,9 @@ public class Robot extends TimedRobot {
 
   //declares an xbox controller used for testing prototype code
   XboxController m_testController;
-
+  XboxController m_testController2;
+  DigitalInput pe1;// = new DigitalInput(8);
+  DigitalInput pe2;// = new DigitalInput(7);
   //declares controller and drivetrain for testing drive code
   /** The class that we wrote to read values from the controller and control the drivetrain */
   PilotController m_pilotController;
@@ -63,10 +68,13 @@ public class Robot extends TimedRobot {
   private NetworkTableEntry m_cameraAngle;
   private NetworkTableEntry m_targetHeight;
   private NetworkTableEntry m_distance;
+  private boolean m_runningMagazine = false;
+  private double m_timeAtStart = 0.0;
 
   public Robot() {
     //instantiates our test controller
     m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
+    m_testController2 = new XboxController(3);
 
     //instantiate launcher motor controllers and shuffleboard control for those motors
     m_launcher = new Launcher();
@@ -116,18 +124,25 @@ public class Robot extends TimedRobot {
         
   @Override
   public void teleopPeriodic() {
-      m_pilotController.controlDriveTrainPeriodic();
+    m_pilotController.controlDriveTrainPeriodic();
+    System.out.println(m_pilotController.getDrivetrain().getLeftDriveEncoderPosition());
   }
 
   @Override
   public void testInit() {
     //zeros the shooter
     m_launcherControl.zeroSpeed();
+    
   }
 
   @Override
   public void testPeriodic() {
-    periodicLauncherTest(); 
+    periodicLauncherTest();
+    //periodicClimberTest(); 
+    // m_intake.setOuterIntakeMotor(0);
+    // m_intake.setInnerIntakeMotor(0);
+    // System.out.print("pe1:\t"+pe1.get());
+    // System.out.print("pe2:\t"+pe2.get()+"\n");
   }
 
   /**
@@ -166,9 +181,16 @@ public class Robot extends TimedRobot {
     }
     else if ((extensionCurrent > 0) && m_testController.getBumper(Hand.kLeft)) {
       m_climber.retractClimber();
-    }
+    } 
     else {
       m_climber.zeroExtensionMotor();
+    }
+
+    if(m_testController.getXButton()) {
+      m_climber.setLiftSpeed(0.5);
+    }
+    else {
+      m_climber.zeroLiftMotor();
     }
 
     if (m_testController.getStartButton()) {
@@ -183,12 +205,25 @@ public class Robot extends TimedRobot {
     System.out.println("Current Encoder Value: \t" + m_climber.getExtensionMotor().getSelectedSensorPosition());
   }
 
+  public void magazineControl() {
+    if(!m_magazine.getLaunchSensor().get()) {
+      m_magazine.runBelt(0);
+    }
+    else if (!m_magazine.getIntakeSensor().get()) {
+      m_magazine.runBelt(0.71);
+    }
+    else {
+      m_magazine.runBelt(0);
+    }
+    System.out.println("Launch sensor is " + m_magazine.getLaunchSensor().get());
+  }
+
   /**
    * Call this during test periodic for launcher testing
    * <p> Controls launcher, magazine, and zeros intake
    */
   public void periodicLauncherTest() {
-    //runs velocity control while b button is pressed
+    // runs velocity control while b button is pressed
     if(m_testController.getYButtonPressed()) {
       m_launcherControl.setVelocity();
     }
@@ -200,28 +235,28 @@ public class Robot extends TimedRobot {
     else if (m_testController.getXButtonPressed()) {
       m_launcherControl.zeroSpeed();
     }
-
-    //runs percent control while a button is pressed
-    if (m_testController.getAButtonPressed()) {
-        m_launcherControl.setPercentSpeed();
-    }
-    //zeros speed while not actively controlled
-    else if (m_testController.getAButtonReleased()) {
-      m_launcherControl.zeroSpeed();
-    }
     
-
     //note that the magazine cannot run over 0.4 without load, or else the polycore will fly off
     //runs the magazine forward while the right bumper is held, and backward while the left one is
-    if (m_testController.getBumper(Hand.kRight)) {
+    if (m_testController2.getXButton()) {
+      magazineControl();
+    }
+    else if (m_testController2.getBumper(Hand.kRight)) {
         m_magazine.runBelt(0.7);
     }
-    else if (m_testController.getBumper(Hand.kLeft)) {
+    else if (m_testController2.getBumper(Hand.kLeft)) {
         m_magazine.runBelt(-0.7);
     }
     //kills the velocity while not holding
     else {
       m_magazine.runBelt(0);
+    }
+
+    if(m_testController2.getStartButtonPressed()) {
+      m_intake.setPosition(Position.kLowered);
+    }
+    else if(m_testController2.getBackButtonPressed()) {
+      m_intake.setPosition(Position.kRaised);
     }
 
     //resets the encoder when the start button is pressed
@@ -233,8 +268,18 @@ public class Robot extends TimedRobot {
     m_launcherControl.publishData();
 
     //disable the intake motors while its unused
-    m_intake.setInnerIntakeMotor(0);
-    m_intake.setOuterIntakeMotor(0);
+    if (m_testController2.getYButton()) {
+      m_intake.setInnerIntakeMotor(.3);
+      m_intake.setOuterIntakeMotor(0.6);
+    } 
+    else if (m_testController2.getAButton()) {
+      m_intake.setInnerIntakeMotor(-.3);
+      m_intake.setOuterIntakeMotor(-0.6);
+    }
+    else {
+      m_intake.setInnerIntakeMotor(0);
+      m_intake.setOuterIntakeMotor(0);
+    }
   }
 
   @Override

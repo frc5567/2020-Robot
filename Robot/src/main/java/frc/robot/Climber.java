@@ -70,7 +70,7 @@ public class Climber {
     public Climber() {
         //instantiate instance variables
         m_extensionMotor = new TalonSRX(RobotMap.EXTENSION_MOTOR_ID);
-        // m_liftMotor = new PWMSparkMax(RobotMap.LIFT_MOTOR_PORT);
+        m_liftMotor = new PWMSparkMax(RobotMap.LIFT_MOTOR_PORT);
 
         //sets our encoders to the encoders plugged into the talons
         m_extensionEncoder = new SensorCollection(m_extensionMotor);
