@@ -19,14 +19,19 @@ public class GamePad extends GenericHID {
 	// this enum difines the buttons and what they do when active
 	private enum GamePadControls {
 		// Buttons
-		Gear_Up(1),
-		Gear_Down(2),
-		Enable_Intake(3),
-		Disable_Intake(4),
-		Change_Launcher_RPM_Up(5),
-		Change_Launcher_RPM_Down(6),
-		Launcher(7),
-		Disable_Launcher(8);
+		Climb_Up(1),
+		Climb_Down(2),
+		Winch(3),
+		Move_Magazine_Down(4),
+		Move_Magazine_For_Launch(5),
+		Launcher_And_Magazine(6),
+		Rev_Launcher(7),
+		Enable_Intake(8),
+		Disable_Intake(9),
+		Dump_Balls(10),
+		Color_Wheel_by_Color(11),
+		Color_Wheel_by_Distance(12);
+
 
 		@SuppressWarnings("MemberName")
 		public final int value;
@@ -36,21 +41,38 @@ public class GamePad extends GenericHID {
 		}
 	}
 	/**
-	 * expectedd to be used in co-pilot conroller 
+	 * expected to be used in co-pilot conroller 
 	 *<p> switches the gear pneumatics to the high gear position 
 	*/
 		//gear up button
-	public boolean getGearUp() {
-		return super.getRawButtonPressed(GamePadControls.Gear_Up.value);
+	public boolean getClimbUp() {
+		return super.getRawButtonReleased(GamePadControls.Climb_Up.value);
 	}
 	/**
 	 * expected to be used in co-pilot controller
 	 * <p> switches the gear pneumatics to the low gear position
 	 */
 		//gear down button
-	public boolean getGearDown() {
-		return super.getRawButtonPressed(GamePadControls.Gear_Down.value);
+	public boolean getClimbDown() {
+		return super.getRawButtonReleased(GamePadControls.Climb_Down.value);
 	}
+
+	public boolean getWinch() {
+		return super.getRawButtonPressed(GamePadControls.Winch.value);
+	}
+
+	public boolean getMoveMagazine() {
+		return super.getRawButtonPressed(GamePadControls.Move_Magazine_For_Launch.value);
+	}
+
+	public boolean getMoveMagazineDown() {
+		return super.getRawButtonPressed(GamePadControls.Move_Magazine_Down.value);
+	}
+
+	public boolean getRevLauncher() {
+		return super.getRawButtonPressed(GamePadControls.Rev_Launcher.value);
+	}
+
 		//intake button
 		/**
 		 * expected to be used in co-pilot controller
@@ -67,40 +89,21 @@ public class GamePad extends GenericHID {
 	public boolean getDisableIntake() {
 		return super.getRawButtonPressed(GamePadControls.Disable_Intake.value);
 	}
-		//Launcher RPM up button
-		/**
-		 * expected to be used in co-pilot controller
-		 * <p> adjusts launcher speed up to accommadate better balls so that we can use the highest speed
-		 * possible for the condition of the balls
-		 */
-	public boolean getLauncherRPMUp() {
-		return super.getRawButtonPressed(GamePadControls.Change_Launcher_RPM_Up.value);
+	
+	public boolean getLauncherAndMagazine() {
+		return super.getRawButtonPressed(GamePadControls.Launcher_And_Magazine.value);
 	}
-		//Launcher RPM down button
-		/**
-		 * expected to be used in co-pilot controller
-		 *<p> adjusts launcher speed up to accommadate tearing balls so that we can use the highest speed
-		 * possible for the condition of the balls
-		 */
-	public boolean getLauncherRPMDown() {
-		return super.getRawButtonPressed(GamePadControls.Change_Launcher_RPM_Down.value);
+
+	public boolean getDumpAllBalls() {
+		return super.getRawButtonPressed(GamePadControls.Dump_Balls.value);
 	}
-	/**
-	 * expected to be used in co-pilot controller
-	 * <p> enables the launcher, shifts into low gear, and begins to index the balls into the launcher
-	 * when the motor has reached desired rpm
-	 */
-		//shoot button
-	public boolean getEnableLauncher() {
-		return super.getRawButtonPressed(GamePadControls.Launcher.value);
+
+	public boolean getColorWheelColor() {
+		return super.getRawButtonReleased(GamePadControls.Color_Wheel_by_Color.value);
 	}
-	/**
-	 * expected to be used in co-pilot controller
-	 * <p> disables the launcher and shifts to high gear
-	 */
-		//stop shooting button
-	public boolean getDisableLauncher() {
-		return super.getRawButtonPressed(GamePadControls.Disable_Launcher.value);
+
+	public boolean getColorWheelDistance() {
+		return super.getRawButtonReleased(GamePadControls.Color_Wheel_by_Distance.value);
 	}
 
 	/**

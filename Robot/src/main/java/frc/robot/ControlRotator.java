@@ -76,7 +76,9 @@ public class ControlRotator{
     }
     */
 
-    //method for getting the color recieved from the fms
+    /**
+     * method for getting the color recieved from the fms
+     */
     public char getRecievedColor(){
         ColorReader color = new ColorReader();
         return color.getColor();
