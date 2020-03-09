@@ -44,7 +44,6 @@ public class PilotController {
         }
     }
 
-    //TODO: Check naming convention
     /**Checks whether or not we are currently targeting and using the drivetrain */
     public static boolean is_currently_targeting = false;
 

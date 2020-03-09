@@ -3,7 +3,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.Drivetrain;
 import frc.robot.LimelightTargeting;
-import frc.robot.ControlRotator;
 import frc.robot.Magazine;
 import frc.robot.Climber;
 import frc.robot.GamePad;

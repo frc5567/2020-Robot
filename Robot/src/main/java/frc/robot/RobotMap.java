@@ -50,7 +50,6 @@ public class RobotMap {
      */
     public static final double PID_INPUT_RANGE = 180.00;
 
-    //TODO: Arbitrary
     /**The cap on the I output, which helps to prevent crazy oscillation */
     public static final double ROTATE_PID_INTEGRATOR_RANGE = 0.10;
 
@@ -95,7 +94,7 @@ public class RobotMap {
     public static final double DRIVE_RAMP_TIME = 1.0;
 
     //TODO:the 6 has to be changed to the diameter of our wheels, in addition, we need to account for gearing
-    public static final double DRIVE_TICS_PER_INCH = (2048 / (6*Math.PI));
+    public static final double DRIVE_TICS_PER_INCH = (2048 / (6.25*Math.PI));
 
     //the total number of encoder ticks in a rotate----TODO: Check to see if this is the correct number
     public static final double STARTING_TICK_VALUE = 1440;
@@ -297,7 +296,6 @@ public class RobotMap {
     public static final double INNER_TARGET_DEGREES = 4.5;
 
     //PID values for targeting the vision target
-    //TODO: These values are temporary and need to be updated in testing
     public static final double TARGETING_P = 0.5;
     public static final double TARGETING_I = 0;//0.00125;
     public static final double TARGETING_D = 0.8;
@@ -334,8 +332,6 @@ public class RobotMap {
     //*                                      *
     //****************************************
     public static final int PCM_CAN_ID = 20;
-    /**TODO:This number is arbitrary and should be removed or changed based on how we index */
-    public static final int CYCLES_TO_MOVE_BALL_ONE_POSITION = 30;
     
     /**
      * The primary slot for a CTRE PID controller. This slot controlls the main motion of the system, 

@@ -55,7 +55,6 @@ public class Launcher {
         m_farSlaveMotor2 = farSlaveMotor2;
 
         //Sets the far motors to be inverted so that they don't work against the close ones
-        //TODO: Inversion MUST be checked individually prior to testing
         m_farSlaveMotor1.setInverted(RobotMap.LAUNCHER_FAR_SLAVE1_INVERTED);
         m_farSlaveMotor2.setInverted(RobotMap.LAUNCHER_FAR_SLAVE2_INVERTED);
 
@@ -185,7 +184,6 @@ public class Launcher {
         
         //sets the period of the velocity sample
         //effectively this defines the amount of time used to calculate the velocity
-        //TODO: this selection is currrently arbitrary
         m_masterMotor.configVelocityMeasurementPeriod(RobotMap.VELOCITY_MEASUREMENT_PERIOD, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //Sets the number of samples used in the rolling average for calculating velocity
@@ -204,7 +202,6 @@ public class Launcher {
         m_masterMotor.config_IntegralZone(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_I_ZONE, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //sets the max output of the motor specifically within closed loop control
-        //TODO: this is likely redundant, but the values can be set to seperate if needed in testing
         m_masterMotor.configClosedLoopPeakOutput(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //this configures an allowable error in closed loop control
