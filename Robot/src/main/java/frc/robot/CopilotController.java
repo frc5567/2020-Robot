@@ -168,9 +168,12 @@ public class CopilotController{
      * and it gets the launcher up to speed
      */
     public void controlMagazineAndLauncher(){
+        //When we first start targeting, grab control of drivetrain and reset target
         if (m_gamePad.getLauncherAndMagazinePressed()) {
+            //lock the 
             PilotController.is_currently_targeting = true;
             m_targetingStage = TargetingStage.kRevAndTarget;
+            m_limelightReader.setPipeline(Pipeline.kStandard);
         }
         else if(m_gamePad.getLauncherAndMagazine()) {
             if (m_targetingStage.equals(TargetingStage.kRevAndTarget)) {
@@ -188,7 +191,7 @@ public class CopilotController{
                 m_limelightTargeting.target();
                 m_launcher.setVelocity(4800);
                 //if we are at speed. exit out
-                if (m_launcher.getMasterMotor().getSelectedSensorVelocity() > 4800 - 50) {
+                if (m_launcher.getMasterMotor().getSelectedSensorVelocity() > 4800 - RobotMap.LAUNCHER_ACCEPTABLE_ERROR) {
                     m_targetingStage = TargetingStage.kRunMagazine;
                 }
             }
