@@ -36,21 +36,14 @@ import frc.robot.PilotController.DriveType;
  * @version 1/25/2019
  */
 public class Robot extends TimedRobot {
-  //declares our launcher system and our controls for that system over the launcher tab
-  Launcher m_launcher;
-  ShuffleboardLauncherControl m_launcherControl;
-
-  //declare our other copilot systems
-  Magazine m_magazine;
-  Intake m_intake;
-  Climber m_climber;
-
   //declares an xbox controller used for testing prototype code
   XboxController m_testController;
   XboxController m_testController2;
+
   //declares controller and drivetrain for testing drive code
   /** The class that we wrote to read values from the controller and control the drivetrain */
   PilotController m_pilotController;
+  CopilotController m_copilotController;
 
   //toggle for the limelight
   //control for toggling the limelight should be moved to either limelight reader or pilot controller
@@ -74,10 +67,6 @@ public class Robot extends TimedRobot {
     m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
     m_testController2 = new XboxController(4);
 
-    //instantiate launcher motor controllers and shuffleboard control for those motors
-    m_launcher = new Launcher();
-    m_launcherControl = new ShuffleboardLauncherControl(m_launcher);
-
     m_limelightReader = new LimelightReader();
 
     //intantiates our PilotController, which controls all systems on the drivetrain
@@ -86,16 +75,10 @@ public class Robot extends TimedRobot {
     //sets our default state to the vision pipeline
     m_isDriverCamera = false;
 
-    //instantiate magazine, this needs to be moved to copilot controller post testing
-    m_magazine = new Magazine();
+    m_copilotController = new CopilotController(m_limelightReader, m_pilotController.getDrivetrain());
 
-    //instantiate intake, this needs to be moved to copilot controller post testing
-    m_intake = new Intake();
-
-    //instantiate climber, this needs to be moved to copilot controller post testing
-    m_climber = new Climber();
-
-    m_auton = new Auton(m_pilotController.getTargeting(), m_magazine, m_launcher, m_pilotController.getDrivetrain());
+    m_auton = new Auton(m_pilotController.getTargeting(), m_copilotController.getMagazine(), 
+                        m_copilotController.getLauncher(), m_pilotController.getDrivetrain());
 
     //sets up our camera testing tab
     shuffleboardConfig();
@@ -126,24 +109,16 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     m_pilotController.controlDriveTrainPeriodic();
+    m_copilotController.periodicCopilotControl();
   }
 
   @Override
   public void testInit() {
-    //zeros the shooter
-    m_launcherControl.zeroSpeed();
     
   }
 
   @Override
   public void testPeriodic() {
-    // periodicLauncherTest();
-    m_pilotController.controlDriveTrainPeriodic();
-    periodicClimberTest(); 
-    // m_intake.setOuterIntakeMotor(0);
-    // m_intake.setInnerIntakeMotor(0);
-    // System.out.print("pe1:\t"+pe1.get());
-    // System.out.print("pe2:\t"+pe2.get()+"\n");
   }
 
   /**
@@ -162,106 +137,6 @@ public class Robot extends TimedRobot {
     
     double lengthToHeightRatio = Math.tan(RobotMap.DEG_TO_RAD_CONVERSION * (m_cameraAngle.getDouble(0) + m_limelightReader.getYDegreesToTarget()));
     m_distance.setDouble((m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0)) / lengthToHeightRatio);
-  }
-
-  /**
-   * Call this during test periodic for climber testing
-   * <p> Controls climber manually (for now)
-   */
-  public void periodicClimberTest() {
-    int extensionCurrent = m_climber.getExtensionMotor().getSelectedSensorPosition();
-
-    if((extensionCurrent < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) && m_testController.getAButton()) {
-      m_climber.setExtensionSpeed(RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
-    }
-    else if ((extensionCurrent > 0) && m_testController.getBButton()) {
-      m_climber.setExtensionSpeed(-RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
-    }
-    else if ((extensionCurrent < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) && m_testController.getBumper(Hand.kRight)) {
-      m_climber.extendClimber();
-    }
-    else if ((extensionCurrent > 0) && m_testController.getBumper(Hand.kLeft)) {
-      m_climber.retractClimber();
-    } 
-    else {
-      m_climber.zeroExtensionMotor();
-    }
-
-    if(m_testController.getXButton()) {
-      m_climber.setLiftSpeed(RobotMap.CLIMBER_WINCH_SPEED);
-    }
-    else {
-      m_climber.zeroLiftMotor();
-    }
-
-    if (m_testController.getStartButton()) {
-      m_climber.encoderReset();
-    }
-
-    m_launcherControl.zeroSpeed();
-    m_magazine.runBelt(0);
-    m_intake.setInnerIntakeMotor(0);
-    m_intake.setOuterIntakeMotor(0);
-   // m_climber.zeroLiftMotor();
-    System.out.println("Current Encoder Value: \t" + m_climber.getExtensionMotor().getSelectedSensorPosition());
-  }
-
-  /**
-   * Call this during test periodic for launcher testing
-   * <p> Controls launcher, magazine, and zeros intake
-   */
-  public void periodicLauncherTest() {
-    // runs velocity control while b button is pressed
-    if(m_testController.getYButtonPressed()) {
-      m_launcherControl.setVelocity();
-    }
-    //zeros speed while not actively controlled
-    else if (m_testController.getBButtonPressed()) {
-      m_launcherControl.setPercentSpeed();
-      m_launcherControl.m_currentVel.setDouble(m_launcher.getMasterMotor().getSelectedSensorVelocity() / RobotMap.RPM_TO_UNITS_PER_100MS);
-    }
-    else if (m_testController.getXButtonPressed()) {
-      m_launcherControl.zeroSpeed();
-    }
-    
-    //runs the magazine forward while the right bumper is held, and backward while the left one is
-    if (m_testController2.getXButton()) {
-      m_magazine.sensorBeltControl();
-    }
-    else if (m_testController2.getBumper(Hand.kRight)) {
-        m_magazine.runBelt(RobotMap.MAGAZINE_LAUNCH_SPEED);
-    }
-    else if (m_testController2.getBumper(Hand.kLeft)) {
-        m_magazine.runBelt(-RobotMap.MAGAZINE_LAUNCH_SPEED);
-    }
-    //kills the velocity while not holding
-    else {
-      m_magazine.runBelt(0);
-    }
-
-    if(m_testController2.getStartButtonPressed()) {
-      m_intake.setPosition(Position.kLowered);
-    }
-    else if(m_testController2.getBackButtonPressed()) {
-      m_intake.setPosition(Position.kRaised);
-    }
-
-    m_launcherControl.setPIDF();
-    m_launcherControl.publishData();
-
-    //disable the intake motors while its unused
-    if (m_testController2.getYButton()) {
-      m_intake.setInnerIntakeMotor(RobotMap.INNER_INTAKE_SPEED);
-      m_intake.setOuterIntakeMotor(RobotMap.OUTER_INTAKE_SPEED);
-    } 
-    else if (m_testController2.getAButton()) {
-      m_intake.setInnerIntakeMotor(-RobotMap.INNER_INTAKE_SPEED);
-      m_intake.setOuterIntakeMotor(-RobotMap.OUTER_INTAKE_SPEED);
-    }
-    else {
-      m_intake.setInnerIntakeMotor(0);
-      m_intake.setOuterIntakeMotor(0);
-    }
   }
 
   @Override

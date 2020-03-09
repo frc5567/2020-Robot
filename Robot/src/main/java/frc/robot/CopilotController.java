@@ -29,8 +29,6 @@ public class CopilotController{
 
     //Declares the Intake to use the positioning and setting motor speeds that are created in that class
     private Intake m_intake;
-    //Declares the enum position for storing the positions our intake arm can move to
-    private Position m_position;
 
     //Declares the launcher to set the speed of the motors on the launcher
     private Launcher m_launcher;
@@ -43,9 +41,6 @@ public class CopilotController{
 
     //Declares the drivetrain to line up with the vision target (used with the limelightTargeting)
     private Drivetrain m_drivetrain;
-
-    //Declares the ShuffleboardLauncherControl class in order to set the percent speed and velocity of the launcher
-    private ShuffleboardLauncherControl m_launcherControl;
 
     //Declares the LimelightReader used for locking onto the target
     private LimelightReader m_limelightReader;
@@ -74,7 +69,6 @@ public class CopilotController{
         m_drivetrain = drivetrain;
 
         m_limelightTargeting = new LimelightTargeting(m_drivetrain, m_limelightReader);
-        m_launcherControl = new ShuffleboardLauncherControl(m_launcher);
         m_climbJoystick = new Joystick(13);
     }
 
@@ -246,5 +240,21 @@ public class CopilotController{
      */
     public LimelightTargeting getTargeting() {
         return m_limelightTargeting;
+    }
+
+    public Magazine getMagazine() {
+        return m_magazine;
+    }
+
+    public Launcher getLauncher() {
+        return m_launcher;
+    }
+
+    public Climber getClimber() {
+        return m_climber;
+    }
+
+    public Intake getIntake() {
+        return m_intake;
     }
 }
