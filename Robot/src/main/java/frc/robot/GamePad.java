@@ -32,8 +32,6 @@ public class GamePad extends GenericHID {
 		Color_Wheel_by_Color(11),
 		Color_Wheel_by_Distance(12);
 
-
-		@SuppressWarnings("MemberName")
 		public final int value;
 
 		GamePadControls(int newValue) {
