@@ -7,18 +7,15 @@ public class TestCopilotController {
     private Intake m_intake;
     private Magazine m_magazine;
     private Launcher m_launcher;
-    private LimelightTargeting m_targeting;
-    private Drivetrain m_drivetrain;
     private XboxController m_controller;
-    private boolean isTargeting;
+    private PilotController m_pilotController;
+    private boolean atLaunchSpeed = false;
 
-    public TestCopilotController(Intake intake, Magazine magazine, Launcher launcher
-                                , LimelightTargeting targeting, Drivetrain drivetrain) {
+    public TestCopilotController(Intake intake, Magazine magazine, Launcher launcher, PilotController pilotController, LimelightReader limelight) {
         m_intake = intake;
         m_magazine = magazine;
         m_launcher = launcher;
-        m_targeting = targeting;
-        m_drivetrain = drivetrain;
+        m_pilotController = pilotController;
         m_controller = new XboxController(3);
     }
 
@@ -27,8 +24,8 @@ public class TestCopilotController {
             targetAndLaunch();
         }
         else {
-            isTargeting = false;
             m_launcher.setMotor(0.0);
+            m_pilotController.controlDriveTrainPeriodic();
         }
         
         if (m_controller.getXButtonPressed()) {
@@ -41,7 +38,7 @@ public class TestCopilotController {
     }
 
     public void targetAndLaunch() {
-
+        m_pilotController.getTargeting().target();
     }
 
     public void dropBarAndIntake() {

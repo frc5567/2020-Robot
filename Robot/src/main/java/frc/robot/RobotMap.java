@@ -128,12 +128,7 @@ public class RobotMap {
     public static final double LAUNCHER_D = 0.1;
     public static final double LAUNCHER_F = .27;
 
-    //600 is minutes to 100ms, 
-    //3010.56 is our calculated raw sensor units per revolution on the output shaft
-    public static final double RPM_TO_UNITS_PER_100MS = 2048.0 / 600;
-
-    //600 is minutes to 100ms,
-    //3010.56 is our calculated raw sensor units per revolution on the output shaft
+    //600 is minutes to 100ms, 2048 is revs to sensor ticks
     public static final double RPM_TO_UNITS_PER_100MS = 2048.0 / 600;
 
     //Calculated free spin angular velocity of our shooter based on specs (-10%) divided by three for gear reduction
