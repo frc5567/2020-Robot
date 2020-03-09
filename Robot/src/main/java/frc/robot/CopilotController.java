@@ -53,30 +53,29 @@ public class CopilotController{
     private Joystick m_climbJoystick;
 
     /**
-     * Creates the objects to allow the copilot controller/gamepad to control the intake, launcher, and shifting Gears
-     * @param gamePad The buttons/controller that is used to control the intake, launcher, and shifting Gears
-     * @param intake The robot intake used to enable and disable the intake by starting and disabling the motors and moving the arm position
-     * @param position The enum that stores the position that the pneumatics/piston/arm is in
-     * @param launcher The robot launcher used to start/enable and stop/disable the launcher motors
-     * @param climber The robot climber used to extend and retract the climber as well as lift the robot off of the ground
-     * @param magazine The robot magazine used to moves the balls to the launcher and back to the intake
-     * @param controlRotator The robot controlRotator used to move the control panel
+     * Creates the objects to allow the copilot controller/gamepad to control the intake, launcher,
+     *  and shifting Gears
+     * <p> We pass in the drivetrain to keep the same object as used in the PilotController.
+     * All other objects are instantiated here for encapsu
      * @param limelightReader The robot LimelightReader used to give the target to the LimelightTargeting
      */
-    public CopilotController(GamePad gamePad, Intake intake, Position position, Launcher launcher, Climber climber, Magazine magazine, ControlRotator controlRotator, LimelightReader limelight){
-        m_gamePad = gamePad;
-        m_intake = intake;
-        m_position = position;
-        m_launcher = launcher;
-        m_climber = climber;
-        m_magazine = magazine;
-        m_controlRotator = controlRotator;
+    public CopilotController(LimelightReader limelight, Drivetrain drivetrain){
+        m_gamePad = new GamePad(RobotMap.GAMEPAD_PORT);
+        m_intake = new Intake();
+        m_launcher = new Launcher();
+        m_climber = new Climber();
+        m_magazine = new Magazine();
+
         m_limelightReader = limelight;
-        //TODO: This must be looked at, we should not be creating a seperate drivetrain
-        m_drivetrain = new Drivetrain(RobotMap.DRIVETRAIN_HAS_TWO_SOLENOIDS);
+        m_drivetrain = drivetrain;
+
         m_limelightTargeting = new LimelightTargeting(m_drivetrain, m_limelightReader);
         m_launcherControl = new ShuffleboardLauncherControl(m_launcher);
         m_climbJoystick = new Joystick(13);
+    }
+
+    public void periodicCopilotControl() {
+
     }
 
     /**
