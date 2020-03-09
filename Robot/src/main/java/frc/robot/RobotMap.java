@@ -199,7 +199,7 @@ public class RobotMap {
 
     //the encoder target of for the extension motor.
     public static final int CLIMBER_EXTENSION_ENCODER_TARGET = 29600;
-    public static final int CLIMBER_EXTENSION_HARD_LIMIT = 29700;
+    public static final int CLIMBER_EXTENSION_HARD_LIMIT = 29200;
 
     //the climber timeout for running confing methods
     public static final int CLIMBER_CONFIG_TIMEOUT_MS = 30;
@@ -323,8 +323,8 @@ public class RobotMap {
     /**The DIO port for the photoelectric sensor mounted near the launcher */
     public static final int MAGAZINE_OUT_SENSOR_PORT = 8;
 
-    public static final double MAGAZINE_INTAKE_SPEED = 0.71;
-    public static final double MAGAZINE_LAUNCH_SPEED = 0.7;
+    public static final double MAGAZINE_INTAKE_SPEED = 0.6;
+    public static final double MAGAZINE_LAUNCH_SPEED = 0.6;
 
     //****************************************
     //*                                      *

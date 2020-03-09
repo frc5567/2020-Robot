@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
         //sets our default state to the vision pipeline
         m_isDriverCamera = false;
 
-        m_copilotController = new CopilotController(m_limelightReader, m_pilotController.getDrivetrain());
+        m_copilotController = new CopilotController(m_limelightReader, m_pilotController.getTargeting(), m_pilotController.getDrivetrain());
 
         m_auton = new Auton(m_pilotController.getTargeting(), m_copilotController.getMagazine(), 
                             m_copilotController.getLauncher(), m_pilotController.getDrivetrain());
@@ -110,6 +110,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
+        System.out.println("Intake sensor: " + m_copilotController.getMagazine().getIntakeSensor().get() + " | Outer sensor: " + m_copilotController.getMagazine().getLaunchSensor().get());
     }
 
     /**

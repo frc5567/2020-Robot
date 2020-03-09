@@ -19,18 +19,18 @@ public class GamePad extends GenericHID {
 	// this enum difines the buttons and what they do when active
 	private enum GamePadControls {
 		// Buttons
-		Climb_Up(1),
-		Climb_Down(2),
-		Winch(3),
+		Climb_Up(2),
+		Climb_Down(3),
+		Winch(1),
 		Move_Magazine_Down(4),
 		Move_Magazine_For_Launch(5),
-		Launcher_And_Magazine(6),
-		Rev_Launcher(7),
+		Launcher_And_Magazine(7),
+		Rev_Launcher(6),
 		Enable_Intake(8),
 		Disable_Intake(9),
-		Dump_Balls(10),
+		Dump_Balls(12),
 		Color_Wheel_by_Color(11),
-		Color_Wheel_by_Distance(12);
+		Color_Wheel_by_Distance(10);
 
 		public final int value;
 
@@ -45,7 +45,7 @@ public class GamePad extends GenericHID {
 	*/
 	//gear up button
 	public boolean getClimbUp() {
-		return super.getRawButtonReleased(GamePadControls.Climb_Up.value);
+		return super.getRawButton(GamePadControls.Climb_Up.value);
 	}
 	/**
 	 * expected to be used in co-pilot controller
@@ -53,11 +53,11 @@ public class GamePad extends GenericHID {
 	 */
 	//gear down button
 	public boolean getClimbDown() {
-		return super.getRawButtonReleased(GamePadControls.Climb_Down.value);
+		return super.getRawButton(GamePadControls.Climb_Down.value);
 	}
 
 	public boolean getWinch() {
-		return super.getRawButtonPressed(GamePadControls.Winch.value);
+		return super.getRawButton(GamePadControls.Winch.value);
 	}
 
 	public boolean getMoveMagazine() {
@@ -70,6 +70,10 @@ public class GamePad extends GenericHID {
 
 	public boolean getRevLauncher() {
 		return super.getRawButtonPressed(GamePadControls.Rev_Launcher.value);
+	}
+
+	public boolean getRevLauncherReleased() {
+		return super.getRawButtonReleased(GamePadControls.Rev_Launcher.value);
 	}
 
 	/**
@@ -105,7 +109,7 @@ public class GamePad extends GenericHID {
 	}
 
 	public boolean getDumpAllBalls() {
-		return super.getRawButtonPressed(GamePadControls.Dump_Balls.value);
+		return super.getRawButton(GamePadControls.Dump_Balls.value);
 	}
 
 	public boolean getColorWheelColor() {
@@ -121,11 +125,11 @@ public class GamePad extends GenericHID {
 	 * We cannot delete these, nor make them private
 	 */
 	public double getX(Hand hand) {
-		return getX();
+		return getRawAxis(0);
 	}
 
 	public double getY(Hand hand) {
-		return getY();
+		return getRawAxis(1);
 	}
 
 }

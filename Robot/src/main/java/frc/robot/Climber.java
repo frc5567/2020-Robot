@@ -198,7 +198,7 @@ public class Climber {
         //configs the acceleration of the extension in sensor units per hundered miliseconds per second
         //this is currently set to 1000u/100ms/s, which is half the value of last year's elevator
         m_extensionMotor.configMotionAcceleration(RobotMap.CLIMBER_MOTION_MAGIC_ACCEL, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
-
+        m_extensionMotor.configMotionSCurveStrength(1);
         //configs the cruise velocity of the extension in sensor units per hundred miliseconds
         //this is currently set to 1000u/100ms, which is half the value of last year's elevator
         m_extensionMotor.configMotionCruiseVelocity(RobotMap.CLIMBER_MOTION_MAGIC_CRUISE_VELOCITY, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
