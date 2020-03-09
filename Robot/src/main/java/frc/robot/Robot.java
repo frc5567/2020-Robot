@@ -142,9 +142,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    // periodicLauncherTest();
+    periodicLauncherTest();
     m_pilotController.controlDriveTrainPeriodic();
-    periodicClimberTest(); 
+    // periodicClimberTest(); 
     // m_intake.setOuterIntakeMotor(0);
     // m_intake.setInnerIntakeMotor(0);
     // System.out.print("pe1:\t"+pe1.get());
