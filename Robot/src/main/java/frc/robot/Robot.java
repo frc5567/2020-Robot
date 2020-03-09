@@ -27,127 +27,127 @@ import frc.robot.PilotController.DriveType;
  * creating this project, you must also update the build.gradle file in the
  * project.
  * 
- * @version 1/25/2019
+ * @version 3/9/2019
  */
 public class Robot extends TimedRobot {
-  //declares an xbox controller used for testing prototype code
-  XboxController m_testController;
-  XboxController m_testController2;
+    //declares an xbox controller used for testing prototype code
+    XboxController m_testController;
+    XboxController m_testController2;
 
-  //declares controller and drivetrain for testing drive code
-  /** The class that we wrote to read values from the controller and control the drivetrain */
-  PilotController m_pilotController;
-  CopilotController m_copilotController;
+    //declares controller and drivetrain for testing drive code
+    /** The class that we wrote to read values from the controller and control the drivetrain */
+    PilotController m_pilotController;
+    CopilotController m_copilotController;
 
-  //toggle for the limelight
-  //control for toggling the limelight should be moved to either limelight reader or pilot controller
-  boolean m_isDriverCamera;
+    //toggle for the limelight
+    //control for toggling the limelight should be moved to either limelight reader or pilot controller
+    boolean m_isDriverCamera;
 
-  //declare our limelight reader object
-  LimelightReader m_limelightReader;
+    //declare our limelight reader object
+    LimelightReader m_limelightReader;
 
-  //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
-  //this tab is exclusivly for testing, but could still be moved into limelight targeting test mode
-  private ShuffleboardTab m_cameraTab;
-  private NetworkTableEntry m_cameraHeight;
-  private NetworkTableEntry m_cameraAngle;
-  private NetworkTableEntry m_targetHeight;
-  private NetworkTableEntry m_distance;
+    //declare private variables for creating a camera tab, and putting up variables to test for angles and distance
+    //this tab is exclusivly for testing, but could still be moved into limelight targeting test mode
+    private ShuffleboardTab m_cameraTab;
+    private NetworkTableEntry m_cameraHeight;
+    private NetworkTableEntry m_cameraAngle;
+    private NetworkTableEntry m_targetHeight;
+    private NetworkTableEntry m_distance;
 
-  private Auton m_auton;
+    private Auton m_auton;
 
-  public Robot() {
-    //instantiates our test controller
-    m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
-    m_testController2 = new XboxController(4);
+    public Robot() {
+        //instantiates our test controller
+        m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
+        m_testController2 = new XboxController(4);
 
-    m_limelightReader = new LimelightReader();
+        m_limelightReader = new LimelightReader();
 
-    //intantiates our PilotController, which controls all systems on the drivetrain
-    m_pilotController = new PilotController(DriveType.kArcade, m_limelightReader);
+        //intantiates our PilotController, which controls all systems on the drivetrain
+        m_pilotController = new PilotController(DriveType.kArcade, m_limelightReader);
     
-    //sets our default state to the vision pipeline
-    m_isDriverCamera = false;
+        //sets our default state to the vision pipeline
+        m_isDriverCamera = false;
 
-    m_copilotController = new CopilotController(m_limelightReader, m_pilotController.getDrivetrain());
+        m_copilotController = new CopilotController(m_limelightReader, m_pilotController.getDrivetrain());
 
-    m_auton = new Auton(m_pilotController.getTargeting(), m_copilotController.getMagazine(), 
-                        m_copilotController.getLauncher(), m_pilotController.getDrivetrain());
+        m_auton = new Auton(m_pilotController.getTargeting(), m_copilotController.getMagazine(), 
+                            m_copilotController.getLauncher(), m_pilotController.getDrivetrain());
 
-    //sets up our camera testing tab
-    shuffleboardConfig();
-  }
+        //sets up our camera testing tab
+        shuffleboardConfig();
+    }
 
-  /**
-   * This function is run when the robot is first started up and should be used
-   * for any initialization code.
-   */
-  @Override
-  public void robotInit() {
-  }
+    /**
+     * This function is run when the robot is first started up and should be used
+     * for any initialization code.
+     */
+    @Override
+    public void robotInit() {
+    }
 
-  @Override
-  public void autonomousInit() {
-    m_auton.init();
-  }
- 
-  @Override
-  public void autonomousPeriodic() {
-    m_auton.periodic();
-  }
+    @Override
+    public void autonomousInit() {
+        m_auton.init();
+    }
+    
+    @Override
+    public void autonomousPeriodic() {
+        m_auton.periodic();
+    }
 
-  @Override
-  public void teleopInit() {
-  }
+    @Override
+    public void teleopInit() {
+    }
         
-  @Override
-  public void teleopPeriodic() {
-    m_pilotController.controlDriveTrainPeriodic();
-    m_copilotController.periodicCopilotControl();
-  }
+    @Override
+    public void teleopPeriodic() {
+        m_pilotController.controlDriveTrainPeriodic();
+        m_copilotController.periodicCopilotControl();
+    }
 
-  @Override
-  public void testInit() {
+    @Override
+    public void testInit() {
     
-  }
+    }
 
-  @Override
-  public void testPeriodic() {
-  }
+    @Override
+    public void testPeriodic() {
+    }
 
-  /**
-   * This method will print out values of all sensors on the robot for prematch checks
-   */
-  public void preMatchSensorTesting() {
+    /**
+     * This method will print out values of all sensors on the robot for prematch checks
+     */
+    public void preMatchSensorTesting() {
 
-  }
+    }
   
-  /**
+    /**
    * Prints out the y degrees to target and 
    * calculates distance based on shuffleboard and limelight
    */
-  public void periodicDistanceTuning() {
-    System.out.println("Y Degrees to target : "+  m_limelightReader.getYDegreesToTarget());
+    public void periodicDistanceTuning() {
+        System.out.println("Y Degrees to target : "+  m_limelightReader.getYDegreesToTarget());
     
-    double lengthToHeightRatio = Math.tan(RobotMap.DEG_TO_RAD_CONVERSION * (m_cameraAngle.getDouble(0) + m_limelightReader.getYDegreesToTarget()));
-    m_distance.setDouble((m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0)) / lengthToHeightRatio);
-  }
+        double lengthToHeightRatio = Math.tan(RobotMap.DEG_TO_RAD_CONVERSION * (m_cameraAngle.getDouble(0) + m_limelightReader.getYDegreesToTarget()));
+        m_distance.setDouble((m_targetHeight.getDouble(0) - m_cameraHeight.getDouble(0)) / lengthToHeightRatio);
+    }
 
-  @Override
-  public void disabledInit() {
-    m_pilotController.getTargeting().getPID_Values();
-    m_pilotController.getDrivetrain().setNeutralMode(NeutralMode.Coast);
-  }
+    @Override
+    public void disabledInit() {
+        m_pilotController.getTargeting().getPID_Values();
+        m_pilotController.getDrivetrain().setNeutralMode(NeutralMode.Coast);
+    }
 
-  @Override
-  public void disabledPeriodic() {
-      //this method pulls our input scalars off of the driver tab on shuffleboard
-      //and sets them on our drivetrain class. Our driver input is multiplied by our scalar values
-      //in order to scale back drivetrain speed.
-      m_pilotController.setInputScalar();
-      m_pilotController.getTargeting().setPID();
-      m_pilotController.getDrivetrain().setNeutralMode(NeutralMode.Coast);
-  }
+    @Override
+    public void disabledPeriodic() {
+        //this method pulls our input scalars off of the driver tab on shuffleboard
+        //and sets them on our drivetrain class. Our driver input is multiplied by our scalar values
+        //in order to scale back drivetrain speed.
+        m_pilotController.setInputScalar();
+        m_pilotController.getTargeting().setPID();
+        m_pilotController.getDrivetrain().setNeutralMode(NeutralMode.Coast);
+    }
 
     /**
      * instantiates all of our network table entries and displays them under the camera tab
@@ -159,24 +159,23 @@ public class Robot extends TimedRobot {
 
         //Creates editable text fields to set camera height, fixed angle, and target height
         m_cameraHeight = m_cameraTab.addPersistent("Camera Height (m)", 0.0)                
-                                .withProperties(Map.of("min", 0.0, "max", 6.0)) 
-                                .withWidget(BuiltInWidgets.kTextView)             
-                                .getEntry();
+                                    .withProperties(Map.of("min", 0.0, "max", 6.0)) 
+                                    .withWidget(BuiltInWidgets.kTextView)             
+                                    .getEntry();
 
         m_cameraAngle = m_cameraTab.addPersistent("Camera Angle (deg)", 0.0)                
-                                .withWidget(BuiltInWidgets.kTextView)             
-                                .withProperties(Map.of("min", 0.0, "max", 90.0)) 
-                                .getEntry();
+                                   .withWidget(BuiltInWidgets.kTextView)             
+                                   .withProperties(Map.of("min", 0.0, "max", 90.0)) 
+                                   .getEntry();
 
         m_targetHeight = m_cameraTab.addPersistent("Target Height (m)", 0.0)                
-                                .withWidget(BuiltInWidgets.kTextView)             
-                                .withProperties(Map.of("min", 0.0, "max", 6.0)) 
-                                .getEntry();
+                                    .withWidget(BuiltInWidgets.kTextView)             
+                                    .withProperties(Map.of("min", 0.0, "max", 6.0)) 
+                                    .getEntry();
         
         
         //creates a field to display calculated distance
         m_distance = m_cameraTab.addPersistent("Distance", 0.0)
-                              .getEntry();
-    }
-
+                                .getEntry();
+        }
 }

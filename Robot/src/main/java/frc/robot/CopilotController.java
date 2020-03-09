@@ -242,18 +242,30 @@ public class CopilotController{
         return m_limelightTargeting;
     }
 
+    /**
+     * @return the magazine
+     */
     public Magazine getMagazine() {
         return m_magazine;
     }
 
+    /**
+     * @return the launcher
+     */
     public Launcher getLauncher() {
         return m_launcher;
     }
 
+    /**
+     * @return the climber
+     */
     public Climber getClimber() {
         return m_climber;
     }
 
+    /**
+     * @return the intake
+     */
     public Intake getIntake() {
         return m_intake;
     }
