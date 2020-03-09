@@ -71,12 +71,15 @@ public class GamePad extends GenericHID {
 		return super.getRawButtonPressed(GamePadControls.Rev_Launcher.value);
 	}
 
-		//intake button
-		/**
-		 * expected to be used in co-pilot controller
-		 * <p> enables intake. Doing so drops the drop bar and turns on the intake motors
-		 */
+	/**
+	 * expected to be used in co-pilot controller
+	 * <p> enables intake. Doing so drops the drop bar and turns on the intake motors
+	 */
 	public boolean getIntake() {
+		return super.getRawButton(GamePadControls.Enable_Intake.value);
+	}
+
+	public boolean getIntakePressed() {
 		return super.getRawButtonPressed(GamePadControls.Enable_Intake.value);
 	}
 		//intake turn off button
