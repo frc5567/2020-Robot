@@ -38,11 +38,12 @@ public class GamePad extends GenericHID {
 			this.value = newValue;
 		}
 	}
+
 	/**
 	 * expected to be used in co-pilot conroller 
 	 *<p> switches the gear pneumatics to the high gear position 
 	*/
-		//gear up button
+	//gear up button
 	public boolean getClimbUp() {
 		return super.getRawButtonReleased(GamePadControls.Climb_Up.value);
 	}
@@ -50,7 +51,7 @@ public class GamePad extends GenericHID {
 	 * expected to be used in co-pilot controller
 	 * <p> switches the gear pneumatics to the low gear position
 	 */
-		//gear down button
+	//gear down button
 	public boolean getClimbDown() {
 		return super.getRawButtonReleased(GamePadControls.Climb_Down.value);
 	}
@@ -82,11 +83,11 @@ public class GamePad extends GenericHID {
 	public boolean getIntakePressed() {
 		return super.getRawButtonPressed(GamePadControls.Enable_Intake.value);
 	}
-		//intake turn off button
-		/**
-		 *  expected to be used in co-pilot controller
-		 * <p> disables intake. Doing so raises the drop bar and turns off the intake motors
-		 */
+	//intake turn off button
+	/**
+	 *  expected to be used in co-pilot controller
+	 * <p> disables intake. Doing so raises the drop bar and turns off the intake motors
+	 */
 	public boolean getDisableIntake() {
 		return super.getRawButtonPressed(GamePadControls.Disable_Intake.value);
 	}
@@ -119,16 +120,12 @@ public class GamePad extends GenericHID {
 	 * These must be extended because GenericHID is abstract
 	 * We cannot delete these, nor make them private
 	 */
-	@Override
 	public double getX(Hand hand) {
-		// TODO Auto-generated method stub
-		return 0;
+		return getX();
 	}
 
-	@Override
 	public double getY(Hand hand) {
-		// TODO Auto-generated method stub
-		return 0;
+		return getY();
 	}
 
 }
