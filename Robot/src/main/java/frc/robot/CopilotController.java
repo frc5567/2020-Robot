@@ -72,6 +72,7 @@ public class CopilotController{
         m_magazine = magazine;
         m_controlRotator = controlRotator;
         m_limelightReader = limelight;
+        //TODO: This must be looked at, we should not be creating a seperate drivetrain
         m_drivetrain = new Drivetrain(RobotMap.DRIVETRAIN_HAS_TWO_SOLENOIDS);
         m_limelightTargeting = new LimelightTargeting(m_drivetrain, m_limelightReader);
         m_launcherControl = new ShuffleboardLauncherControl(m_launcher);
@@ -82,49 +83,39 @@ public class CopilotController{
      * Controls the climber using two buttons for moving the climber up and down,
      * a joystick to move the climber up and down,
      * and a button to lift the robot off the ground
-     * @param targetPos the target position for the encoder when lifting the robot up
      */
-    public void controlClimber(int targetPos){
+    public void controlClimber(){
         //Gets current position of the climber
         int extensionCurrent = m_climber.getExtensionMotor().getSelectedSensorPosition();
         //Extends the climber up at a speed of 0.4 when the getClimbUp button is pushed 
         //and the current position is less than the maximum position of 29700
-        if((extensionCurrent < 29700) && m_gamePad.getClimbUp()) {
-            m_climber.setExtensionSpeed(0.4);
+        if(m_gamePad.getClimbUp()) {
             m_climber.extendClimber();
         } 
         //Retracts the climber down at the speed of -0.4 when the getClimb Down button is pushed
         //and the current position is greater than the minimum position of 0
-        else if((extensionCurrent > 0) && m_gamePad.getClimbDown()) {
-            m_climber.setExtensionSpeed(-0.4);
+        else if(m_gamePad.getClimbDown()) {
             m_climber.retractClimber();
         }
-        //Stops the climber's motor by setting it to zero
-        else {
-            m_climber.zeroExtensionMotor();
-        }
-
         //Zeros the climber's motor when the joystick y value is in a deadband of -0.05 to 0.05
-        if((m_climbJoystick.getY() < 0.05) && (m_climbJoystick.getY() > -0.05) ){
+        else if((m_climbJoystick.getY() < 0.05) && (m_climbJoystick.getY() > -0.05) ){
             m_climber.zeroExtensionMotor();
         }
         //Extends the climber up by a speed of 0.4 if the joystick y value is greater than 0.05
-        //and if the current position is less than the maximum position of 29700
-        else if((extensionCurrent < 29700) && (m_climbJoystick.getY() > 0.05)) {
-            m_climber.setExtensionSpeed(0.4);
-            m_climber.extendClimber();
+        //and if the current position is less than the maximum position
+        else if((extensionCurrent < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) && (m_climbJoystick.getY() > 0.05)) {
+            m_climber.setExtensionSpeed(RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
         }
         //Retracts the climber by a speed of -0.4 if the joystick y value less than -0.05
         //and the current position is greater than the minimum position of 0
         else if((extensionCurrent > 0) && (m_climbJoystick.getY() < -0.05)){
-            m_climber.setExtensionSpeed(-0.4);
-            m_climber.retractClimber();
+            m_climber.setExtensionSpeed(-RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
         }
 
         //If the getWinch button is pressed, the robot is lifted up from the ground at a speed of 0.4
         //until it reaches the target position. If the button isn't pressed, the motors are zeroed
         if(m_gamePad.getWinch()) {
-            m_climber.liftRobot(targetPos, 0.4);
+            m_climber.setLiftSpeed(RobotMap.CLIMBER_WINCH_SPEED);
         } else {
             m_climber.zeroLiftMotor();
         }
@@ -137,11 +128,11 @@ public class CopilotController{
     public void controlMagazine(){
         //when the getMoveMagazine button is pushed, magazine moves the balls toward the launcher at a speed of 0.37
         if(m_gamePad.getMoveMagazine()){
-            m_magazine.runBelt(0.37);
+            m_magazine.runBelt(RobotMap.MAGAZINE_LAUNCH_SPEED);
         } 
         //When the getMoveMagazineDown button is pushed, the magazine moves the balls back towars the intake at a speed of -0.37
         else if(m_gamePad.getMoveMagazineDown()){
-            m_magazine.runBelt(-0.37);
+            m_magazine.runBelt(-RobotMap.MAGAZINE_LAUNCH_SPEED);
         } 
         //Stops the magazine when none of the two buttons are pushed by setting the speed to 0
         else {
@@ -191,25 +182,14 @@ public class CopilotController{
      * Turns on the Intake to take in the balls and turns the intake off to stop the intake of balls
      */
     public void controlIntake(){
-
-        //Determine the target position that the arm is moving to by using the opposite position of where the arm is currently
-        if(m_intake.getPosition() == Position.kLowered){
-                m_position = Position.kRaised;
-            } else {
-                m_position = Position.kLowered;
-            }
-
         //If the button is pressed on the gamePad, the intake is enabled for the drop bar to lower and the motors to run to take in the balls
         if(m_gamePad.getIntake()){
             //moves the arm to the target position (it would move the position to the target position of lowered)
-            m_intake.setPosition(m_position);
+            m_intake.setPosition(Position.kLowered);
 
             //Sets the motor speeds for the inner and outer motors to bring the balls in
-            m_intake.setInnerIntakeMotor(RobotMap.COPILOT_CONTROLLER_INNER_INTAKE_SPEED);
-            m_intake.setOuterIntakeMotor(RobotMap.COPILOT_CONTROLLER_OUTER_INTAKE_SPEED);
-
-            //gives us the string name of the position that the arm is at currently
-            m_intake.getPositionName();
+            m_intake.setInnerIntakeMotor(RobotMap.INNER_INTAKE_SPEED);
+            m_intake.setOuterIntakeMotor(RobotMap.OUTER_INTAKE_SPEED);
         }
 
         //If the B button is pressed, the intake is disabled to raise the drop bar and stop the motors
@@ -219,10 +199,7 @@ public class CopilotController{
             m_intake.setOuterIntakeMotor(0);
 
             //sets the position to the new target position of raised
-            m_intake.setPosition(m_position);
-
-            //Gices us the string name of the position that the arm is at currently
-            m_intake.getPositionName();
+            m_intake.setPosition(Position.kRaised);
         }
     }
 
@@ -233,11 +210,12 @@ public class CopilotController{
         //When the getDumpAllBalls butoonn is pressed, the magazine moves backwards at a speed of -0.37 to push the ball back to the intake
         //the intake then pushes the balls out of the intake
         if(m_gamePad.getDumpAllBalls()){
-            m_magazine.runBelt(-0.37);
-            m_intake.setInnerIntakeMotor(-0.3);
-            m_intake.setOuterIntakeMotor(-0.3);
+            m_magazine.runBelt(-RobotMap.MAGAZINE_LAUNCH_SPEED);
+            m_intake.setInnerIntakeMotor(-RobotMap.INNER_INTAKE_SPEED);
+            m_intake.setOuterIntakeMotor(-RobotMap.OUTER_INTAKE_SPEED);
         } else {
             //Stops the magazine and zeros the intake motors
+            //TODO: CANNOT ZERO MOTORS HERE OR ELSE THEY WILL NEVER RUN
             m_magazine.runBelt(0);
             m_intake.setInnerIntakeMotor(0);
             m_intake.setOuterIntakeMotor(0);

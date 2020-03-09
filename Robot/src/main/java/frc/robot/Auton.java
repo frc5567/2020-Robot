@@ -3,7 +3,16 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Drivetrain.Gear;
 
+/**
+ * This is the basic autonomous class
+ * @author Josh Overbeek
+ * @version 3/9/2020
+ */
 public class Auton {
+
+    /**
+     * Enum for storing states of auton
+     */
     public enum AutonState {
         kInitialReverse(0), 
         kTarget(1), 
@@ -26,6 +35,7 @@ public class Auton {
         }
     }
 
+    //Declaring all member variables
     private Drivetrain m_drivetrain;
     private LimelightTargeting m_targeting;
     private Magazine m_magazine;
@@ -33,6 +43,10 @@ public class Auton {
     private AutonState m_state;
     private double m_tempTime = 0;
 
+    /**
+     * Constructor for auton objects
+     * <p>We pass in all the objects to avoid creating multiple drivetrains, etc.
+     */
     public Auton(LimelightTargeting targeting, Magazine magazine, Launcher launcher, Drivetrain drivetrain) {
         m_magazine = magazine;
         m_launcher = launcher;
@@ -56,11 +70,18 @@ public class Auton {
         m_targeting.resetError();
         m_state = AutonState.kInitialReverse;
         m_drivetrain.zeroEncoders();
-
     }
 
+    /**
+     * To be run in auton periodic.
+     * This runs through our auton sequence
+     */
+    //This method follows this structure: 
+    //Check state in enclosing if statement
+    //Run method which returns whether it is finished
+    //If the method is complete, change the state, otherwise return out
     public void periodic() {
-        //back up for brief period
+        //back up a short amount at a low speed
         if (m_state.equals(AutonState.kInitialReverse)) {
             System.out.println("Move back");
             if (reverse(-0.15, -30000)) {
@@ -70,9 +91,11 @@ public class Auton {
                 return;
             }
         }
+        //lock on to the target and rev the launcher to holding speed
         else if (m_state.equals(AutonState.kTarget)) {
             System.out.println("target");
             m_launcher.setMotor(0.5);
+            //if we are on target and our launcher is up to speed, progress the state
             if (m_targeting.target() && (m_launcher.getMasterMotor().getMotorOutputPercent() > 0.47)) {
                 m_state = AutonState.kRevToVelocity;
             }
@@ -80,22 +103,31 @@ public class Auton {
                 return;
             }
         }
+        //revs the launcher up to launch speed
         else if (m_state.equals(AutonState.kRevToVelocity)) {
             m_targeting.target();
             System.out.println("rev");
+            //if we are at speed. exit out
             if (revToVelocity(4800)) {
                 m_state = AutonState.kRunBalls;
                 m_tempTime = Timer.getFPGATimestamp();
             }
         }
+        //drives the magazine for launching
         else if (m_state.equals(AutonState.kRunBalls)) {
+            //zero drivetrain
             m_drivetrain.arcadeDrive(0, 0);
             System.out.println("mag");
-            runMagazine(0.8);
+
+            //run our magazineto launch balls
+            m_magazine.runBelt(RobotMap.MAGAZINE_LAUNCH_SPEED);
+
+            //progress state after three seconds
             if (m_tempTime + 3 < Timer.getFPGATimestamp()) {
                 m_state = AutonState.kEnd;
             }
         }
+        //kill all motors as the final state
         else if (m_state.equals(AutonState.kEnd)) {
             System.out.println("end");
             m_drivetrain.arcadeDrive(0, 0);
@@ -134,9 +166,4 @@ public class Auton {
             return false;
         }
     }
-
-    public void runMagazine(double speed) {
-        m_magazine.runBelt(speed);
-    }
- 
 }

@@ -170,14 +170,14 @@ public class Robot extends TimedRobot {
    */
   public void periodicClimberTest() {
     int extensionCurrent = m_climber.getExtensionMotor().getSelectedSensorPosition();
-    //TODO: RobotMap 29700 (Hard limit)
-    if((extensionCurrent < 29700) && m_testController.getAButton()) {
-      m_climber.setExtensionSpeed(0.4);
+
+    if((extensionCurrent < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) && m_testController.getAButton()) {
+      m_climber.setExtensionSpeed(RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
     }
     else if ((extensionCurrent > 0) && m_testController.getBButton()) {
-      m_climber.setExtensionSpeed(-0.4);
+      m_climber.setExtensionSpeed(-RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
     }
-    else if ((extensionCurrent < 29700) && m_testController.getBumper(Hand.kRight)) {
+    else if ((extensionCurrent < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) && m_testController.getBumper(Hand.kRight)) {
       m_climber.extendClimber();
     }
     else if ((extensionCurrent > 0) && m_testController.getBumper(Hand.kLeft)) {
@@ -188,7 +188,7 @@ public class Robot extends TimedRobot {
     }
 
     if(m_testController.getXButton()) {
-      m_climber.setLiftSpeed(0.5);
+      m_climber.setLiftSpeed(RobotMap.CLIMBER_WINCH_SPEED);
     }
     else {
       m_climber.zeroLiftMotor();
@@ -229,10 +229,10 @@ public class Robot extends TimedRobot {
       m_magazine.sensorBeltControl();
     }
     else if (m_testController2.getBumper(Hand.kRight)) {
-        m_magazine.runBelt(0.7);
+        m_magazine.runBelt(RobotMap.MAGAZINE_LAUNCH_SPEED);
     }
     else if (m_testController2.getBumper(Hand.kLeft)) {
-        m_magazine.runBelt(-0.7);
+        m_magazine.runBelt(-RobotMap.MAGAZINE_LAUNCH_SPEED);
     }
     //kills the velocity while not holding
     else {
@@ -246,22 +246,17 @@ public class Robot extends TimedRobot {
       m_intake.setPosition(Position.kRaised);
     }
 
-    //resets the encoder when the start button is pressed
-    if (m_testController.getStartButton()) {
-        m_launcher.getMasterMotor().setSelectedSensorPosition(0);
-    }
-
     m_launcherControl.setPIDF();
     m_launcherControl.publishData();
 
     //disable the intake motors while its unused
     if (m_testController2.getYButton()) {
-      m_intake.setInnerIntakeMotor(.3);
-      m_intake.setOuterIntakeMotor(0.8);
+      m_intake.setInnerIntakeMotor(RobotMap.INNER_INTAKE_SPEED);
+      m_intake.setOuterIntakeMotor(RobotMap.OUTER_INTAKE_SPEED);
     } 
     else if (m_testController2.getAButton()) {
-      m_intake.setInnerIntakeMotor(-.3);
-      m_intake.setOuterIntakeMotor(-0.6);
+      m_intake.setInnerIntakeMotor(-RobotMap.INNER_INTAKE_SPEED);
+      m_intake.setOuterIntakeMotor(-RobotMap.OUTER_INTAKE_SPEED);
     }
     else {
       m_intake.setInnerIntakeMotor(0);
@@ -283,7 +278,6 @@ public class Robot extends TimedRobot {
       m_pilotController.setInputScalar();
       m_pilotController.getTargeting().setPID();
       m_pilotController.getDrivetrain().setNeutralMode(NeutralMode.Coast);
-      
   }
 
     /**

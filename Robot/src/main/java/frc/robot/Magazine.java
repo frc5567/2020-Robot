@@ -71,7 +71,7 @@ public class Magazine {
             runBelt(0);
         }
         else if (m_intakeSensor.get()) {
-            runBelt(0.71);
+            runBelt(RobotMap.MAGAZINE_INTAKE_SPEED);
         }
         else {
             runBelt(0);

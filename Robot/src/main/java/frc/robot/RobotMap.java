@@ -22,10 +22,6 @@ public class RobotMap {
     /**the deadband on our controller sticks, used to prevent drift*/
     public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.08;
 
-    //The intake motor speeds, for the inner and outer motors, used in the PilotController class
-    public static final double COPILOT_CONTROLLER_INNER_INTAKE_SPEED = 0.3;
-    public static final double COPILOT_CONTROLLER_OUTER_INTAKE_SPEED = 0.3;
-
     //****************************************
     //*                                      *
     //*        DRIVETRAIN CONSTANTS          *
@@ -200,8 +196,9 @@ public class RobotMap {
     /**The adjustment value for the proportionality constant for the lift motor */
     public static final double CLIMBER_ADJUSTMENT_VALUE = 0.5;
 
-    //the encoder target of for the extension motor. TODO: Input an actual value here
+    //the encoder target of for the extension motor.
     public static final int CLIMBER_EXTENSION_ENCODER_TARGET = 29600;
+    public static final int CLIMBER_EXTENSION_HARD_LIMIT = 29700;
 
     //the climber timeout for running confing methods
     public static final int CLIMBER_CONFIG_TIMEOUT_MS = 30;
@@ -230,6 +227,9 @@ public class RobotMap {
     public static final double CLIMBER_EXTENSION_D = 0;
     public static final double CLIMBER_EXTENSION_F = 0.05;
 
+    public static final double CLIMBER_EXTENSION_MANUAL_SPEED = 0.4;
+    public static final double CLIMBER_WINCH_SPEED = 0.5;
+
     //the acceptable integral zone for the extension motor
     //100 is the value used last year, this should be adjusted in testing if need be
     public static final int CLIMBER_EXTENSION_I_ZONE = 600;
@@ -253,7 +253,7 @@ public class RobotMap {
     public static final boolean OUTER_INTAKE_INVERTED = true;
     public static final boolean INNER_INTAKE_INVERTED = true;
 
-    public static final double OUTER_INTAKE_SPEED = 0.6;
+    public static final double OUTER_INTAKE_SPEED = 0.8;
     public static final double INNER_INTAKE_SPEED = 0.3;
 
     //the ports for the intake position piston
@@ -322,6 +322,9 @@ public class RobotMap {
 
     /**The DIO port for the photoelectric sensor mounted near the launcher */
     public static final int MAGAZINE_OUT_SENSOR_PORT = 8;
+
+    public static final double MAGAZINE_INTAKE_SPEED = 0.71;
+    public static final double MAGAZINE_LAUNCH_SPEED = 0.7;
 
     //****************************************
     //*                                      *
