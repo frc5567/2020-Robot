@@ -30,14 +30,16 @@ import frc.robot.PilotController.DriveType;
  * @version 3/9/2019
  */
 public class Robot extends TimedRobot {
-    //declares an xbox controller used for testing prototype code
-    XboxController m_testController;
-    XboxController m_testController2;
 
     //declares controller and drivetrain for testing drive code
     /** The class that we wrote to read values from the controller and control the drivetrain */
-    PilotController m_pilotController;
-    CopilotController m_copilotController;
+    private PilotController m_pilotController;
+
+    /** The copilot class for controlling all other systems on the robot */
+    private CopilotController m_copilotController;
+    
+    /** The auton class that runs our auton */
+    private Auton m_auton;
 
     //toggle for the limelight
     //control for toggling the limelight should be moved to either limelight reader or pilot controller
@@ -54,12 +56,7 @@ public class Robot extends TimedRobot {
     private NetworkTableEntry m_targetHeight;
     private NetworkTableEntry m_distance;
 
-    private Auton m_auton;
-
     public Robot() {
-        //instantiates our test controller
-        m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
-        m_testController2 = new XboxController(4);
 
         m_limelightReader = new LimelightReader();
 
