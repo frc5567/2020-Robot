@@ -39,6 +39,9 @@ public class GamePad extends GenericHID {
 		}
 	}
 
+	// TODO: Document methods with accurate comments
+	
+
 	/**
 	 * expected to be used in co-pilot conroller 
 	 *<p> switches the gear pneumatics to the high gear position 
