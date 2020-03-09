@@ -7,13 +7,6 @@
 
 package frc.robot;
 
-import java.util.Map;
-
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -69,6 +62,8 @@ public class Robot extends TimedRobot {
 
   private Auton m_auton;
 
+  DigitalInput m_switchIR;
+
   public Robot() {
     //instantiates our test controller
     m_testController = new XboxController(RobotMap.TEST_CONTROLLER_PORT);
@@ -86,19 +81,11 @@ public class Robot extends TimedRobot {
     //sets our default state to the vision pipeline
     m_isDriverCamera = false;
 
-    //instantiate magazine, this needs to be moved to copilot controller post testing
-    m_magazine = new Magazine();
+    shooter = new Launcher(0.5, leftTalon, rightTalon, leftVictor, rightVictor);
+    shooterControl = new ShuffleboardShooterControl(shooter);
 
-    //instantiate intake, this needs to be moved to copilot controller post testing
-    m_intake = new Intake();
-
-    //instantiate climber, this needs to be moved to copilot controller post testing
-    m_climber = new Climber();
-
-    m_auton = new Auton(m_pilotController.getTargeting(), m_magazine, m_launcher, m_pilotController.getDrivetrain());
-
-    //sets up our camera testing tab
-    shuffleboardConfig();
+    testController = new XboxController(0);
+    m_switchIR = new DigitalInput(0);
   }
 
   /**
@@ -125,7 +112,7 @@ public class Robot extends TimedRobot {
         
   @Override
   public void teleopPeriodic() {
-    m_pilotController.controlDriveTrainPeriodic();
+    System.out.println(m_switchIR.get());
   }
 
   @Override

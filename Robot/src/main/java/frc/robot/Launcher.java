@@ -6,8 +6,6 @@ import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 /**
  * A launcher that uses one or multiple motors to launch a projectile
@@ -28,11 +26,11 @@ public class Launcher {
     /**The slave on the same side as the master motor controller */
     private BaseMotorController m_closeSlaveMotor;
 
-    /**The slaves on the further side from the master motor, and inverted */
-    private BaseMotorController m_farSlaveMotor1, m_farSlaveMotor2;
-
-    //the encoder plugged into the master Talon
-    SensorCollection m_encoder;
+    //speed controller used to launch 
+    private BaseMotorController leftMotor;
+    private BaseMotorController rightMotor;
+    private BaseMotorController leftSlaveMotor;
+    private BaseMotorController rightSlaveMotor;
 
     /**
      * Constructor for Launcher objects
@@ -70,22 +68,12 @@ public class Launcher {
      * Constructor for robot objects
      * <p> This instantiates a launcher using the robot map constants rather than parameters
      */
-    public Launcher() {
-        //instantiate motors and djustment value using robot map constants
-        m_masterMotor = new TalonSRX(RobotMap.MASTER_LAUNCHER_ID);
-        m_closeSlaveMotor = new VictorSPX(RobotMap.CLOSE_LAUNCHER_SLAVE_ID);
-        m_farSlaveMotor1 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE1_ID);
-        m_farSlaveMotor2 = new VictorSPX(RobotMap.FAR_LAUNCHER_SLAVE2_ID);
-
-        //Sets the far motors to be inverted so that they don't work against the close ones
-        m_farSlaveMotor1.setInverted(RobotMap.LAUNCHER_FAR_SLAVE1_INVERTED);
-        m_farSlaveMotor2.setInverted(RobotMap.LAUNCHER_FAR_SLAVE2_INVERTED);
-
-        //Instantiates the encoder as the encoder plugged into the master
-        m_encoder = new SensorCollection(m_masterMotor);
-
-        //run the config methods to set up velocity control
-        configVelocityControl();
+    public Launcher(double p, BaseMotorController leftMotor, BaseMotorController rightMotor, BaseMotorController leftSlaveMotor, BaseMotorController rightSlaveMotor) {
+        this.p = p;
+        this.leftMotor = leftMotor;
+        this.rightMotor = rightMotor;
+        this.leftSlaveMotor = leftSlaveMotor;
+        this.rightSlaveMotor = rightSlaveMotor;
     }
 
     /**
@@ -93,13 +81,10 @@ public class Launcher {
      * @param speed A value between -1.0 and 1.0 where 1.0 is full speed forward
      */
     public void setMotor(double speed) {
-        //set the master motor directly
-        m_masterMotor.set(ControlMode.PercentOutput, speed);
-
-        //set all other motors to follow
-        m_closeSlaveMotor.follow(m_masterMotor, FollowerType.PercentOutput);
-        m_farSlaveMotor1.follow(m_masterMotor, FollowerType.PercentOutput);
-        m_farSlaveMotor2.follow(m_masterMotor, FollowerType.PercentOutput);
+        leftMotor.set(ControlMode.PercentOutput, speed);
+        rightMotor.set(ControlMode.PercentOutput, -speed);
+        leftSlaveMotor.follow(leftMotor);
+        rightSlaveMotor.follow(rightMotor);
     }
 
     /**
