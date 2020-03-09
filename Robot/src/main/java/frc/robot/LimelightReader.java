@@ -20,6 +20,10 @@ public class LimelightReader {
         m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     }
 
+    public NetworkTable getTable() {
+        return m_limelightTable;
+    }
+
     /**
      * Forces the LEDs to turn off on the limelight
      */

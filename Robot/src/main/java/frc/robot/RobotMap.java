@@ -96,7 +96,7 @@ public class RobotMap {
     public static final int PERIOD_MS = 10;
 
     //the time it takes the drive train to ramp to full speed in open loop control in seconds
-    public static final double DRIVE_RAMP_TIME = 0.5;
+    public static final double DRIVE_RAMP_TIME = 1.0;
 
     //TODO:the 6 has to be changed to the diameter of our wheels, in addition, we need to account for gearing
     public static final double DRIVE_TICS_PER_INCH = (2048 / (6*Math.PI));
@@ -297,7 +297,7 @@ public class RobotMap {
     //PID values for targeting the vision target
     //TODO: These values are temporary and need to be updated in testing
     public static final double TARGETING_P = 0.5;
-    public static final double TARGETING_I = 0.00125;
+    public static final double TARGETING_I = 0;//0.00125;
     public static final double TARGETING_D = 0.8;
 
     //the period between controller updates in seconds

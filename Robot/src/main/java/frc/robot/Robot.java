@@ -126,7 +126,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     m_pilotController.controlDriveTrainPeriodic();
-    System.out.println(m_pilotController.getDrivetrain().getLeftDriveEncoderPosition());
   }
 
   @Override
@@ -138,8 +137,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    periodicLauncherTest();
-    //periodicClimberTest(); 
+    // periodicLauncherTest();
+    m_pilotController.controlDriveTrainPeriodic();
+    periodicClimberTest(); 
     // m_intake.setOuterIntakeMotor(0);
     // m_intake.setInnerIntakeMotor(0);
     // System.out.print("pe1:\t"+pe1.get());
@@ -257,7 +257,7 @@ public class Robot extends TimedRobot {
     //disable the intake motors while its unused
     if (m_testController2.getYButton()) {
       m_intake.setInnerIntakeMotor(.3);
-      m_intake.setOuterIntakeMotor(0.6);
+      m_intake.setOuterIntakeMotor(0.8);
     } 
     else if (m_testController2.getAButton()) {
       m_intake.setInnerIntakeMotor(-.3);
