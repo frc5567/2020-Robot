@@ -197,7 +197,8 @@ public class CopilotController{
             m_magazine.sensorBeltControl();
         }
         //When the getDumpAllBalls buton is pressed, the magazine moves backwards and 
-        //the intake then pushes the balls out of the intake TODO: This doesn't work with chinese finger trap
+        //the intake then pushes the balls out of the intake 
+        //TODO: This doesn't work with chinese finger trap
         else if(m_gamePad.getDumpAllBalls()){
             m_magazine.runBelt(-RobotMap.MAGAZINE_LAUNCH_SPEED);
             m_intake.setInnerIntakeMotor(-RobotMap.INNER_INTAKE_SPEED);

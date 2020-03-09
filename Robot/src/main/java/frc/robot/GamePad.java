@@ -61,11 +61,11 @@ public class GamePad extends GenericHID {
 	}
 
 	public boolean getMoveMagazine() {
-		return super.getRawButtonPressed(GamePadControls.Move_Magazine_For_Launch.value);
+		return super.getRawButton(GamePadControls.Move_Magazine_For_Launch.value);
 	}
 
 	public boolean getMoveMagazineDown() {
-		return super.getRawButtonPressed(GamePadControls.Move_Magazine_Down.value);
+		return super.getRawButton(GamePadControls.Move_Magazine_Down.value);
 	}
 
 	public boolean getRevLauncher() {
