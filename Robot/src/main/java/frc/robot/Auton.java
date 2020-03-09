@@ -143,7 +143,7 @@ public class Auton {
      * @return Whether we have hit our target
      */
     public boolean reverse(double speed, double target) {
-        if (m_drivetrain.getLeftDriveEncoderPosition() < target || m_drivetrain.getLeftDriveEncoderPosition() < target) {
+        if (m_drivetrain.getLeftDriveEncoderPosition() < target || m_drivetrain.getRightDriveEncoderPosition() < target) {
             m_drivetrain.arcadeDrive(0, 0);
             return true;
         }

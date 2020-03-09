@@ -89,7 +89,15 @@ public class GamePad extends GenericHID {
 	}
 	
 	public boolean getLauncherAndMagazine() {
+		return super.getRawButton(GamePadControls.Launcher_And_Magazine.value);
+	}
+
+	public boolean getLauncherAndMagazinePressed() {
 		return super.getRawButtonPressed(GamePadControls.Launcher_And_Magazine.value);
+	}
+
+	public boolean getLauncherAndMagazineReleased() {
+		return super.getRawButtonReleased(GamePadControls.Launcher_And_Magazine.value);
 	}
 
 	public boolean getDumpAllBalls() {

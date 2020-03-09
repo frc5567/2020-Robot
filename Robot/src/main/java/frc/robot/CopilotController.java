@@ -9,6 +9,7 @@ import frc.robot.Climber;
 import frc.robot.GamePad;
 import frc.robot.Intake;
 import frc.robot.Intake.Position;
+import frc.robot.LimelightReader.Pipeline;
 
 /**
  * A class to control the Intake, Launcher, Magazine, and Climber using the copilot controller
@@ -16,6 +17,12 @@ import frc.robot.Intake.Position;
  * @version 3/7/2020
  */
 public class CopilotController{
+    public enum TargetingStage {
+        kRevAndTarget, kRevToVelocity, kRunMagazine
+    }
+
+    //declare Targeting enum to keep track of current targeting state
+    private TargetingStage m_targetingStage = TargetingStage.kRevAndTarget;
 
     //Declares the gamePad for the use of the buttons from the GamePad class
     private GamePad m_gamePad;
@@ -160,15 +167,46 @@ public class CopilotController{
      * Controls the launcher and magazine at the same time using one button to set the magazine speed to 0.37 moving the balls toward the launcher,
      * and it gets the launcher up to speed
      */
-    //TODO: check what to do with launcher
     public void controlMagazineAndLauncher(){
-        //The magazine moves the balls toward the launcher at the speed of 0.37 and gets the launcher up to speed when the button is pushed
-        if(m_gamePad.getLauncherAndMagazine()) {
-            m_magazine.runBelt(0.37);
-            m_launcherControl.setPercentSpeed();
-            m_limelightTargeting.target();
-            m_launcherControl.m_currentVel.setDouble(m_launcher.getMasterMotor().getSelectedSensorVelocity() / RobotMap.RPM_TO_UNITS_PER_100MS);
-            //TODO: Rev Launcher
+        if (m_gamePad.getLauncherAndMagazinePressed()) {
+            PilotController.is_currently_targeting = true;
+            m_targetingStage = TargetingStage.kRevAndTarget;
+        }
+        else if(m_gamePad.getLauncherAndMagazine()) {
+            if (m_targetingStage.equals(TargetingStage.kRevAndTarget)) {
+                m_launcher.setMotor(RobotMap.LAUNCHER_HOLDING_SPEED);
+                //if we are on target and our launcher is up to speed, progress the state
+                if (m_limelightTargeting.target() && (m_launcher.getMasterMotor().getMotorOutputPercent() > 0.47)) {
+                    m_targetingStage = TargetingStage.kRevToVelocity;
+                }
+                else {
+                    return;
+                }
+            }
+            //revs the launcher up to launch speed
+            else if (m_targetingStage.equals(TargetingStage.kRevToVelocity)) {
+                m_limelightTargeting.target();
+                m_launcher.setVelocity(4800);
+                //if we are at speed. exit out
+                if (m_launcher.getMasterMotor().getSelectedSensorVelocity() > 4800 - 50) {
+                    m_targetingStage = TargetingStage.kRunMagazine;
+                }
+            }
+            //drives the magazine for launching
+            else if (m_targetingStage.equals(TargetingStage.kRunMagazine)) {
+                //zero drivetrain
+                m_drivetrain.arcadeDrive(0, 0);
+
+                //run our magazine to launch balls
+                m_magazine.runBelt(RobotMap.MAGAZINE_LAUNCH_SPEED);
+            }
+        }
+        else if (m_gamePad.getLauncherAndMagazineReleased()) {
+            m_launcher.setMotor(0);
+            m_magazine.runBelt(0);
+            m_drivetrain.arcadeDrive(0, 0);
+            m_limelightReader.setPipeline(Pipeline.kDriver);
+            PilotController.is_currently_targeting = false;
         }
         else {
             //Stops the magazine and zeros the launcher speed

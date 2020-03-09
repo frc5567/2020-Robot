@@ -151,7 +151,9 @@ public class RobotMap {
 
     //adjustment value for the launcher percent control
     //0.5 is pretty arbitrary, it is the value that was used for initial launcher testing
-	public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
+    public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
+    
+    public static final double LAUNCHER_HOLDING_SPEED = 0.5;
     
     //the measurement period for calculating velocity off of the encoder
 	public static final VelocityMeasPeriod VELOCITY_MEASUREMENT_PERIOD = VelocityMeasPeriod.Period_10Ms;
