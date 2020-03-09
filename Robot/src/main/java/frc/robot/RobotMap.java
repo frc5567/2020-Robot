@@ -50,7 +50,6 @@ public class RobotMap {
      */
     public static final double PID_INPUT_RANGE = 180.00;
 
-    //TODO: Arbitrary
     /**The cap on the I output, which helps to prevent crazy oscillation */
     public static final double ROTATE_PID_INTEGRATOR_RANGE = 0.10;
 
@@ -95,7 +94,7 @@ public class RobotMap {
     public static final double DRIVE_RAMP_TIME = 1.0;
 
     //TODO:the 6 has to be changed to the diameter of our wheels, in addition, we need to account for gearing
-    public static final double DRIVE_TICS_PER_INCH = (2048 / (6*Math.PI));
+    public static final double DRIVE_TICS_PER_INCH = (2048 / (6.25*Math.PI));
 
     //the total number of encoder ticks in a rotate----TODO: Check to see if this is the correct number
     public static final double STARTING_TICK_VALUE = 1440;
@@ -124,8 +123,7 @@ public class RobotMap {
     public static final double LAUNCHER_D = 0.1;
     public static final double LAUNCHER_F = .27;
 
-    //600 is minutes to 100ms, 
-    //3010.56 is our calculated raw sensor units per revolution on the output shaft
+    //600 is minutes to 100ms, 2048 is revs to sensor ticks
     public static final double RPM_TO_UNITS_PER_100MS = 2048.0 / 600;
 
     //Calculated free spin angular velocity of our shooter based on specs (-10%) divided by three for gear reduction
@@ -152,7 +150,9 @@ public class RobotMap {
 
     //adjustment value for the launcher percent control
     //0.5 is pretty arbitrary, it is the value that was used for initial launcher testing
-	public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
+    public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
+    
+    public static final double LAUNCHER_HOLDING_SPEED = 0.5;
     
     //the measurement period for calculating velocity off of the encoder
 	public static final VelocityMeasPeriod VELOCITY_MEASUREMENT_PERIOD = VelocityMeasPeriod.Period_10Ms;
@@ -197,8 +197,9 @@ public class RobotMap {
     /**The adjustment value for the proportionality constant for the lift motor */
     public static final double CLIMBER_ADJUSTMENT_VALUE = 0.5;
 
-    //the encoder target of for the extension motor. TODO: Input an actual value here
+    //the encoder target of for the extension motor.
     public static final int CLIMBER_EXTENSION_ENCODER_TARGET = 29600;
+    public static final int CLIMBER_EXTENSION_HARD_LIMIT = 29700;
 
     //the climber timeout for running confing methods
     public static final int CLIMBER_CONFIG_TIMEOUT_MS = 30;
@@ -227,6 +228,9 @@ public class RobotMap {
     public static final double CLIMBER_EXTENSION_D = 0;
     public static final double CLIMBER_EXTENSION_F = 0.05;
 
+    public static final double CLIMBER_EXTENSION_MANUAL_SPEED = 0.4;
+    public static final double CLIMBER_WINCH_SPEED = 0.5;
+
     //the acceptable integral zone for the extension motor
     //100 is the value used last year, this should be adjusted in testing if need be
     public static final int CLIMBER_EXTENSION_I_ZONE = 600;
@@ -249,6 +253,9 @@ public class RobotMap {
     //inversion for our intake motors
     public static final boolean OUTER_INTAKE_INVERTED = true;
     public static final boolean INNER_INTAKE_INVERTED = true;
+
+    public static final double OUTER_INTAKE_SPEED = 0.8;
+    public static final double INNER_INTAKE_SPEED = 0.3;
 
     //the ports for the intake position piston
     public static final int INTAKE_POSITION_PISTON_FORWARD_PORT = 0;
@@ -289,7 +296,6 @@ public class RobotMap {
     public static final double INNER_TARGET_DEGREES = 4.5;
 
     //PID values for targeting the vision target
-    //TODO: These values are temporary and need to be updated in testing
     public static final double TARGETING_P = 0.5;
     public static final double TARGETING_I = 0;//0.00125;
     public static final double TARGETING_D = 0.8;
@@ -317,14 +323,15 @@ public class RobotMap {
     /**The DIO port for the photoelectric sensor mounted near the launcher */
     public static final int MAGAZINE_OUT_SENSOR_PORT = 8;
 
+    public static final double MAGAZINE_INTAKE_SPEED = 0.71;
+    public static final double MAGAZINE_LAUNCH_SPEED = 0.7;
+
     //****************************************
     //*                                      *
     //*           GENERAL CONSTANTS          *
     //*                                      *
     //****************************************
     public static final int PCM_CAN_ID = 20;
-    /**TODO:This number is arbitrary and should be removed or changed based on how we index */
-    public static final int CYCLES_TO_MOVE_BALL_ONE_POSITION = 30;
     
     /**
      * The primary slot for a CTRE PID controller. This slot controlls the main motion of the system, 

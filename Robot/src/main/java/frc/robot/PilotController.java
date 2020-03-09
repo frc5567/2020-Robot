@@ -44,6 +44,9 @@ public class PilotController {
         }
     }
 
+    /**Checks whether or not we are currently targeting and using the drivetrain */
+    public static boolean is_currently_targeting = false;
+
     //declare our drivetrain and our controller
     private XboxController m_controller;
     private Drivetrain m_drivetrain;
@@ -192,6 +195,11 @@ public class PilotController {
      * Controls all pilot controlled systems
      */
     public void controlDriveTrainPeriodic() {
+        //prevents the PilotController from targeting while the copilot is targeting
+        if (is_currently_targeting) {
+            return;
+        }
+
         //if the b button is pressed, lock onto the high target
         if (m_controller.getBButton()) {
             m_limelight.getTable().getEntry("pipeline").setDouble(0);
