@@ -105,11 +105,11 @@ public class RobotMap {
     public static final int SLAVE_LEFT_FALCON_ID = 13;
     public static final int SLAVE_RIGHT_FALCON_ID = 14;
 
-    //solenoid ports
+    //solenoid ports TODO: Make one solenoid based on RIGHT
     public static final int LEFT_SOLENOID_FORWARD_PORT = 4;
     public static final int LEFT_SOLENOID_REVERSE_PORT = 5;
-    public static final int RIGHT_SOLENOID_FORWARD_PORT = 2;
-    public static final int RIGHT_SOLENOID_REVERSE_PORT = 1;
+    public static final int RIGHT_SOLENOID_FORWARD_PORT = 1;
+    public static final int RIGHT_SOLENOID_REVERSE_PORT = 2;
 
 
     //****************************************
