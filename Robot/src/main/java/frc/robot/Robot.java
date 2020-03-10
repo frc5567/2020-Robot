@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.LimelightReader.Pipeline;
 import frc.robot.PilotController.DriveType;
 
 
@@ -86,6 +87,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         m_auton.init();
+        //force limelight into targeting mode pre-auton
+        m_limelightReader.setPipeline(Pipeline.kStandard);
     }
     
     @Override
@@ -105,12 +108,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-    
     }
 
     @Override
     public void testPeriodic() {
-        System.out.println("Intake sensor: " + m_copilotController.getMagazine().getIntakeSensor().get() + " | Outer sensor: " + m_copilotController.getMagazine().getLaunchSensor().get());
+        
     }
 
     /**

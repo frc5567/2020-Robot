@@ -113,7 +113,7 @@ public class GamePad extends GenericHID {
 	}
 
 	public boolean getColorWheelColor() {
-		return super.getRawButtonReleased(GamePadControls.Color_Wheel_by_Color.value);
+		return super.getRawButton(GamePadControls.Color_Wheel_by_Color.value);
 	}
 
 	public boolean getColorWheelDistance() {

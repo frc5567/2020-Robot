@@ -73,14 +73,28 @@ public class LimelightTargeting {
             //Passes in a speed of zero to keep us from moving, and sets the turn speed to the calculated output of the PID
             //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
             //This way the PID controller should target dead center
+
+            //read the degrees to target, inverted as to make it match what we expect
             double degToTarget = -m_limelight.getRawDegreesToTarget();
+
+            //clamp the turn, and sclae it back by 45 to match our max expected change
             double turn = MathUtil.clamp((m_targetController.calculate(degToTarget, 0) /45), -1, 1);
+            
+            //add a floor to the turn to create a minimal adjustment
+            //this allows us to prevent i-induced oscillations while still having fine control at low degree turns
+            if (Math.abs(turn) > 0.01 && Math.abs(turn) < 0.05) {
+                turn = Math.copySign(0.05, turn);
+            }
+
+            //feed the turn into the arcade drive
             m_drivetrain.arcadeDrive(0, turn);
-            System.out.println("Postition error: " + m_targetController.getPositionError());
+
+            //returns whether the PID believes that we are on target
+            return onTarget();
         }
 
-        //returns whether the PID believes that we are on target
-        return onTarget();
+        //always return false if we don't see a target
+        return false;
     }
 
     /**

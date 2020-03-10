@@ -87,8 +87,6 @@ public class CopilotController{
      * and a button to lift the robot off the ground
      */
     public void controlClimber(){
-        //Gets current position of the climber
-        int extensionCurrent = m_climber.getExtensionMotor().getSelectedSensorPosition();
         //Extends the climber up at a speed of 0.4 when the getClimbUp button is pushed 
         //and the current position is less than the maximum position of 29700
         if(m_gamePad.getClimbUp()) {
@@ -96,7 +94,7 @@ public class CopilotController{
         } 
         //Retracts the climber down at the speed of -0.4 when the getClimb Down button is pushed
         //and the current position is greater than the minimum position of 0
-        else if(m_gamePad.getClimbDown() && (extensionCurrent > 500)) {
+        else if(m_gamePad.getClimbDown() && (m_climber.getExtensionMotor().getSelectedSensorPosition() > 500)) {
             m_climber.setExtensionSpeed(-RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
         }
         //Zeros the climber's motor when the joystick y value is in a deadband of -0.05 to 0.05
@@ -105,7 +103,7 @@ public class CopilotController{
         }
         //Extends the climber up by a speed of 0.4 if the joystick y value is greater than 0.05
         //and if the current position is less than the maximum position
-        else if((extensionCurrent < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) && (m_gamePad.getY(Hand.kRight) > 0.05)) {
+        else if((m_climber.getExtensionMotor().getSelectedSensorPosition() < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) && (m_gamePad.getY(Hand.kRight) > 0.05)) {
             m_climber.setExtensionSpeed(RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
         }
         else if (m_gamePad.getY(Hand.kRight) > 0.05) {
@@ -113,11 +111,11 @@ public class CopilotController{
         }
         //Retracts the climber by a speed of -0.4 if the joystick y value less than -0.05
         //and the current position is greater than the minimum position of 0
-        else if((extensionCurrent > 500) && (m_gamePad.getY(Hand.kRight) < -0.05)){
-            m_climber.setExtensionSpeed(-RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
+        else if((m_climber.getExtensionMotor().getSelectedSensorPosition() > 500) && (m_gamePad.getY(Hand.kRight) < -0.05)){
+            m_climber.setExtensionSpeed(-0.125);
         }
         else if (m_gamePad.getY(Hand.kRight) < -0.05) {
-            m_climber.setExtensionSpeed(-RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED / 2);
+            m_climber.setExtensionSpeed(-0.125);
         }
 
         //If the getWinch button is pressed, the robot is lifted up from the ground at a speed of 0.4
@@ -143,6 +141,8 @@ public class CopilotController{
             //set our stage to the first one
             m_targetingStage = TargetingStage.kRevAndTarget;
 
+            m_drivetrain.arcadeDrive(0, 0);
+
             //set our vision pipeline to targeting
             m_limelightReader.setPipeline(Pipeline.kStandard);
 
@@ -151,33 +151,30 @@ public class CopilotController{
         //while the button is held, run the targeting and launching sequence
         else if(m_gamePad.getLauncherAndMagazine()) {
             //if we are in the first stage
-            if (m_targetingStage.equals(TargetingStage.kRevAndTarget)) {
+            if (m_targetingStage == TargetingStage.kRevAndTarget) {
                 //sets the launcher to the holding speed
                 m_launcher.setMotor(RobotMap.LAUNCHER_HOLDING_SPEED);
 
                 //if we are on target and our launcher is up to speed, progress the state
-                if (m_limelightTargeting.target() && (m_launcher.getMasterMotor().getMotorOutputPercent() > RobotMap.LAUNCHER_HOLDING_SPEED)) {
+                if (m_limelightTargeting.target() && (m_launcher.getMasterMotor().getMotorOutputPercent() > (RobotMap.LAUNCHER_HOLDING_SPEED - 0.03))) {
                     m_targetingStage = TargetingStage.kRevToVelocity;
-                }
-                else {
-                    return;
                 }
             }
             //revs the launcher up to launch speed
-            else if (m_targetingStage.equals(TargetingStage.kRevToVelocity)) {
+            else if (m_targetingStage == TargetingStage.kRevToVelocity) {
                 //continue running the targeting method
                 m_limelightTargeting.target();
 
                 //set the velocity to a launch speed TODO: Grab launch speed as a function of distance
-                m_launcher.setVelocity(4800);
+                m_launcher.setVelocity(4800 *RobotMap.RPM_TO_UNITS_PER_100MS);
 
                 //if we are at speed. exit out TODO: Make 4800 a variable
-                if (m_launcher.getMasterMotor().getSelectedSensorVelocity() > 4800 - RobotMap.LAUNCHER_ACCEPTABLE_ERROR) {
+                if (m_launcher.getMasterMotor().getSelectedSensorVelocity() > 4800 * RobotMap.RPM_TO_UNITS_PER_100MS) {
                     m_targetingStage = TargetingStage.kRunMagazine;
                 }
             }
             //drives the magazine for launching
-            else if (m_targetingStage.equals(TargetingStage.kRunMagazine)) {
+            else if (m_targetingStage == TargetingStage.kRunMagazine) {
                 //zero drivetrain
                 m_drivetrain.arcadeDrive(0, 0);
 
@@ -207,7 +204,6 @@ public class CopilotController{
         else if(m_gamePad.getMoveMagazineDown()){
             m_magazine.runBelt(-RobotMap.MAGAZINE_LAUNCH_SPEED);
         } 
-        //when the getMoveMagazine button is pushed, magazine moves the balls toward the launcher at a speed of 0.37
         else if (m_intake.m_position == Position.kLowered) {
             m_magazine.sensorBeltControl();
         }
@@ -227,7 +223,7 @@ public class CopilotController{
      * Turns on the Intake to take in the balls and turns the intake off to stop the intake of balls
      */
     public void controlIntake(){
-        if (m_gamePad.getDumpAllBalls()) {
+        if (m_gamePad.getDumpAllBalls() || m_gamePad.getColorWheelColor()) {
             m_intake.setInnerIntakeMotor(-RobotMap.INNER_INTAKE_SPEED);
             m_intake.setOuterIntakeMotor(-RobotMap.OUTER_INTAKE_SPEED);
             m_intake.setPosition(Position.kRaised);

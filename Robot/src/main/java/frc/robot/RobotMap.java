@@ -296,18 +296,18 @@ public class RobotMap {
     public static final double INNER_TARGET_DEGREES = 4.5;
 
     //PID values for targeting the vision target
-    public static final double TARGETING_P = 0.5;
-    public static final double TARGETING_I = 0;//0.00125;
-    public static final double TARGETING_D = 0.8;
+    public static final double TARGETING_P = 0.55;
+    public static final double TARGETING_I = 0.002;
+    public static final double TARGETING_D = 0.75;
 
     //the period between controller updates in seconds
-    public static final double TARGETING_PERIOD_S = 20;
+    public static final double TARGETING_PERIOD_S = 2;
 
     //the maximum accumulated error for the Integral portion of our targeting PID
-    public static final double TARGETING_MAX_ACCUMULATED_ERROR = 30;
+    public static final double TARGETING_MAX_ACCUMULATED_ERROR = 2;
 
     //the acceptable error for our vision targeting in degrees
-    public static final double TARGETING_ERROR_TOLERANCE = 0.5;
+    public static final double TARGETING_ERROR_TOLERANCE = 1.0;
 
     //****************************************
     //*                                      *
@@ -323,8 +323,8 @@ public class RobotMap {
     /**The DIO port for the photoelectric sensor mounted near the launcher */
     public static final int MAGAZINE_OUT_SENSOR_PORT = 8;
 
-    public static final double MAGAZINE_INTAKE_SPEED = 0.6;
-    public static final double MAGAZINE_LAUNCH_SPEED = 0.6;
+    public static final double MAGAZINE_INTAKE_SPEED = 0.65;
+    public static final double MAGAZINE_LAUNCH_SPEED = 0.65;
 
     //****************************************
     //*                                      *

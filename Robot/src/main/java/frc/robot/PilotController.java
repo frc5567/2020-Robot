@@ -138,8 +138,9 @@ public class PilotController {
         turnInput = adjustForDeadband(turnInput);
 
         //multiplies our input by our current scalar
-        velocityInput *= m_currentVelocityScalar * Math.abs(velocityInput);
-        turnInput *= m_currentTurnScalar * Math.abs(turnInput);
+        //commented out squared inputs per pilot request
+        velocityInput *= m_currentVelocityScalar;// * Math.abs(velocityInput);
+        turnInput *= m_currentTurnScalar;// * Math.abs(turnInput);
 
         //run our drivetrain with the adjusted input
         m_drivetrain.arcadeDrive(velocityInput, turnInput);
@@ -200,21 +201,13 @@ public class PilotController {
             return;
         }
 
-        //if the b button is pressed, lock onto the high target
-        if (m_controller.getBButton()) {
-            m_limelight.getTable().getEntry("pipeline").setDouble(0);
-            m_limelightTargeting.target();
+        m_limelight.getTable().getEntry("pipeline").setDouble(3);
+        //runs our drivetrain based on control scheme passed in
+        if (m_driveType == DriveType.kArcade) {
+            arcadeDrive();
         }
-        //when the b button isn't pressed, run the drive train as normal
-        else {
-            m_limelight.getTable().getEntry("pipeline").setDouble(3);
-            //runs our drivetrain based on control scheme passed in
-            if (m_driveType == DriveType.kArcade) {
-                arcadeDrive();
-            }
-            else if (m_driveType == DriveType.kTank) {
-                tankDrive();
-            }
+        else if (m_driveType == DriveType.kTank) {
+            tankDrive();
         }
 
         //Controls shifting the gears off of the x and y buttons
