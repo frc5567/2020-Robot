@@ -67,9 +67,6 @@ public class RobotMap {
     /**The timeout for the status frame config methods particular to the left side */
     public static final int LEFT_PERIOD_MS = 5;
 
-    /**The slow auto speed used in autonomous movement. TODO: decide if we are keeping this */
-    public static final double AUTO_SPEED = 0.2;
-
     /**The deadband in percent output for the motor. Any value less than this is treated as zero */
     public static final double PERCENT_DEADBAND = 0.001;
 
@@ -93,7 +90,7 @@ public class RobotMap {
     //the time it takes the drive train to ramp to full speed in open loop control in seconds
     public static final double DRIVE_RAMP_TIME = 1.0;
 
-    //TODO:the 6 has to be changed to the diameter of our wheels, in addition, we need to account for gearing
+    //TODO:Does not account for gearing
     public static final double DRIVE_TICS_PER_INCH = (2048 / (6.25*Math.PI));
 
     //the total number of encoder ticks in a rotate----TODO: Check to see if this is the correct number
@@ -279,7 +276,7 @@ public class RobotMap {
     //****************************************
     /**Height of the vision target in inches */
     public static final double TARGET_HEIGHT_INCHES = 98.25;
-    /**Height of the limelight lense in inches TODO: Finalized when robot is set */
+    /**Height of the limelight lense in inches */
     public static final double CAMERA_HEIGHT_INCHES = 43.4;
     /**The difference between the camera height and the target height */
     public static final double NET_HEIGHT_INCHES = RobotMap.TARGET_HEIGHT_INCHES - RobotMap.CAMERA_HEIGHT_INCHES;

@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import frc.robot.Drivetrain;
 import frc.robot.LimelightTargeting;
@@ -48,9 +47,6 @@ public class CopilotController{
 
     //Declare the targeting object used to lock-on to the vision target and then lining up with the target
     private LimelightTargeting m_limelightTargeting;
-
-    //Declares the joystick used to move the climber up and down
-    private Joystick m_climbJoystick;
 
     /**
      * Creates the objects to allow the copilot controller/gamepad to control the intake, launcher,
@@ -209,7 +205,7 @@ public class CopilotController{
         }
         //When the getDumpAllBalls buton is pressed, the magazine moves backwards and 
         //the intake then pushes the balls out of the intake 
-        //TODO: This doesn't work with chinese finger trap
+        //This doesn't work with chinese finger trap
         else if(m_gamePad.getDumpAllBalls()){
             m_magazine.runBelt(-0.45);
         } 
