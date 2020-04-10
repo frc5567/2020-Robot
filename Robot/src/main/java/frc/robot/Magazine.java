@@ -16,7 +16,7 @@ public class Magazine {
     //declare our motor controllers for our belts and the wheel
     private VictorSPX m_motor;
 
-    /**The photoelectric sensors for indexing, which are normally false */
+    /**The photoelectric sensors for indexing, which are normally true */
     private DigitalInput m_intakeSensor;
     private DigitalInput m_launchSensor;
 
@@ -51,7 +51,7 @@ public class Magazine {
     }
 
     /**
-     * Runs the belt at a inputted speed
+     * Runs the belt at an inputted speed
      * @param speed The percent speed both belts should move at from -1.0 to 1.0
      */
     public void runBelt(double speed) {
@@ -65,10 +65,7 @@ public class Magazine {
      * the magazine runs until the ball is clear of the intake sensor.
      */
     public void sensorBeltControl() {
-        if(!m_launchSensor.get()) {
-            runBelt(0);
-        }
-        else if (!m_intakeSensor.get()) {
+        if (!m_intakeSensor.get() && m_launchSensor.get()) {
             runBelt(RobotMap.MAGAZINE_INTAKE_SPEED);
         }
         else {
