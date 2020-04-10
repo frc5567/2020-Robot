@@ -190,7 +190,7 @@ public class CopilotController{
             m_limelightReader.setPipeline(Pipeline.kDriver);
             PilotController.is_currently_targeting = false;
         }
-        else if(m_gamePad.getRevLauncher()) {
+        else if(m_gamePad.getRevLauncherPressed()) {
             m_launcher.setMotor(RobotMap.LAUNCHER_HOLDING_SPEED);
             m_drivetrain.shiftGear(Gear.kLowGear);
         }
@@ -253,7 +253,7 @@ public class CopilotController{
         }
 
         //If the B button is pressed, the intake is disabled to raise the drop bar and stop the motors
-        if(m_gamePad.getDisableIntake()){
+        if(m_gamePad.getDisableIntakePressed()){
             //sets the position to the new target position of raised
             m_intake.setPosition(Position.kRaised);
         }

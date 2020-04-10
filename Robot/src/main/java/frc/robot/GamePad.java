@@ -68,7 +68,7 @@ public class GamePad extends GenericHID {
 		return super.getRawButton(GamePadControls.Move_Magazine_Down.value);
 	}
 
-	public boolean getRevLauncher() {
+	public boolean getRevLauncherPressed() {
 		return super.getRawButtonPressed(GamePadControls.Rev_Launcher.value);
 	}
 
@@ -92,7 +92,7 @@ public class GamePad extends GenericHID {
 	 *  expected to be used in co-pilot controller
 	 * <p> disables intake. Doing so raises the drop bar and turns off the intake motors
 	 */
-	public boolean getDisableIntake() {
+	public boolean getDisableIntakePressed() {
 		return super.getRawButtonPressed(GamePadControls.Disable_Intake.value);
 	}
 	
@@ -116,7 +116,7 @@ public class GamePad extends GenericHID {
 		return super.getRawButton(GamePadControls.Color_Wheel_by_Color.value);
 	}
 
-	public boolean getColorWheelDistance() {
+	public boolean getColorWheelDistanceReleased() {
 		return super.getRawButtonReleased(GamePadControls.Color_Wheel_by_Distance.value);
 	}
 
