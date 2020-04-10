@@ -298,6 +298,7 @@ public class RobotMap {
     public static final double TARGETING_D = 0.75;
 
     //the period between controller updates in seconds
+    //this is used for the calculation of the velocity error and the total error - i and d
     public static final double TARGETING_PERIOD_S = 2;
 
     //the maximum accumulated error for the Integral portion of our targeting PID

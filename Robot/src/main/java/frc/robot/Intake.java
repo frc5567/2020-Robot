@@ -88,26 +88,6 @@ public class Intake {
     }
 
     /**
-     * Constructor for intake objects
-     * This constructor requires a spark pro motor controller
-     * @param outerIntakeMotor A spark pro motor controller for running the intake
-     * @param innerIntakeMotor The inner intake wheel for pulling balls into the magazine
-     * @param positionPiston the double solenoid used to control the piston controlling position
-     */
-    public Intake(PWMSparkMax outerIntakeMotor, SpeedController innerIntakeMotor, DoubleSolenoid positionPiston) {  
-        //instantiate instance variables
-        m_outerMotor = outerIntakeMotor;
-        m_innerMotor = innerIntakeMotor;
-        m_positionPiston = positionPiston;
-
-        //set our starting position to unknown
-        m_position = Position.kUnknown;
-
-        //then set the solenoids to the raised position
-        setPosition(Position.kRaised);
-    }
-
-    /**
      * Vertical constructor for the intake
      * Uses robot map constants for instantation
      */

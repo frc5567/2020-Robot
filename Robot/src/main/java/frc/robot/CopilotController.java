@@ -161,11 +161,15 @@ public class CopilotController{
                 //continue running the targeting method
                 m_limelightTargeting.target();
 
-                //set the velocity to a launch speed TODO: Grab launch speed as a function of distance
-                m_launcher.setVelocity(4800 *RobotMap.RPM_TO_UNITS_PER_100MS);
+                //assigns the targetVelocity
+                //ideally this would be a function of distance to target, currently it is set from testing
+                double targetVelocity = 4800; //TODO: Grab launch speed as a function of distance
 
-                //if we are at speed. exit out TODO: Make 4800 a variable
-                if (m_launcher.getMasterMotor().getSelectedSensorVelocity() > 4800 * RobotMap.RPM_TO_UNITS_PER_100MS) {
+                //set the velocity to a launch speed
+                m_launcher.setVelocity(targetVelocity *RobotMap.RPM_TO_UNITS_PER_100MS);
+
+                //if we are at speed. exit out
+                if (m_launcher.getMasterMotor().getSelectedSensorVelocity() > targetVelocity * RobotMap.RPM_TO_UNITS_PER_100MS) {
                     m_targetingStage = TargetingStage.kRunMagazine;
                 }
             }
@@ -187,7 +191,7 @@ public class CopilotController{
             PilotController.is_currently_targeting = false;
         }
         else if(m_gamePad.getRevLauncher()) {
-            m_launcher.setMotor(0.5);
+            m_launcher.setMotor(RobotMap.LAUNCHER_HOLDING_SPEED);
             m_drivetrain.shiftGear(Gear.kLowGear);
         }
         else if(m_gamePad.getRevLauncherReleased()) {
