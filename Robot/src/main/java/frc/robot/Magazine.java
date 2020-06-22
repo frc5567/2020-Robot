@@ -75,8 +75,10 @@ public class Magazine {
 
     /**
      * Ticks the number of stored balls up or down based on our sensors
-     * <p>This is meant to be run in a periodic method so it can constantly be checking sensors and updating the count
-     * <p>This is very likely completely wrong but I'll leave it here for now
+     * <p>This is meant to be run in a periodic method so it can constantly be checking sensors and updating
+     *  the count
+     * <p>This is very likely completely wrong but I'll leave it here for now. UPDATE: I would like to test 
+     * this someday to see if it's possible to launch a set number of balls
      */
     public void manageStoredBalls() {
         boolean intakeInput = m_intakeSensor.get();

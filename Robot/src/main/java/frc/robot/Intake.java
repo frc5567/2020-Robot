@@ -95,6 +95,7 @@ public class Intake {
         m_outerMotor = new VictorSP(RobotMap.INTAKE_PWM_SPARK_PORT);
         m_innerMotor = new Talon(RobotMap.INTAKE_INNER_MOTOR_PORT);
 
+        //set inversions to match our physical intuition
         m_outerMotor.setInverted(RobotMap.OUTER_INTAKE_INVERTED);
         m_innerMotor.setInverted(RobotMap.INNER_INTAKE_INVERTED);
 

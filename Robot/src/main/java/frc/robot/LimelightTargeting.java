@@ -16,7 +16,7 @@ import edu.wpi.first.wpiutil.math.MathUtil;
  * @author Josh Overbeek
  * @version 2/1/2020
  */
-public class LimelightTargeting {
+public class LimelightTargeting implements ShuffleboardEnabled {
     //Declare our drivetrain, limelight, and PID controller
     private Drivetrain m_drivetrain;
     private LimelightReader m_limelight;
@@ -142,7 +142,7 @@ public class LimelightTargeting {
     /**
      * instantiates all of our network table entries and displays them under the targeting tab
      */
-    private void shuffleboardConfig() {
+    public void shuffleboardConfig() {
         //creates a tab on the shuffleboard for all our targeting needs
         m_targetingTab = Shuffleboard.getTab("Targeting");
         

@@ -13,7 +13,7 @@ import frc.robot.Drivetrain.Gear;
  * @author Josh Overbeek
  * @version 1/25/2020
  */
-public class PilotController {
+public class PilotController implements ShuffleboardEnabled {
     /**
      * Enum to indicate different control systems
      * <p>Possible values:
