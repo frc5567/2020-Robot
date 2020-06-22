@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -9,7 +8,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 /**
  * A class for controlling the intake system
- * <p>This expects a SparkMAX controlling a Neo as its main motor
+ * 
  * @author Josh Overbeek
  * @version 2/8/2020
  */
