@@ -64,9 +64,6 @@ public class Drivetrain {
     //Declares the turn control PID
     private PIDController m_rotController;
 
-    //Delcare variable to determine if two solenoids are being used
-    private final boolean m_hasTwoSolenoids;
-
     // Declare drivetrain motors
     private TalonFX m_masterRightMotor;
     private TalonFX m_masterLeftMotor;
@@ -99,9 +96,6 @@ public class Drivetrain {
         //Instantiates the left and right pistons
         m_leftSolenoid = leftPiston;
         m_rightSolenoid = rightPiston;
-
-        //Instantiates the boolean to determine if there are two solenoids
-        m_hasTwoSolenoids = hasTwoSolenoids;
 
         // Initializes classes to call encoders connected to TalonFXs
         m_leftDriveEncoder = new SensorCollection(m_masterLeftMotor);
@@ -145,9 +139,6 @@ public class Drivetrain {
         //instantiate the gyro for rotation control
         m_gyro = new NavX(SerialPort.Port.kMXP);
 
-        //Instantiates the boolean to determine if there are two solenoids
-        m_hasTwoSolenoids = hasTwoSolenoids;
-
         //Initializes rotate PID controller with the PIDF constants
         configRotatePID();
 
@@ -158,18 +149,12 @@ public class Drivetrain {
         m_gear = Gear.kUnknown; 
     }
 
-    /**TODO: these methods need to be condensed
-     * Sets the drive gear using our pistons. 
-     * This is private so that it can never be called by an outside class to prevent confusion
-     * @param value The value to give to the pistons where kOff removes pressure, kForward is _ gear, and kReverse is _ gear
+    /**
+     * Zeros the drive encoders
      */
-    private void setPiston(DoubleSolenoid.Value value) {
-        m_leftSolenoid.set(value);
-    }
-
     public void zeroEncoders() {
-        m_leftDriveEncoder.setQuadraturePosition(0, 10);
-        m_rightDriveEncoder.setQuadraturePosition(0, 10);
+        m_leftDriveEncoder.setQuadraturePosition(0, RobotMap.TIMEOUT_MS);
+        m_rightDriveEncoder.setQuadraturePosition(0, RobotMap.TIMEOUT_MS);
     }
 
     /**
