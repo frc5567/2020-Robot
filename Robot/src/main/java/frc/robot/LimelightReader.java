@@ -9,6 +9,27 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * @author Josh Overbeek
  */
 public class LimelightReader {
+    // creates a enum for our pipeline modes
+    public enum Pipeline{
+        kStandard(0),
+        kZoomX2(1),
+        kZoomX3(2),
+        kDriver(3);
+
+        int pipelineID;
+
+        private Pipeline(int pipelineID) {
+            this.pipelineID = pipelineID;
+        }
+
+        public int getID() {
+            return pipelineID;
+        }
+    }
+
+    // declare object to store current pipeline
+    public Pipeline m_pipeline;
+
     //declares the network table for limelight info so that we can access it
     private NetworkTable m_limelightTable;
 
@@ -131,33 +152,16 @@ public class LimelightReader {
         double lengthToHeightRatio = Math.tan(RobotMap.DEG_TO_RAD_CONVERSION * (cameraDegreesFromGround + getYDegreesToTarget()));
         return (RobotMap.NET_HEIGHT_INCHES / lengthToHeightRatio);
     }
-    // creates a enum for our pipeline modes
-    // creates a enum for our pipeline modes
-    public enum Pipeline{
-        kStandard,
-        kZoomX2,
-        kZoomX3,
-        kDriver;
-    }
-    // declare object to store pipeline
-    public Pipeline m_pipeline;
-    public void setPipeline(Pipeline pipeline){
 
+    /**
+     * Set the current pipeline on the limelight
+     */
+    public void setPipeline(Pipeline pipeline){
+        //set the current pipeline
         m_pipeline = pipeline;
 
-        // changes pipeline mode depending on what we set it to
-        if(m_pipeline == Pipeline.kStandard){
-            m_limelightTable.getEntry("pipeline").setNumber(0);
-        }
-        else if(m_pipeline == Pipeline.kZoomX2){
-            m_limelightTable.getEntry("pipeline").setNumber(1);
-        }
-        else if(m_pipeline == Pipeline.kZoomX3){
-            m_limelightTable.getEntry("pipeline").setNumber(2);
-        }
-        else if(m_pipeline == Pipeline.kDriver){
-            m_limelightTable.getEntry("pipeline").setNumber(3);
-        }
+        //passes the ID of the desired pipeline to the network tables to set the limelight
+        m_limelightTable.getEntry("pipeline").setNumber(m_pipeline.getID());
     }
     
 }
