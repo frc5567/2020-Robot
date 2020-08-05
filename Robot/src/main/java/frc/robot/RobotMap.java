@@ -22,6 +22,23 @@ public class RobotMap {
     /**the deadband on our controller sticks, used to prevent drift*/
     public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.08;
 
+    /** A storage class to put all of the gamepad button IDs in the same spot */
+    static final class GAMEPAD_BUTTON_ID
+    {
+        public static final int CLIMB_UP = 2;
+		public static final int CLIMB_DOWN = 3;
+		public static final int WINCH = 1;
+		public static final int MOVE_MAGAZINE_DOWN = 4;
+		public static final int MOVE_MAGAZINE_LAUNCH = 5;
+		public static final int LAUNCHER_AND_MAGAZINE = 7;
+		public static final int REV_LAUNCHER = 7;
+		public static final int ENABLE_INTAKE = 8;
+		public static final int DISABLE_INTAKE = 9;
+		public static final int DUMP_BALLS = 12;
+		public static final int COLOR_WHEEL_COLOR = 11;
+		public static final int COLOR_WHEEL_DISTANCE = 10;
+    }
+
     //****************************************
     //*                                      *
     //*        DRIVETRAIN CONSTANTS          *
@@ -198,6 +215,8 @@ public class RobotMap {
     public static final int CLIMBER_EXTENSION_ENCODER_TARGET = 29600;
     public static final int CLIMBER_EXTENSION_HARD_LIMIT = 29200;
 
+    public static final int CLIMBER_MIN_EXTENSION = 500;
+
     //the climber timeout for running confing methods
     public static final int CLIMBER_CONFIG_TIMEOUT_MS = 30;
 
@@ -227,6 +246,7 @@ public class RobotMap {
 
     public static final double CLIMBER_EXTENSION_MANUAL_SPEED = 0.4;
     public static final double CLIMBER_WINCH_SPEED = 0.5;
+    public static final double CLIMBER_REDUCED_SPEED = 0.125;
 
     //the acceptable integral zone for the extension motor
     //100 is the value used last year, this should be adjusted in testing if need be
@@ -323,6 +343,7 @@ public class RobotMap {
 
     public static final double MAGAZINE_INTAKE_SPEED = 0.65;
     public static final double MAGAZINE_LAUNCH_SPEED = 0.65;
+    public static final double MAGAZINE_DUMP_SPEED = -0.45;
 
     //****************************************
     //*                                      *

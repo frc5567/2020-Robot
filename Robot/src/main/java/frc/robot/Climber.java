@@ -45,13 +45,11 @@ public class Climber {
      * 
      * @param extensionMotor The motor that extends the climber
      * @param liftMotor The motor that pulls the robot up by turning the winch
-     * @param adjustmentValue The value we use to adjust speed
      */
-    public Climber(TalonSRX extensionMotor, SpeedController liftMotor, double adjustmentValue) {
+    public Climber(TalonSRX extensionMotor, SpeedController liftMotor) {
         //instantiate instance variables
         m_extensionMotor = extensionMotor;
         m_liftMotor = liftMotor;
-        m_adjustmentValue = adjustmentValue;
 
         //sets our encoders to the encoders plugged into the talons
         m_extensionEncoder = new SensorCollection(m_extensionMotor);
@@ -74,9 +72,6 @@ public class Climber {
 
         //sets our encoders to the encoders plugged into the talons
         m_extensionEncoder = new SensorCollection(m_extensionMotor);
-
-        //using the launcher value temporarily, needs to be fixed
-        m_adjustmentValue = RobotMap.CLIMBER_ADJUSTMENT_VALUE;
 
         //sets starting position on object contruction
         //object construction should occur in RobotInit or in Robot contructor
@@ -159,7 +154,7 @@ public class Climber {
         //calculates error based on the difference between current and target speeds
         m_error = setpoint - m_liftCurrentSpeed;
         //adjusts the current speed proportionally to the error
-        m_liftCurrentSpeed += (m_error * m_adjustmentValue);
+        m_liftCurrentSpeed += (m_error * RobotMap.CLIMBER_ADJUSTMENT_VALUE);
 
         //sets the speed of the motors based on the adjusted current speed
         setLiftSpeed(m_liftCurrentSpeed);
@@ -301,6 +296,6 @@ public class Climber {
      */
     public String toString() {
         return "Extension motor controller: " + m_extensionMotor.toString() + " | Lift motor controller: "
-                + m_liftMotor.toString() + " | Extension encoder: " + m_extensionEncoder.toString() + " | Adjustment value: " + m_adjustmentValue;
+                + m_liftMotor.toString() + " | Extension encoder: " + m_extensionEncoder.toString() + " | Adjustment value: " + RobotMap.CLIMBER_ADJUSTMENT_VALUE;
     }
 }

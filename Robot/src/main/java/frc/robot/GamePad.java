@@ -19,18 +19,18 @@ public class GamePad extends GenericHID {
 	// this enum difines the buttons and what they do when active
 	private enum GamePadControls {
 		// Buttons
-		Climb_Up(2),
-		Climb_Down(3),
-		Winch(1),
-		Move_Magazine_Down(4),
-		Move_Magazine_For_Launch(5),
-		Launcher_And_Magazine(7),
-		Rev_Launcher(6),
-		Enable_Intake(8),
-		Disable_Intake(9),
-		Dump_Balls(12),
-		Color_Wheel_by_Color(11),
-		Color_Wheel_by_Distance(10);
+		Climb_Up(RobotMap.GAMEPAD_BUTTON_ID.CLIMB_UP),
+		Climb_Down(RobotMap.GAMEPAD_BUTTON_ID.CLIMB_DOWN),
+		Winch(RobotMap.GAMEPAD_BUTTON_ID.WINCH),
+		Move_Magazine_Down(RobotMap.GAMEPAD_BUTTON_ID.MOVE_MAGAZINE_DOWN),
+		Move_Magazine_For_Launch(RobotMap.GAMEPAD_BUTTON_ID.MOVE_MAGAZINE_LAUNCH),
+		Launcher_And_Magazine(RobotMap.GAMEPAD_BUTTON_ID.LAUNCHER_AND_MAGAZINE),
+		Rev_Launcher(RobotMap.GAMEPAD_BUTTON_ID.REV_LAUNCHER),
+		Enable_Intake(RobotMap.GAMEPAD_BUTTON_ID.ENABLE_INTAKE),
+		Disable_Intake(RobotMap.GAMEPAD_BUTTON_ID.DISABLE_INTAKE),
+		Dump_Balls(RobotMap.GAMEPAD_BUTTON_ID.DUMP_BALLS),
+		Color_Wheel_by_Color(RobotMap.GAMEPAD_BUTTON_ID.COLOR_WHEEL_COLOR),
+		Color_Wheel_by_Distance(RobotMap.GAMEPAD_BUTTON_ID.COLOR_WHEEL_DISTANCE);
 
 		public final int value;
 

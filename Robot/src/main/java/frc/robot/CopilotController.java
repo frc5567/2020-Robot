@@ -83,38 +83,40 @@ public class CopilotController{
      * and a button to lift the robot off the ground
      */
     public void controlClimber(){
-        //Extends the climber up at a speed of 0.4 when the getClimbUp button is pushed 
-        //and the current position is less than the maximum position of 29700
+        //Extends the climber up at a speed of 0.4 when the getClimbUp button is pushed
         if(m_gamePad.getClimbUp()) {
             m_climber.extendClimber();
         } 
         //Retracts the climber down at the speed of -0.4 when the getClimb Down button is pushed
-        //and the current position is greater than the minimum position of 0
-        else if(m_gamePad.getClimbDown() && (m_climber.getExtensionMotor().getSelectedSensorPosition() > 500)) {
+        //and the current position is greater than the minimum position
+        else if(m_gamePad.getClimbDown() && (m_climber.getExtensionMotor().getSelectedSensorPosition() > RobotMap.CLIMBER_MIN_EXTENSION)) {
             m_climber.setExtensionSpeed(-RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
         }
-        //Zeros the climber's motor when the joystick y value is in a deadband of -0.05 to 0.05
-        else if((m_gamePad.getY(Hand.kRight) < 0.05) && (m_gamePad.getY(Hand.kRight) > -0.05) ){
+        //Zeros the climber's motor when the joystick y value is in a deadband
+        else if((m_gamePad.getY(Hand.kRight) < RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) 
+                && (m_gamePad.getY(Hand.kRight) > -RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) ){
             m_climber.zeroExtensionMotor();
         }
-        //Extends the climber up by a speed of 0.4 if the joystick y value is greater than 0.05
+        //Extends the climber up by a speed of 0.4 if the joystick y value is out of deadband
         //and if the current position is less than the maximum position
-        else if((m_climber.getExtensionMotor().getSelectedSensorPosition() < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) && (m_gamePad.getY(Hand.kRight) > 0.05)) {
+        else if((m_climber.getExtensionMotor().getSelectedSensorPosition() < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) 
+                && (m_gamePad.getY(Hand.kRight) > RobotMap.PILOT_CONTROLLER_STICK_DEADBAND)) {
             m_climber.setExtensionSpeed(RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
         }
-        else if (m_gamePad.getY(Hand.kRight) > 0.05) {
+        else if (m_gamePad.getY(Hand.kRight) > RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
             m_climber.setExtensionSpeed(RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED / 2);
         }
-        //Retracts the climber by a speed of -0.4 if the joystick y value less than -0.05
-        //and the current position is greater than the minimum position of 0
-        else if((m_climber.getExtensionMotor().getSelectedSensorPosition() > 500) && (m_gamePad.getY(Hand.kRight) < -0.05)){
-            m_climber.setExtensionSpeed(-0.125);
+        //Retracts the climber by a speed of -0.4 if the joystick y value less than deadband
+        //and the current position is greater than the minimum position 
+        else if((m_climber.getExtensionMotor().getSelectedSensorPosition() > RobotMap.CLIMBER_MIN_EXTENSION) 
+                && (m_gamePad.getY(Hand.kRight) < -RobotMap.PILOT_CONTROLLER_STICK_DEADBAND)){
+            m_climber.setExtensionSpeed(-RobotMap.CLIMBER_REDUCED_SPEED);
         }
-        else if (m_gamePad.getY(Hand.kRight) < -0.05) {
-            m_climber.setExtensionSpeed(-0.125);
+        else if (m_gamePad.getY(Hand.kRight) < -RobotMap.PILOT_CONTROLLER_STICK_DEADBAND) {
+            m_climber.setExtensionSpeed(-RobotMap.CLIMBER_REDUCED_SPEED);
         }
 
-        //If the getWinch button is pressed, the robot is lifted up from the ground at a speed of 0.4
+        //If the getWinch button is pressed, the robot is lifted up from the ground
         //until it reaches the target position. If the button isn't pressed, the motors are zeroed
         if(m_gamePad.getWinch()) {
             m_climber.setLiftSpeed(RobotMap.CLIMBER_WINCH_SPEED);
@@ -211,7 +213,7 @@ public class CopilotController{
         //the intake then pushes the balls out of the intake 
         //This doesn't work with chinese finger trap
         else if(m_gamePad.getDumpAllBalls()){
-            m_magazine.runBelt(-0.45);
+            m_magazine.runBelt(RobotMap.MAGAZINE_DUMP_SPEED);
         } 
         else {
             //Stops the magazine and zeros the launcher speed
