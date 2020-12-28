@@ -19,90 +19,104 @@ public class GamePad extends GenericHID {
 	// this enum difines the buttons and what they do when active
 	private enum GamePadControls {
 		// Buttons
-		Climb_Up(1),
-		Climb_Down(2),
-		Winch(3),
-		Move_Magazine_Down(4),
-		Move_Magazine_For_Launch(5),
-		Launcher_And_Magazine(6),
-		Rev_Launcher(7),
-		Enable_Intake(8),
-		Disable_Intake(9),
-		Dump_Balls(10),
-		Color_Wheel_by_Color(11),
-		Color_Wheel_by_Distance(12);
+		Climb_Up(RobotMap.GAMEPAD_BUTTON_ID.CLIMB_UP),
+		Climb_Down(RobotMap.GAMEPAD_BUTTON_ID.CLIMB_DOWN),
+		Winch(RobotMap.GAMEPAD_BUTTON_ID.WINCH),
+		Move_Magazine_Down(RobotMap.GAMEPAD_BUTTON_ID.MOVE_MAGAZINE_DOWN),
+		Move_Magazine_For_Launch(RobotMap.GAMEPAD_BUTTON_ID.MOVE_MAGAZINE_LAUNCH),
+		Launcher_And_Magazine(RobotMap.GAMEPAD_BUTTON_ID.LAUNCHER_AND_MAGAZINE),
+		Rev_Launcher(RobotMap.GAMEPAD_BUTTON_ID.REV_LAUNCHER),
+		Enable_Intake(RobotMap.GAMEPAD_BUTTON_ID.ENABLE_INTAKE),
+		Disable_Intake(RobotMap.GAMEPAD_BUTTON_ID.DISABLE_INTAKE),
+		Dump_Balls(RobotMap.GAMEPAD_BUTTON_ID.DUMP_BALLS),
+		Color_Wheel_by_Color(RobotMap.GAMEPAD_BUTTON_ID.COLOR_WHEEL_COLOR),
+		Color_Wheel_by_Distance(RobotMap.GAMEPAD_BUTTON_ID.COLOR_WHEEL_DISTANCE);
 
-
-		@SuppressWarnings("MemberName")
 		public final int value;
 
 		GamePadControls(int newValue) {
 			this.value = newValue;
 		}
 	}
+
 	/**
 	 * expected to be used in co-pilot conroller 
 	 *<p> switches the gear pneumatics to the high gear position 
 	*/
-		//gear up button
+	//gear up button
 	public boolean getClimbUp() {
-		return super.getRawButtonReleased(GamePadControls.Climb_Up.value);
+		return super.getRawButton(GamePadControls.Climb_Up.value);
 	}
 	/**
 	 * expected to be used in co-pilot controller
 	 * <p> switches the gear pneumatics to the low gear position
 	 */
-		//gear down button
+	//gear down button
 	public boolean getClimbDown() {
-		return super.getRawButtonReleased(GamePadControls.Climb_Down.value);
+		return super.getRawButton(GamePadControls.Climb_Down.value);
 	}
 
 	public boolean getWinch() {
-		return super.getRawButtonPressed(GamePadControls.Winch.value);
+		return super.getRawButton(GamePadControls.Winch.value);
 	}
 
 	public boolean getMoveMagazine() {
-		return super.getRawButtonPressed(GamePadControls.Move_Magazine_For_Launch.value);
+		return super.getRawButton(GamePadControls.Move_Magazine_For_Launch.value);
 	}
 
 	public boolean getMoveMagazineDown() {
-		return super.getRawButtonPressed(GamePadControls.Move_Magazine_Down.value);
+		return super.getRawButton(GamePadControls.Move_Magazine_Down.value);
 	}
 
-	public boolean getRevLauncher() {
+	public boolean getRevLauncherPressed() {
 		return super.getRawButtonPressed(GamePadControls.Rev_Launcher.value);
 	}
 
-		//intake button
-		/**
-		 * expected to be used in co-pilot controller
-		 * <p> enables intake. Doing so drops the drop bar and turns on the intake motors
-		 */
+	public boolean getRevLauncherReleased() {
+		return super.getRawButtonReleased(GamePadControls.Rev_Launcher.value);
+	}
+
+	/**
+	 * expected to be used in co-pilot controller
+	 * <p> enables intake. Doing so drops the drop bar and turns on the intake motors
+	 */
 	public boolean getIntake() {
+		return super.getRawButton(GamePadControls.Enable_Intake.value);
+	}
+
+	public boolean getIntakePressed() {
 		return super.getRawButtonPressed(GamePadControls.Enable_Intake.value);
 	}
-		//intake turn off button
-		/**
-		 *  expected to be used in co-pilot controller
-		 * <p> disables intake. Doing so raises the drop bar and turns off the intake motors
-		 */
-	public boolean getDisableIntake() {
+	//intake turn off button
+	/**
+	 *  expected to be used in co-pilot controller
+	 * <p> disables intake. Doing so raises the drop bar and turns off the intake motors
+	 */
+	public boolean getDisableIntakePressed() {
 		return super.getRawButtonPressed(GamePadControls.Disable_Intake.value);
 	}
 	
 	public boolean getLauncherAndMagazine() {
+		return super.getRawButton(GamePadControls.Launcher_And_Magazine.value);
+	}
+
+	public boolean getLauncherAndMagazinePressed() {
 		return super.getRawButtonPressed(GamePadControls.Launcher_And_Magazine.value);
 	}
 
+	public boolean getLauncherAndMagazineReleased() {
+		return super.getRawButtonReleased(GamePadControls.Launcher_And_Magazine.value);
+	}
+
 	public boolean getDumpAllBalls() {
-		return super.getRawButtonPressed(GamePadControls.Dump_Balls.value);
+		return super.getRawButton(GamePadControls.Dump_Balls.value);
 	}
 
 	public boolean getColorWheelColor() {
-		return super.getRawButtonReleased(GamePadControls.Color_Wheel_by_Color.value);
+		return super.getRawButton(GamePadControls.Color_Wheel_by_Color.value);
 	}
 
-	public boolean getColorWheelDistance() {
+	public boolean getColorWheelDistanceReleased() {
 		return super.getRawButtonReleased(GamePadControls.Color_Wheel_by_Distance.value);
 	}
 
@@ -110,16 +124,12 @@ public class GamePad extends GenericHID {
 	 * These must be extended because GenericHID is abstract
 	 * We cannot delete these, nor make them private
 	 */
-	@Override
 	public double getX(Hand hand) {
-		// TODO Auto-generated method stub
-		return 0;
+		return getRawAxis(0);
 	}
 
-	@Override
 	public double getY(Hand hand) {
-		// TODO Auto-generated method stub
-		return 0;
+		return getRawAxis(1);
 	}
 
 }

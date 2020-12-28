@@ -45,13 +45,11 @@ public class Climber {
      * 
      * @param extensionMotor The motor that extends the climber
      * @param liftMotor The motor that pulls the robot up by turning the winch
-     * @param adjustmentValue The value we use to adjust speed
      */
-    public Climber(TalonSRX extensionMotor, SpeedController liftMotor, double adjustmentValue) {
+    public Climber(TalonSRX extensionMotor, SpeedController liftMotor) {
         //instantiate instance variables
         m_extensionMotor = extensionMotor;
         m_liftMotor = liftMotor;
-        m_adjustmentValue = adjustmentValue;
 
         //sets our encoders to the encoders plugged into the talons
         m_extensionEncoder = new SensorCollection(m_extensionMotor);
@@ -71,9 +69,6 @@ public class Climber {
         //instantiate instance variables
         m_extensionMotor = new TalonSRX(RobotMap.EXTENSION_MOTOR_ID);
         m_liftMotor = new PWMSparkMax(RobotMap.LIFT_MOTOR_PORT);
-
-        //using the launcher value temporarily, needs to be fixed
-        m_adjustmentValue = RobotMap.CLIMBER_ADJUSTMENT_VALUE;
 
         //sets our encoders to the encoders plugged into the talons
         m_extensionEncoder = new SensorCollection(m_extensionMotor);
@@ -159,7 +154,7 @@ public class Climber {
         //calculates error based on the difference between current and target speeds
         m_error = setpoint - m_liftCurrentSpeed;
         //adjusts the current speed proportionally to the error
-        m_liftCurrentSpeed += (m_error * m_adjustmentValue);
+        m_liftCurrentSpeed += (m_error * RobotMap.CLIMBER_ADJUSTMENT_VALUE);
 
         //sets the speed of the motors based on the adjusted current speed
         setLiftSpeed(m_liftCurrentSpeed);
@@ -170,7 +165,7 @@ public class Climber {
      */
     public void configExtensionMotionMagic() {
         //zero our motors and reset the encoders
-        zeroMotors();
+        // zeroMotors();
         encoderReset();
 
         //set our feedback sensor to the encoder plugged into the motor controller
@@ -198,7 +193,7 @@ public class Climber {
         //configs the acceleration of the extension in sensor units per hundered miliseconds per second
         //this is currently set to 1000u/100ms/s, which is half the value of last year's elevator
         m_extensionMotor.configMotionAcceleration(RobotMap.CLIMBER_MOTION_MAGIC_ACCEL, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
-
+        m_extensionMotor.configMotionSCurveStrength(1);
         //configs the cruise velocity of the extension in sensor units per hundred miliseconds
         //this is currently set to 1000u/100ms, which is half the value of last year's elevator
         m_extensionMotor.configMotionCruiseVelocity(RobotMap.CLIMBER_MOTION_MAGIC_CRUISE_VELOCITY, RobotMap.CLIMBER_CONFIG_TIMEOUT_MS);
@@ -301,6 +296,6 @@ public class Climber {
      */
     public String toString() {
         return "Extension motor controller: " + m_extensionMotor.toString() + " | Lift motor controller: "
-                + m_liftMotor.toString() + " | Extension encoder: " + m_extensionEncoder.toString() + " | Adjustment value: " + m_adjustmentValue;
+                + m_liftMotor.toString() + " | Extension encoder: " + m_extensionEncoder.toString() + " | Adjustment value: " + RobotMap.CLIMBER_ADJUSTMENT_VALUE;
     }
 }

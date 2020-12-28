@@ -13,7 +13,7 @@ import frc.robot.Drivetrain.Gear;
  * @author Josh Overbeek
  * @version 1/25/2020
  */
-public class PilotController {
+public class PilotController implements ShuffleboardEnabled {
     /**
      * Enum to indicate different control systems
      * <p>Possible values:
@@ -44,12 +44,16 @@ public class PilotController {
         }
     }
 
+    /**Checks whether or not we are currently targeting and using the drivetrain */
+    public static boolean is_currently_targeting = false;
+
     //declare our drivetrain and our controller
     private XboxController m_controller;
     private Drivetrain m_drivetrain;
 
     //declare the targeting object used to lock-on to the vision target
     private LimelightTargeting m_limelightTargeting;
+    private LimelightReader m_limelight;
 
     //declare the drive control type
     private final DriveType m_driveType;
@@ -99,7 +103,8 @@ public class PilotController {
     public PilotController(DriveType driveType, LimelightReader limelight) {
         m_drivetrain = new Drivetrain(RobotMap.DRIVETRAIN_HAS_TWO_SOLENOIDS);
         m_driveType = driveType;
-        m_limelightTargeting = new LimelightTargeting(m_drivetrain, limelight);
+        m_limelight = limelight;
+        m_limelightTargeting = new LimelightTargeting(m_drivetrain, m_limelight);
 
         //instantiate xbox controller for controlling the drivetrain
         m_controller = new XboxController(RobotMap.DRIVE_CONTROLLER_PORT);
@@ -133,8 +138,9 @@ public class PilotController {
         turnInput = adjustForDeadband(turnInput);
 
         //multiplies our input by our current scalar
-        velocityInput *= m_currentVelocityScalar;
-        turnInput *= m_currentTurnScalar;
+        //commented out squared inputs per pilot request
+        velocityInput *= m_currentVelocityScalar;// * Math.abs(velocityInput);
+        turnInput *= m_currentTurnScalar;// * Math.abs(turnInput);
 
         //run our drivetrain with the adjusted input
         m_drivetrain.arcadeDrive(velocityInput, turnInput);
@@ -190,19 +196,18 @@ public class PilotController {
      * Controls all pilot controlled systems
      */
     public void controlDriveTrainPeriodic() {
-        //if the b button is pressed, lock onto the high target
-        if (m_controller.getBButton()) {
-            m_limelightTargeting.target();
+        //prevents the PilotController from targeting while the copilot is targeting
+        if (is_currently_targeting) {
+            return;
         }
-        //when the b button isn't pressed, run the drive train as normal
-        else {
-            //runs our drivetrain based on control scheme passed in
-            if (m_driveType == DriveType.kArcade) {
-                arcadeDrive();
-            }
-            else if (m_driveType == DriveType.kTank) {
-                tankDrive();
-            }
+
+        m_limelight.getTable().getEntry("pipeline").setDouble(3);
+        //runs our drivetrain based on control scheme passed in
+        if (m_driveType == DriveType.kArcade) {
+            arcadeDrive();
+        }
+        else if (m_driveType == DriveType.kTank) {
+            tankDrive();
         }
 
         //Controls shifting the gears off of the x and y buttons

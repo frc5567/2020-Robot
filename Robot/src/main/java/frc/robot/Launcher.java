@@ -1,10 +1,10 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -55,7 +55,6 @@ public class Launcher {
         m_farSlaveMotor2 = farSlaveMotor2;
 
         //Sets the far motors to be inverted so that they don't work against the close ones
-        //TODO: Inversion MUST be checked individually prior to testing
         m_farSlaveMotor1.setInverted(RobotMap.LAUNCHER_FAR_SLAVE1_INVERTED);
         m_farSlaveMotor2.setInverted(RobotMap.LAUNCHER_FAR_SLAVE2_INVERTED);
 
@@ -123,11 +122,11 @@ public class Launcher {
     public void setVelocity(double velocity) {
         //set the velocity of the motors
         m_masterMotor.set(ControlMode.Velocity, velocity);
-
+        
         //set our slave motors to follow master
-        m_closeSlaveMotor.follow(m_masterMotor);
-        m_farSlaveMotor1.follow(m_masterMotor);
-        m_farSlaveMotor2.follow(m_masterMotor);
+        m_closeSlaveMotor.follow(m_masterMotor, FollowerType.PercentOutput);
+        m_farSlaveMotor1.follow(m_masterMotor, FollowerType.PercentOutput);
+        m_farSlaveMotor2.follow(m_masterMotor, FollowerType.PercentOutput);
     }
 
     /**
@@ -162,7 +161,10 @@ public class Launcher {
     private void configVelocityControl() {
         //config remote sensors
         //sets the sensor to be a quad encoder, sets our feedback device to be that sensor
-        m_masterMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
+        m_masterMotor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative, RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+
+        //zero the encoders on every init
+        zeroEncoder();
 
         //sets whether our motor is inverted
         //this is currently false but can be switched based on testing
@@ -173,16 +175,15 @@ public class Launcher {
         m_masterMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, RobotMap.LAUNCHER_FEEDBACK_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //this configs the deadband for the PID output. Any output with an absolute value less than this will be treated as zero
-        m_masterMotor.configNeutralDeadband(RobotMap.LAUNCHER_NEUTRAL_DEADBAND, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        m_masterMotor.configNeutralDeadband(0, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //this sets the peak output for our motor controller.
         m_masterMotor.configPeakOutputForward(RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
         //this does the same thing but for the reverse direction
-        m_masterMotor.configPeakOutputReverse(-RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
+        m_masterMotor.configPeakOutputReverse(0, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
         
         //sets the period of the velocity sample
         //effectively this defines the amount of time used to calculate the velocity
-        //TODO: this selection is currrently arbitrary
         m_masterMotor.configVelocityMeasurementPeriod(RobotMap.VELOCITY_MEASUREMENT_PERIOD, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //Sets the number of samples used in the rolling average for calculating velocity
@@ -201,7 +202,6 @@ public class Launcher {
         m_masterMotor.config_IntegralZone(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_I_ZONE, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //sets the max output of the motor specifically within closed loop control
-        //TODO: this is likely redundant, but the values can be set to seperate if needed in testing
         m_masterMotor.configClosedLoopPeakOutput(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_PID_PEAK_OUTPUT, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
         //this configures an allowable error in closed loop control
@@ -212,6 +212,10 @@ public class Launcher {
         //should be increased if the can bus is haveing issues
         m_masterMotor.configClosedLoopPeriod(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_CLOSED_LOOP_PERIOD_MS, RobotMap.LAUNCHER_CONFIG_TIMEOUT_MS);
 
+        //configures ramp speed
+        m_masterMotor.configOpenloopRamp(RobotMap.LAUNCHER_OPEN_LOOP_RAMP_TIME_S);
+        m_masterMotor.configClosedloopRamp(0);
+
         //sets our closed loop control to use our primary PID slot
         m_masterMotor.selectProfileSlot(RobotMap.PID_PRIMARY_SLOT, 0);
     }
@@ -221,7 +225,7 @@ public class Launcher {
      * 
      * @return the motor used to drive the launcher
      */
-    public BaseMotorController getMasterMotor() {
+    public TalonSRX getMasterMotor() {
         return m_masterMotor;
     }
 
@@ -230,6 +234,13 @@ public class Launcher {
      */
     public double getCurrentSpeed() {
         return m_currentSpeed;
+    }
+
+    /**
+     * Zeros the selected encoder
+     */
+    public void zeroEncoder() {
+        m_masterMotor.setSelectedSensorPosition(0);
     }
 
     /**
@@ -254,5 +265,29 @@ public class Launcher {
     public String toString() {
         return "Motor ID: " + m_masterMotor.getDeviceID() + ", Motor Inversion: " + m_masterMotor.getInverted()
         + ", Current Output (percent): " + m_masterMotor.getMotorOutputPercent()+ " | Encoder Position: "+ m_encoder.getQuadraturePosition();
+    }
+
+    /**
+     * Sets PIDF values to based on passed in parameters
+     * @param p Proportionality Constant
+     * @param i Integral Constant
+     * @param d Derivative Constant
+     * @param f Feed-Forward Constant
+     */
+    public void configPIDF(double p, double i, double d, double f) {
+        m_masterMotor.config_kP(RobotMap.PID_PRIMARY_SLOT, p);
+        m_masterMotor.config_kI(RobotMap.PID_PRIMARY_SLOT, i);
+        m_masterMotor.config_kD(RobotMap.PID_PRIMARY_SLOT, d);
+        m_masterMotor.config_kF(RobotMap.PID_PRIMARY_SLOT, f);
+    }
+
+    /**
+     * Resets PIDF values to their RobotMap constants
+     */
+    public void resetPIDF() {
+        m_masterMotor.config_kP(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_P);
+        m_masterMotor.config_kI(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_I);
+        m_masterMotor.config_kD(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_D);
+        m_masterMotor.config_kF(RobotMap.PID_PRIMARY_SLOT, RobotMap.LAUNCHER_F);
     }
 }

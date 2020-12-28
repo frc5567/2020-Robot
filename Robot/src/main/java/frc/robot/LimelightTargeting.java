@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
  * This class should be used to center our robot on the high target.
@@ -15,7 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  * @author Josh Overbeek
  * @version 2/1/2020
  */
-public class LimelightTargeting {
+public class LimelightTargeting implements ShuffleboardEnabled {
     //Declare our drivetrain, limelight, and PID controller
     private Drivetrain m_drivetrain;
     private LimelightReader m_limelight;
@@ -72,11 +73,28 @@ public class LimelightTargeting {
             //Passes in a speed of zero to keep us from moving, and sets the turn speed to the calculated output of the PID
             //The calculate methods passes in our measurement in degrees from the limelight as our offset and sets our setpoint to zero degrees
             //This way the PID controller should target dead center
-            m_drivetrain.arcadeDrive(0, m_targetController.calculate(m_limelight.getModifiedDegreesToTarget(), 0) );
+
+            //read the degrees to target, inverted as to make it match what we expect
+            double degToTarget = -m_limelight.getRawDegreesToTarget();
+
+            //clamp the turn, and sclae it back by 45 to match our max expected change
+            double turn = MathUtil.clamp((m_targetController.calculate(degToTarget, 0) /45), -1, 1);
+            
+            //add a floor to the turn to create a minimal adjustment
+            //this allows us to prevent i-induced oscillations while still having fine control at low degree turns
+            if (Math.abs(turn) > 0.01 && Math.abs(turn) < 0.05) {
+                turn = Math.copySign(0.05, turn);
+            }
+
+            //feed the turn into the arcade drive
+            m_drivetrain.arcadeDrive(0, turn);
+
+            //returns whether the PID believes that we are on target
+            return onTarget();
         }
 
-        //returns whether the PID believes that we are on target
-        return onTarget();
+        //always return false if we don't see a target
+        return false;
     }
 
     /**
@@ -103,6 +121,12 @@ public class LimelightTargeting {
         m_targetController.setPID(m_pEntry.getDouble(RobotMap.TARGETING_P), m_iEntry.getDouble(RobotMap.TARGETING_I), m_dEntry.getDouble(RobotMap.TARGETING_D));
     }
 
+    public void getPID_Values(){
+        System.out.printf("P:%f\tI:%f\tD:%f\t\n",m_targetController.getP(),
+        m_targetController.getI(),m_targetController.getD());
+        return ;
+    }
+
     /**
      * Reset the PID to RobotMap constants
      * <p>This should be called every time we disable
@@ -111,29 +135,33 @@ public class LimelightTargeting {
         m_targetController.setPID(RobotMap.TARGETING_P, RobotMap.TARGETING_I, RobotMap.TARGETING_D);
     }
 
+    public void resetError() {
+        m_targetController.reset();
+    }
+
     /**
      * instantiates all of our network table entries and displays them under the targeting tab
      */
-    private void shuffleboardConfig() {
+    public void shuffleboardConfig() {
         //creates a tab on the shuffleboard for all our targeting needs
         m_targetingTab = Shuffleboard.getTab("Targeting");
-
+        
         //creates a persistent widget as text for setting P constant
         m_pEntry = m_targetingTab.addPersistent("P", RobotMap.TARGETING_P)       //creates widget with the robotmap constant as a default
                                  .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
-                                 .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                 .withProperties(Map.of("min", -1000, "max", 100.0))   //sets min and max values
                                  .getEntry();   
         
         //creates a persistent widget as text for setting I constant
         m_iEntry = m_targetingTab.addPersistent("I", RobotMap.TARGETING_I)       //creates widget with the robotmap constant as a default
                                  .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
-                                 .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                 .withProperties(Map.of("min",-1000, "max", 100.0))   //sets min and max values
                                  .getEntry();   
 
         //creates a persistent widget as text for setting D constant
         m_dEntry = m_targetingTab.addPersistent("D", RobotMap.TARGETING_D)       //creates widget with the robotmap constant as a default
                                  .withWidget(BuiltInWidgets.kTextView)           //sets widget to a text view
-                                 .withProperties(Map.of("min", 0, "max", 1.0))   //sets min and max values
+                                 .withProperties(Map.of("min", -1000, "max", 100.0))   //sets min and max values
                                  .getEntry();  
 
         //create a widget to display whether we are currently on target

@@ -10,13 +10,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.SensorTerm;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 
 /**
@@ -69,9 +64,6 @@ public class Drivetrain {
     //Declares the turn control PID
     private PIDController m_rotController;
 
-    //Delcare variable to determine if two solenoids are being used
-    private final boolean m_hasTwoSolenoids;
-
     // Declare drivetrain motors
     private TalonFX m_masterRightMotor;
     private TalonFX m_masterLeftMotor;
@@ -104,9 +96,6 @@ public class Drivetrain {
         //Instantiates the left and right pistons
         m_leftSolenoid = leftPiston;
         m_rightSolenoid = rightPiston;
-
-        //Instantiates the boolean to determine if there are two solenoids
-        m_hasTwoSolenoids = hasTwoSolenoids;
 
         // Initializes classes to call encoders connected to TalonFXs
         m_leftDriveEncoder = new SensorCollection(m_masterLeftMotor);
@@ -150,9 +139,6 @@ public class Drivetrain {
         //instantiate the gyro for rotation control
         m_gyro = new NavX(SerialPort.Port.kMXP);
 
-        //Instantiates the boolean to determine if there are two solenoids
-        m_hasTwoSolenoids = hasTwoSolenoids;
-
         //Initializes rotate PID controller with the PIDF constants
         configRotatePID();
 
@@ -163,13 +149,12 @@ public class Drivetrain {
         m_gear = Gear.kUnknown; 
     }
 
-    /**TODO: these methods need to be condensed
-     * Sets the drive gear using our pistons. 
-     * This is private so that it can never be called by an outside class to prevent confusion
-     * @param value The value to give to the pistons where kOff removes pressure, kForward is _ gear, and kReverse is _ gear
+    /**
+     * Zeros the drive encoders
      */
-    private void setPiston(DoubleSolenoid.Value value) {
-        m_leftSolenoid.set(value);
+    public void zeroEncoders() {
+        m_leftDriveEncoder.setQuadraturePosition(0, RobotMap.TIMEOUT_MS);
+        m_rightDriveEncoder.setQuadraturePosition(0, RobotMap.TIMEOUT_MS);
     }
 
     /**
@@ -425,43 +410,9 @@ public class Drivetrain {
         //Configure the left Talon's selected sensor to a Quad encoder
         m_masterLeftMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, RobotMap.PID_PRIMARY_SLOT, RobotMap.TIMEOUT_MS);
 
-        //this is my best guess, in theory the TalonFX selected sensor should be the afore set selected feeback device
-        m_masterRightMotor.configRemoteFeedbackFilter(m_masterLeftMotor.getBaseID(), RemoteSensorSource.TalonSRX_SelectedSensor, 1, RobotMap.TIMEOUT_MS);
-        
-        // Setup Sum Signal to be used for Distance
-        //Feedback Device of Remote Talon
-        m_masterRightMotor.configSensorTerm(SensorTerm.Sum0, FeedbackDevice.RemoteSensor1, RobotMap.TIMEOUT_MS);
-
-        //TODO:These need to be integrated sensors, not quad encoders
-        //Quadrature Encoder of current Talon
-        m_masterRightMotor.configSensorTerm(SensorTerm.Sum1, FeedbackDevice.QuadEncoder, RobotMap.TIMEOUT_MS);
-
-        // Setup Difference signal to be used for turn
-        m_masterRightMotor.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.RemoteSensor1, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.configSensorTerm(SensorTerm.Diff0, FeedbackDevice.QuadEncoder, RobotMap.TIMEOUT_MS);
-
-        //Configure sum [Sum of both QuadEncoders] to be used for Primary PID Index
-        m_masterRightMotor.configSelectedFeedbackSensor(FeedbackDevice.SensorSum, 0, RobotMap.TIMEOUT_MS);
-
-        //Scale Feedback by 0.5 to half the sum of Distance
-        m_masterRightMotor.configSelectedFeedbackCoefficient(RobotMap.SCALE_FEEDBACK_COEFFICIENT_VALUE, 0, RobotMap.TIMEOUT_MS);
-
-        //Configure Difference [Difference between both QuadEncoders] to be used for Aukiliary PID Index
-        m_masterRightMotor.configSelectedFeedbackSensor(FeedbackDevice.SensorDifference, 1, RobotMap.TIMEOUT_MS);
-
-        //Don't scale the Feedback Sensor (use 1 for 1:1 ration)
-        m_masterRightMotor.configSelectedFeedbackCoefficient(RobotMap.UNSCALED_FEEDBACK_COEFFICIENT_VALUE, 1, RobotMap.TIMEOUT_MS);
-
         m_masterRightMotor.setSelectedSensorPosition(0, 0, RobotMap.TIMEOUT_MS);
         m_masterRightMotor.setSelectedSensorPosition(0, 1, RobotMap.TIMEOUT_MS);
         m_masterLeftMotor.setSelectedSensorPosition(0);
-
-        //Set status frame periods to ensure we don't have stale data. 20 and 5 are time in ms
-        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, RobotMap.RIGHT_PERIOD_MS, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, RobotMap.RIGHT_PERIOD_MS, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, RobotMap.RIGHT_PERIOD_MS, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.setStatusFramePeriod(StatusFrame.Status_10_Targets, RobotMap.RIGHT_PERIOD_MS, RobotMap.TIMEOUT_MS);
-        m_masterLeftMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, RobotMap.LEFT_PERIOD_MS, RobotMap.TIMEOUT_MS);
 
         //Configure neutral deadband
         m_masterRightMotor.configNeutralDeadband(RobotMap.PERCENT_DEADBAND, RobotMap.TIMEOUT_MS);
@@ -477,44 +428,10 @@ public class Drivetrain {
         m_masterRightMotor.configPeakOutputForward(+RobotMap.PEAK_OUTPUT, RobotMap.TIMEOUT_MS);
         m_masterRightMotor.configPeakOutputReverse(-RobotMap.PEAK_OUTPUT, RobotMap.TIMEOUT_MS);
 
-        //motion magic config
-        m_masterRightMotor.configMotionAcceleration(RobotMap.DRIVE_ACCEL, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.configMotionCruiseVelocity(RobotMap.DRIVE_CRUISE_SPEED, RobotMap.TIMEOUT_MS);
-
-        //FPID Gains for velocity servo
-        m_masterRightMotor.config_kP(0, RobotMap.DRIVETRAIN_GAINS.kP, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.config_kI(0, RobotMap.DRIVETRAIN_GAINS.kI, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.config_kD(0, RobotMap.DRIVETRAIN_GAINS.kD, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.config_kF(0, RobotMap.DRIVETRAIN_GAINS.kF, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.config_IntegralZone(0, RobotMap.DRIVETRAIN_GAINS.kIzone, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.configClosedLoopPeakOutput(0, RobotMap.DRIVETRAIN_GAINS.kPeakOutput, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.configAllowableClosedloopError(0, RobotMap.ALLOWABLE_CLOSED_LOOP_ERROR, RobotMap.TIMEOUT_MS);
-
-        //FPID Gains for turn servo
-        m_masterRightMotor.config_kP(1, RobotMap.GAINS_TURNING.kP, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.config_kI(1, RobotMap.GAINS_TURNING.kI, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.config_kD(1, RobotMap.GAINS_TURNING.kD, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.config_kF(1, RobotMap.GAINS_TURNING.kF, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.config_IntegralZone(1, RobotMap.GAINS_TURNING.kIzone, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.configClosedLoopPeakOutput(1, RobotMap.GAINS_TURNING.kPeakOutput, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.configAllowableClosedloopError(1, RobotMap.ALLOWABLE_CLOSED_LOOP_ERROR, RobotMap.TIMEOUT_MS);
-
         m_masterRightMotor.configClosedLoopPeriod(0, RobotMap.LOOP_TIME_MS, RobotMap.TIMEOUT_MS);
-        m_masterRightMotor.configClosedLoopPeriod(1, RobotMap.LOOP_TIME_MS, RobotMap.TIMEOUT_MS);
-
-        //Sets the status frame period to 10ms
-        m_masterRightMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, RobotMap.PERIOD_MS);
-
-        /**
-         * false means talon's local output is PID0 + PID1, and other side Talon is PID0 - PID1
-         * 
-         * if it was true, the talon's local outpu is PID0 - PID1, and other side Talon is PID0 + PID1
-         */
-        m_masterRightMotor.configAuxPIDPolarity(false, RobotMap.TIMEOUT_MS);
 
         //sets profile slot for PID
         m_masterRightMotor.selectProfileSlot(0, 0);
-        m_masterRightMotor.selectProfileSlot(1, 1);
     }
 
     public void setNeutralMode(NeutralMode neutralMode) {

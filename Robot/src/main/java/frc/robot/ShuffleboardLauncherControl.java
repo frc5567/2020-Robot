@@ -20,6 +20,12 @@ public class ShuffleboardLauncherControl {
     private Launcher m_launcher;
     private NetworkTableEntry m_percentTarget;
     private NetworkTableEntry m_angularVelocityTarget;
+
+    private NetworkTableEntry m_pLaunch;
+    private NetworkTableEntry m_iLaunch;
+    private NetworkTableEntry m_dLaunch;
+    private NetworkTableEntry m_fLaunch;
+    NetworkTableEntry m_currentVel;
     
     /**
      * Constructor for ShuffleboardShooterControl objects
@@ -45,6 +51,27 @@ public class ShuffleboardLauncherControl {
                               .withWidget(BuiltInWidgets.kTextView)                             //sets widget to a text view
                               .withProperties(Map.of("min", -10000.0, "max", 10000.0))          //sets min and max values
                               .getEntry();                                                      //retrieves the entry to assign our setpoint
+
+        m_pLaunch = m_launcherTab.addPersistent("P", 0.0)
+                                 .withWidget(BuiltInWidgets.kTextView)
+                                 .getEntry();
+
+        m_iLaunch = m_launcherTab.addPersistent("I", 0.0)
+                                 .withWidget(BuiltInWidgets.kTextView)
+                                 .getEntry();
+
+        m_dLaunch = m_launcherTab.addPersistent("D", 0.0)
+                                 .withWidget(BuiltInWidgets.kTextView)
+                                 .getEntry();
+
+        m_fLaunch = m_launcherTab.addPersistent("F", 0.0)
+                                 .withWidget(BuiltInWidgets.kTextView)
+                                 .getEntry();
+
+        m_currentVel = m_launcherTab.addPersistent("Current Velocity", 0.0)
+                                    .withWidget(BuiltInWidgets.kTextView)
+                                    .getEntry();
+
     }
 
     /**
@@ -56,7 +83,7 @@ public class ShuffleboardLauncherControl {
         double tempSpeed = m_percentTarget.getDouble(0.0);
 
         //runs the proportional control system based on the aquired speed
-        m_launcher.proportionalSpeedSetter(tempSpeed);
+        m_launcher.setMotor(tempSpeed);
     }
 
     /**
@@ -68,18 +95,39 @@ public class ShuffleboardLauncherControl {
         //assigns the speed based on the shuffleboard with a default value of zero
         double tempVelocity = m_angularVelocityTarget.getDouble(0.0);
 
-        //divide imput by 600 to convert from rpm to rev per 100ms
-        tempVelocity /= 600;
+        //Convert inputted velocity in rpm to raw units per 100 ms
+        tempVelocity *= RobotMap.RPM_TO_UNITS_PER_100MS;
 
         //runs the proportional control system based on the aquired speed
         m_launcher.setVelocity(tempVelocity);
     }
 
     /**
+     * Sets PIDF values based on shuffleboard values
+     */
+    public void setPIDF() {
+        m_launcher.configPIDF(m_pLaunch.getDouble(0), m_iLaunch.getDouble(0), m_dLaunch.getDouble(0), m_fLaunch.getDouble(0));
+    }
+
+    /**
+     * Resets PIDF values to RobotMap constants
+     */
+    public void resetPIDF() {
+        m_launcher.resetPIDF();
+    }
+
+    /**
+     * This method publishes all requested data to shuffleboard widgets
+     * <p> This currently holds velocity in RPM, but we can put anything we want here
+     */
+    public void publishData() {
+        m_currentVel.setDouble(m_launcher.getMasterMotor().getSelectedSensorVelocity(0) / RobotMap.RPM_TO_UNITS_PER_100MS);
+    }
+
+    /**
      * Sets the setpoint to zero, should be used as a default state
      */
     public void zeroSpeed() {
-        m_launcher.proportionalSpeedSetter(0.0);
+        m_launcher.setMotor(0.0);
     }
-
 }

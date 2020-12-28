@@ -22,9 +22,22 @@ public class RobotMap {
     /**the deadband on our controller sticks, used to prevent drift*/
     public static final double PILOT_CONTROLLER_STICK_DEADBAND = 0.08;
 
-    //The intake motor speeds, for the inner and outer motors, used in the PilotController class
-    public static final double COPILOT_CONTROLLER_INNER_INTAKE_SPEED = 0.3;
-    public static final double COPILOT_CONTROLLER_OUTER_INTAKE_SPEED = 0.3;
+    /** A storage class to put all of the gamepad button IDs in the same spot */
+    static final class GAMEPAD_BUTTON_ID
+    {
+        public static final int CLIMB_UP = 2;
+		public static final int CLIMB_DOWN = 3;
+		public static final int WINCH = 1;
+		public static final int MOVE_MAGAZINE_DOWN = 4;
+		public static final int MOVE_MAGAZINE_LAUNCH = 5;
+		public static final int LAUNCHER_AND_MAGAZINE = 7;
+		public static final int REV_LAUNCHER = 7;
+		public static final int ENABLE_INTAKE = 8;
+		public static final int DISABLE_INTAKE = 9;
+		public static final int DUMP_BALLS = 12;
+		public static final int COLOR_WHEEL_COLOR = 11;
+		public static final int COLOR_WHEEL_DISTANCE = 10;
+    }
 
     //****************************************
     //*                                      *
@@ -54,7 +67,6 @@ public class RobotMap {
      */
     public static final double PID_INPUT_RANGE = 180.00;
 
-    //TODO: Arbitrary
     /**The cap on the I output, which helps to prevent crazy oscillation */
     public static final double ROTATE_PID_INTEGRATOR_RANGE = 0.10;
 
@@ -71,9 +83,6 @@ public class RobotMap {
     public static final int RIGHT_PERIOD_MS = 20;
     /**The timeout for the status frame config methods particular to the left side */
     public static final int LEFT_PERIOD_MS = 5;
-
-    /**The slow auto speed used in autonomous movement. TODO: decide if we are keeping this */
-    public static final double AUTO_SPEED = 0.2;
 
     /**The deadband in percent output for the motor. Any value less than this is treated as zero */
     public static final double PERCENT_DEADBAND = 0.001;
@@ -96,10 +105,10 @@ public class RobotMap {
     public static final int PERIOD_MS = 10;
 
     //the time it takes the drive train to ramp to full speed in open loop control in seconds
-    public static final double DRIVE_RAMP_TIME = 0.5;
+    public static final double DRIVE_RAMP_TIME = 1.0;
 
-    //TODO:the 6 has to be changed to the diameter of our wheels, in addition, we need to account for gearing
-    public static final double DRIVE_TICS_PER_INCH = (2048 / (6*Math.PI));
+    //TODO:Does not account for gearing
+    public static final double DRIVE_TICS_PER_INCH = (2048 / (6.25*Math.PI));
 
     //the total number of encoder ticks in a rotate----TODO: Check to see if this is the correct number
     public static final double STARTING_TICK_VALUE = 1440;
@@ -110,11 +119,11 @@ public class RobotMap {
     public static final int SLAVE_LEFT_FALCON_ID = 13;
     public static final int SLAVE_RIGHT_FALCON_ID = 14;
 
-    //solenoid ports
-    public static final int LEFT_SOLENOID_FORWARD_PORT = 0;
-    public static final int LEFT_SOLENOID_REVERSE_PORT = 1;
+    //solenoid ports TODO: Make one solenoid based on RIGHT
+    public static final int LEFT_SOLENOID_FORWARD_PORT = 4;
+    public static final int LEFT_SOLENOID_REVERSE_PORT = 5;
     public static final int RIGHT_SOLENOID_FORWARD_PORT = 2;
-    public static final int RIGHT_SOLENOID_REVERSE_PORT = 3;
+    public static final int RIGHT_SOLENOID_REVERSE_PORT = 1;
 
 
     //****************************************
@@ -123,14 +132,12 @@ public class RobotMap {
     //*                                      *
     //****************************************
     //launcher PID constants for velocity control
-    //to be set later
-    public static final double LAUNCHER_P = 0;
+    public static final double LAUNCHER_P = 1.0;
     public static final double LAUNCHER_I = 0;
-    public static final double LAUNCHER_D = 0;
-    public static final double LAUNCHER_F = 0;
+    public static final double LAUNCHER_D = 0.1;
+    public static final double LAUNCHER_F = .27;
 
-    //600 is minutes to 100ms,
-    //3010.56 is our calculated raw sensor units per revolution on the output shaft
+    //600 is minutes to 100ms, 2048 is revs to sensor ticks
     public static final double RPM_TO_UNITS_PER_100MS = 2048.0 / 600;
 
     //Calculated free spin angular velocity of our shooter based on specs (-10%) divided by three for gear reduction
@@ -151,13 +158,15 @@ public class RobotMap {
 	public static final boolean LAUNCHER_MASTER_INVERTED = false;
 
     //inversion for far slave motors
-    //TODO: one of these should be inverted based on testing, currently unsure which one
-    public static final boolean LAUNCHER_FAR_SLAVE1_INVERTED = true;
+    //The far slave motor 1 was inverted at manufacturing, so it needs to not be inverted
+    public static final boolean LAUNCHER_FAR_SLAVE1_INVERTED = false;
     public static final boolean LAUNCHER_FAR_SLAVE2_INVERTED = true;
 
     //adjustment value for the launcher percent control
     //0.5 is pretty arbitrary, it is the value that was used for initial launcher testing
-	public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
+    public static final double LAUNCHER_ADJUSTMENT_VALUE = 0.5;
+    
+    public static final double LAUNCHER_HOLDING_SPEED = 0.5;
     
     //the measurement period for calculating velocity off of the encoder
 	public static final VelocityMeasPeriod VELOCITY_MEASUREMENT_PERIOD = VelocityMeasPeriod.Period_10Ms;
@@ -172,7 +181,7 @@ public class RobotMap {
     public static final double LAUNCHER_NEUTRAL_DEADBAND = 0.04;
 
     //the peak output on our launcher PID
-    public static final double LAUNCHER_PID_PEAK_OUTPUT = 1.0;
+    public static final double LAUNCHER_PID_PEAK_OUTPUT = 0.9;
 
     //the number of samples use in rolling average. Valid values are 1,2,4,8,16,32. If another value is specified, it will truncate to nearest support value.
     //this number is currently arbitrary
@@ -180,13 +189,14 @@ public class RobotMap {
 
     //the acceptable integral zone for the launch master motor
     //100 is the value used last year, this should be adjusted in testing if need be
-    public static final int LAUNCHER_I_ZONE = 100;
+    public static final int LAUNCHER_I_ZONE = 1000;
 
     //the acceptable error for the launcher PID. Any error less than this will be treated as zero
-    public static final int LAUNCHER_ACCEPTABLE_ERROR = 0;
+    public static final int LAUNCHER_ACCEPTABLE_ERROR = 50;
 
     //the closed loop period for the launcher PID
     public static final int LAUNCHER_CLOSED_LOOP_PERIOD_MS = 10; 
+    public static final int LAUNCHER_OPEN_LOOP_RAMP_TIME_S = 3;
 
     //****************************************
     //*                                      *
@@ -196,13 +206,16 @@ public class RobotMap {
     /**The CAN ID for the extension motor */
     public static final int EXTENSION_MOTOR_ID = 27;
     /**The PWM port for the winch or lift motor */
-    public static final int LIFT_MOTOR_PORT = 1;
+    public static final int LIFT_MOTOR_PORT = 3;
 
     /**The adjustment value for the proportionality constant for the lift motor */
     public static final double CLIMBER_ADJUSTMENT_VALUE = 0.5;
 
-    //the encoder target of for the extension motor. TODO: Input an actual value here
-    public static final int CLIMBER_EXTENSION_ENCODER_TARGET = 0;
+    //the encoder target of for the extension motor.
+    public static final int CLIMBER_EXTENSION_ENCODER_TARGET = 29600;
+    public static final int CLIMBER_EXTENSION_HARD_LIMIT = 29200;
+
+    public static final int CLIMBER_MIN_EXTENSION = 500;
 
     //the climber timeout for running confing methods
     public static final int CLIMBER_CONFIG_TIMEOUT_MS = 30;
@@ -211,29 +224,33 @@ public class RobotMap {
     public static final int CLIMBER_FEEDBACK_PERIOD_MS = 10;
 
     //the neutral deadband for our climber PIDs
-    public static final double CLIMBER_NEUTRAL_DEADBAND = 0.04;
+    public static final double CLIMBER_NEUTRAL_DEADBAND = 0.02;
 
     //the peak output on our climber PIDs
     public static final double CLIMBER_PID_PEAK_OUTPUT = 1.0;
 
     //the acceleration for the climber in units per 100ms per second
     //1000 is half the value for the elevator last year, this needs to be tuned via testing
-    public static final int CLIMBER_MOTION_MAGIC_ACCEL = 1000;
+    public static final int CLIMBER_MOTION_MAGIC_ACCEL = 2000;
 
     //the cruise velocity for the climber in units per second
     //1000 is half the value for the elevator last year, this needs to be tuned via testing
-    public static final int CLIMBER_MOTION_MAGIC_CRUISE_VELOCITY = 1000;
+    public static final int CLIMBER_MOTION_MAGIC_CRUISE_VELOCITY = 2000;
 
     //the PIDF values for the extension motor on the climber
     //these values are temporary and should be tuned through testing
-    public static final double CLIMBER_EXTENSION_P = 0;
-    public static final double CLIMBER_EXTENSION_I = 0;
+    public static final double CLIMBER_EXTENSION_P = 0.4;
+    public static final double CLIMBER_EXTENSION_I = 0.01;
     public static final double CLIMBER_EXTENSION_D = 0;
-    public static final double CLIMBER_EXTENSION_F = 0;
+    public static final double CLIMBER_EXTENSION_F = 0.05;
+
+    public static final double CLIMBER_EXTENSION_MANUAL_SPEED = 0.4;
+    public static final double CLIMBER_WINCH_SPEED = 0.5;
+    public static final double CLIMBER_REDUCED_SPEED = 0.125;
 
     //the acceptable integral zone for the extension motor
     //100 is the value used last year, this should be adjusted in testing if need be
-    public static final int CLIMBER_EXTENSION_I_ZONE = 100;
+    public static final int CLIMBER_EXTENSION_I_ZONE = 600;
 
     //the acceptable error for the extension PID. Any error less than this will be treated as zero
     public static final int CLIMBER_EXTENSION_ACCEPTABLE_ERROR = 0;
@@ -247,20 +264,22 @@ public class RobotMap {
     //*                                      *
     //****************************************
     //the PWM port for the outer motor - this is on PWM to reduce CAN traffic
-    public static final int INTAKE_PWM_SPARK_PORT = 0;
+    public static final int INTAKE_PWM_SPARK_PORT = 2;
+    public static final int INTAKE_INNER_MOTOR_PORT = 1;
+
+    //inversion for our intake motors
+    public static final boolean OUTER_INTAKE_INVERTED = true;
+    public static final boolean INNER_INTAKE_INVERTED = true;
+
+    public static final double OUTER_INTAKE_SPEED = 0.8;
+    public static final double INNER_INTAKE_SPEED = 0.3;
 
     //the ports for the intake position piston
-    public static final int INTAKE_POSITION_PISTON_FORWARD_PORT = 4;
-    public static final int INTAKE_POSITION_PISTON_REVERSE_PORT = 5;
-
-    /**The CAN ID for the inner intake motor */
-    public static final int INTAKE_VICTOR_ID = 16;
+    public static final int INTAKE_POSITION_PISTON_FORWARD_PORT = 0;
+    public static final int INTAKE_POSITION_PISTON_REVERSE_PORT = 3;
 
     //the ramp time in seconds from zero to full speed for the intake motor
     public static final double INTAKE_OPEN_LOOP_RAMP_TIME_S = 0.75;
-
-    //The maximum number of ticks that the encoder has------The number of ticks might not be correct:double check
-    public static final double MAX_ENCODER_TICKS = 22;
 
     //****************************************
     //*                                      *
@@ -277,35 +296,36 @@ public class RobotMap {
     //****************************************
     /**Height of the vision target in inches */
     public static final double TARGET_HEIGHT_INCHES = 98.25;
-    /**Height of the limelight lense in inches TODO: Finalized when robot is set */
-    public static final double CAMERA_HEIGHT_INCHES = 45d;
+    /**Height of the limelight lense in inches */
+    public static final double CAMERA_HEIGHT_INCHES = 43.4;
     /**The difference between the camera height and the target height */
     public static final double NET_HEIGHT_INCHES = RobotMap.TARGET_HEIGHT_INCHES - RobotMap.CAMERA_HEIGHT_INCHES;
 
+    public static final double CAMERA_DEGREES_FROM_GROUND = 14.4;
     /**
      * This is the offset we make for inner target - 
      * we multiply this by our actual offset to change our targeting 
      * <p> TODO:Needs to be tested and tuned
      */
-    public static final double OFFSET_TARGET_DEGREES = 0.8;
+    public static final double OFFSET_TARGET_DEGREES = 5.5;
 
     //This is the range on either side in degrees where we can still hit the inner target
     public static final double INNER_TARGET_DEGREES = 4.5;
 
     //PID values for targeting the vision target
-    //TODO: These values are temporary and need to be updated in testing
-    public static final double TARGETING_P = 0;
-    public static final double TARGETING_I = 0;
-    public static final double TARGETING_D = 0;
+    public static final double TARGETING_P = 0.55;
+    public static final double TARGETING_I = 0.002;
+    public static final double TARGETING_D = 0.75;
 
     //the period between controller updates in seconds
-    public static final double TARGETING_PERIOD_S = 20;
+    //this is used for the calculation of the velocity error and the total error - i and d
+    public static final double TARGETING_PERIOD_S = 2;
 
     //the maximum accumulated error for the Integral portion of our targeting PID
-    public static final double TARGETING_MAX_ACCUMULATED_ERROR = 0;
+    public static final double TARGETING_MAX_ACCUMULATED_ERROR = 2;
 
     //the acceptable error for our vision targeting in degrees
-    public static final double TARGETING_ERROR_TOLERANCE = 0;
+    public static final double TARGETING_ERROR_TOLERANCE = 1.0;
 
     //****************************************
     //*                                      *
@@ -313,13 +333,17 @@ public class RobotMap {
     //*                                      *
     //****************************************
     /**The CAN ID for the motor driving the magazine */
-    public static final int MAGAZINE_MOTOR_PORT = 26;
+    public static final int MAGAZINE_MOTOR_PORT = 30;
 
     /**The DIO port for the photoelectric sensor mounted near the intake */
-    public static final int MAGAZINE_IN_SENSOR_PORT = 0;
+    public static final int MAGAZINE_IN_SENSOR_PORT = 7;
 
     /**The DIO port for the photoelectric sensor mounted near the launcher */
-    public static final int MAGAZINE_OUT_SENSOR_PORT = 1;
+    public static final int MAGAZINE_OUT_SENSOR_PORT = 8;
+
+    public static final double MAGAZINE_INTAKE_SPEED = 0.65;
+    public static final double MAGAZINE_LAUNCH_SPEED = 0.65;
+    public static final double MAGAZINE_DUMP_SPEED = -0.45;
 
     //****************************************
     //*                                      *
@@ -327,8 +351,6 @@ public class RobotMap {
     //*                                      *
     //****************************************
     public static final int PCM_CAN_ID = 20;
-    /**TODO:This number is arbitrary and should be removed or changed based on how we index */
-    public static final int CYCLES_TO_MOVE_BALL_ONE_POSITION = 30;
     
     /**
      * The primary slot for a CTRE PID controller. This slot controlls the main motion of the system, 

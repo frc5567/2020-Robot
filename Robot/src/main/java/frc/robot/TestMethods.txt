@@ -1,0 +1,100 @@
+
+  /**
+   * Call this during test periodic for climber testing
+   * <p> Controls climber manually (for now)
+   */
+  public void periodicClimberTest() {
+    int extensionCurrent = m_climber.getExtensionMotor().getSelectedSensorPosition();
+
+    if((extensionCurrent < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) && m_testController.getAButton()) {
+      m_climber.setExtensionSpeed(RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
+    }
+    else if ((extensionCurrent > 0) && m_testController.getBButton()) {
+      m_climber.setExtensionSpeed(-RobotMap.CLIMBER_EXTENSION_MANUAL_SPEED);
+    }
+    else if ((extensionCurrent < RobotMap.CLIMBER_EXTENSION_HARD_LIMIT) && m_testController.getBumper(Hand.kRight)) {
+      m_climber.extendClimber();
+    }
+    else if ((extensionCurrent > 0) && m_testController.getBumper(Hand.kLeft)) {
+      m_climber.retractClimber();
+    } 
+    else {
+      m_climber.zeroExtensionMotor();
+    }
+
+    if(m_testController.getXButton()) {
+      m_climber.setLiftSpeed(RobotMap.CLIMBER_WINCH_SPEED);
+    }
+    else {
+      m_climber.zeroLiftMotor();
+    }
+
+    if (m_testController.getStartButton()) {
+      m_climber.encoderReset();
+    }
+
+    m_launcherControl.zeroSpeed();
+    m_magazine.runBelt(0);
+    m_intake.setInnerIntakeMotor(0);
+    m_intake.setOuterIntakeMotor(0);
+   // m_climber.zeroLiftMotor();
+    System.out.println("Current Encoder Value: \t" + m_climber.getExtensionMotor().getSelectedSensorPosition());
+  }
+
+  /**
+   * Call this during test periodic for launcher testing
+   * <p> Controls launcher, magazine, and zeros intake
+   */
+  public void periodicLauncherTest() {
+    // runs velocity control while b button is pressed
+    if(m_testController.getYButtonPressed()) {
+      m_launcherControl.setVelocity();
+    }
+    //zeros speed while not actively controlled
+    else if (m_testController.getBButtonPressed()) {
+      m_launcherControl.setPercentSpeed();
+      m_launcherControl.m_currentVel.setDouble(m_launcher.getMasterMotor().getSelectedSensorVelocity() / RobotMap.RPM_TO_UNITS_PER_100MS);
+    }
+    else if (m_testController.getXButtonPressed()) {
+      m_launcherControl.zeroSpeed();
+    }
+    
+    //runs the magazine forward while the right bumper is held, and backward while the left one is
+    if (m_testController2.getXButton()) {
+      m_magazine.sensorBeltControl();
+    }
+    else if (m_testController2.getBumper(Hand.kRight)) {
+        m_magazine.runBelt(RobotMap.MAGAZINE_LAUNCH_SPEED);
+    }
+    else if (m_testController2.getBumper(Hand.kLeft)) {
+        m_magazine.runBelt(-RobotMap.MAGAZINE_LAUNCH_SPEED);
+    }
+    //kills the velocity while not holding
+    else {
+      m_magazine.runBelt(0);
+    }
+
+    if(m_testController2.getStartButtonPressed()) {
+      m_intake.setPosition(Position.kLowered);
+    }
+    else if(m_testController2.getBackButtonPressed()) {
+      m_intake.setPosition(Position.kRaised);
+    }
+
+    m_launcherControl.setPIDF();
+    m_launcherControl.publishData();
+
+    //disable the intake motors while its unused
+    if (m_testController2.getYButton()) {
+      m_intake.setInnerIntakeMotor(RobotMap.INNER_INTAKE_SPEED);
+      m_intake.setOuterIntakeMotor(RobotMap.OUTER_INTAKE_SPEED);
+    } 
+    else if (m_testController2.getAButton()) {
+      m_intake.setInnerIntakeMotor(-RobotMap.INNER_INTAKE_SPEED);
+      m_intake.setOuterIntakeMotor(-RobotMap.OUTER_INTAKE_SPEED);
+    }
+    else {
+      m_intake.setInnerIntakeMotor(0);
+      m_intake.setOuterIntakeMotor(0);
+    }
+  }
